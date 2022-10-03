@@ -9,11 +9,12 @@ public class enemy_control : MonoBehaviour
     public float current_health, previous_health;
     public stats enemy_stat;
     damage_manager damages;
-    GameObject healthbar, greybar;
+    GameObject healthbar, greybar, player;
     Rigidbody2D body;
     public List<GameObject> hit_by;
     void Start()
     {
+        player.GameObject.Find("player");
         hit_by = new List<GameObject>();
         body = gameObject.GetComponent<Rigidbody2D>();
         current_health = enemy_stat.health;
