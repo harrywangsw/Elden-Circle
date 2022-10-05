@@ -10,7 +10,7 @@ public class straight_sword : MonoBehaviour
     public float angul;
     int swing_dir = 1;
     public int swings = 0;
-    public bool attack_order, new_input, attacking;
+    public bool attack_order, new_input, attacking, left;
     Rigidbody2D body;
     damage_manager manager;
     void Start()

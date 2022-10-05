@@ -14,7 +14,7 @@ public unsafe class player_control : MonoBehaviour
     {
         update_weapon();
     }
-    void update_weapon()
+    public void update_weapon()
     {
         string type = rweapon.tag;
         if (type == "straight_sword")
