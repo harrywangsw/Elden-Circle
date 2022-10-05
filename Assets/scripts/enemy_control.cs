@@ -11,7 +11,8 @@ public unsafe class enemy_control : MonoBehaviour
     public bool* pattacking;
     public stats enemy_stat;
     damage_manager damages;
-    GameObject healthbar, greybar, player, rweapon;
+    GameObject healthbar, greybar, player;
+    public GameObject rweapon;
     Rigidbody2D body;
     public List<GameObject> hit_by;
     void Start()
@@ -34,6 +35,7 @@ public unsafe class enemy_control : MonoBehaviour
 
     void Update()
     {
+
         health_bar();
     }
 

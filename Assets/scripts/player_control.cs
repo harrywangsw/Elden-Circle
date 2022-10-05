@@ -5,7 +5,7 @@ using UnityEngine;
 public unsafe class player_control : MonoBehaviour
 {
     public float speed, walkAcceleration;
-    public bool attack_order, attacking, movable;
+    public bool new_input, attacking, movable;
     public bool* pattacking;
     Vector2 velocity = new Vector2();
     public GameObject rweapon;
@@ -17,10 +17,12 @@ public unsafe class player_control : MonoBehaviour
     public void update_weapon()
     {
         string type = rweapon.tag;
+        //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
         if (type == "straight_sword")
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<straight_sword>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<straight_sword>().p_newinput = p_attack_order; }
         }
         else if (type == "spear")
         {
@@ -31,6 +33,8 @@ public unsafe class player_control : MonoBehaviour
     void Update()
     {
         attacking = *pattacking;
+        if (Input.GetMouseButtonDown(0)) new_input = true;
+        else new_input = false;
     }
 
     void FixedUpdate()

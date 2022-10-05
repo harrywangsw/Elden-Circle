@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 [RequireComponent(typeof(damage_manager))]
-public class straight_sword : MonoBehaviour
+public unsafe class straight_sword : MonoBehaviour
 {
     public float extend_time, swing_angle;
     public float torque;
     public float angul;
     int swing_dir = 1;
     public int swings = 0;
-    public bool attack_order, new_input, attacking, left;
+    public bool init_attack, new_input, attacking, left;
+    public bool* p_newinput;
     Rigidbody2D body;
     damage_manager manager;
     void Start()
@@ -49,7 +50,7 @@ public class straight_sword : MonoBehaviour
         while (transform.localScale.x > 0f)
         {
             //transition to extend if attack ordered, except for when thrusting
-            if (attack_order&&swings!=3) 
+            if (init_attack&&swings!=3) 
             {
                 yield return extend();
                 yield break;
@@ -64,7 +65,7 @@ public class straight_sword : MonoBehaviour
                 swings = 0;
                 swing_dir = 1;
                 attacking = false;
-                attack_order = false;
+                init_attack = false;
                 new_input = false;
                 yield break;
             }
@@ -76,7 +77,7 @@ public class straight_sword : MonoBehaviour
     {
         if(manager.slash<manager.pierce) (manager.slash, manager.pierce) = (manager.pierce, manager.slash);
         attacking = true;
-        attack_order = false;
+        init_attack = false;
         new_input = false;
         swings++;
         if (swings == 3)
@@ -127,8 +128,7 @@ public class straight_sword : MonoBehaviour
         body.angularVelocity = 0f;
         //Debug.Log("swing ended");
         yield return new WaitForSeconds(0.1f);
-        attack_order = new_input;
-        if (!attack_order)
+        if (!init_attack)
         {
             yield return retract();
         }
@@ -142,11 +142,10 @@ public class straight_sword : MonoBehaviour
 
     void Update()
     {
-        //new input will be equated as a new attack order when swing has ended
-        if (Input.GetMouseButtonDown(0)) new_input = true;
-        //to trigger the first attack_order
-        if (transform.localScale.x == 0f) attack_order = new_input;
-        if (attack_order&&!attacking) StartCoroutine(extend());
+        new_input = *p_newinput;
+        //to trigger the first init_attack
+        if (transform.localScale.x == 0f||get_new_input()) init_attack = new_input;
+        if (init_attack&&!attacking) StartCoroutine(extend());
     }
     void FixedUpdate()
     {
@@ -179,6 +178,8 @@ public class straight_sword : MonoBehaviour
     {
         //no more moves after the third
         if (swings == 3) return false;
+        //don't init new attack when already initing new attack
+        if (init_attack) return false;
         //check direction of swing to see if we're in the last half of the swing 
         if (Math.Sign(body.angularVelocity) == 1)
         {

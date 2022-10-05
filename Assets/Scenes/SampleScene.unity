@@ -143,12 +143,12 @@ PrefabInstance:
     - target: {fileID: 1770923913232244962, guid: 0a4ff3a091df05d48a9608b39054b5ff,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.2039998
+      value: -2.77
       objectReference: {fileID: 0}
     - target: {fileID: 1770923913232244962, guid: 0a4ff3a091df05d48a9608b39054b5ff,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.24000001
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1770923913232244962, guid: 0a4ff3a091df05d48a9608b39054b5ff,
         type: 3}
@@ -398,6 +398,7 @@ MonoBehaviour:
     strike_def: 0.8
     pierce_def: 0.8
     health: 1100
+  rweapon: {fileID: 55204722}
   hit_by: []
 --- !u!50 &394458766
 Rigidbody2D:
