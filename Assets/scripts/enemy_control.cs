@@ -7,14 +7,14 @@ using System;
 public unsafe class enemy_control : MonoBehaviour
 {
     public float current_health, previous_health;
-    public bool attack_order, attacking, movable;
+    public bool new_input, attacking, movable;
     public bool* pattacking;
     public stats enemy_stat;
     damage_manager damages;
     GameObject healthbar, greybar, player;
     public GameObject rweapon;
     Rigidbody2D body;
-    public List<GameObject> hit_by;
+    public Listenemy <GameObject> hit_by;
     void Start()
     {
         player=GameObject.Find("player");
@@ -26,41 +26,21 @@ public unsafe class enemy_control : MonoBehaviour
         {
             if (transform.GetChild(i).gameObject.name == "health_bar") healthbar = transform.GetChild(i).gameObject;
         }
-        greybar = GameObject.Instantiate(healthbar, healthbar.transform);
-        greybar.GetComponent<SpriteRenderer>().color = Color.grey;
-        greybar.transform.localPosition = Vector3.zero;
-        greybar.transform.SetParent(transform);
-        greybar.GetComponent<SpriteRenderer>().sortingOrder = 0;
+        update_weapon();
     }
 
     void Update()
     {
-
-        health_bar();
+        if ((player.transform.position - transform.position).magnitude<=3f) new_input = true;
+        else new_input = false;
+        face_player();
     }
 
-    void health_bar()
+    void face_player()
     {
-        if (current_health != previous_health)
-        {
-            StartCoroutine(health_bar_anim());
-            previous_health = current_health;
-        }
+        transform.rotation = Quaternion.Euler(0f, 0f, Vector3.Angle(player.transform.position, Vector3.right));
     }
 
-    IEnumerator health_bar_anim()
-    {
-        int inc_dec = Math.Sign(previous_health - current_health);
-        if (inc_dec == 1)
-        {
-            healthbar.transform.localScale = new Vector3(current_health / enemy_stat.health, 1f, 1f);
-            while (greybar.transform.localScale.x > current_health / enemy_stat.health)
-            {
-                greybar.transform.localScale -= new Vector3(0.001f, 0f, 0f);
-                yield return new WaitForSeconds(Time.deltaTime);
-            }
-        }
-    }
 
     void OnCollisionEnter2D(Collision2D c)
     {
@@ -72,8 +52,16 @@ public unsafe class enemy_control : MonoBehaviour
             body.velocity = Vector3.zero;
             damages = c.gameObject.GetComponent<damage_manager>();           
             current_health -= calc_damage();
+            animate_hurt();
             if (current_health < 0f) Destroy(gameObject);
         }
+    }
+
+    IEnumerator animate_hurt()
+    {
+        gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        gameObject.GetComponent<SpriteRenderer>().color = Color.black;
     }
 
     void OnCollisionExit2D(Collision2D c)
@@ -89,10 +77,12 @@ public unsafe class enemy_control : MonoBehaviour
     public void update_weapon()
     {
         string type = rweapon.tag;
+        //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
         if (type == "straight_sword")
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<straight_sword>().attacking) { pattacking = pattack_fixed; }
+            fixed (bool* p_attack_order = &new_input) { rweapon.GetComponent<straight_sword>().p_newinput = p_attack_order; }
         }
         else if (type == "spear")
         {

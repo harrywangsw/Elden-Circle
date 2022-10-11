@@ -14,7 +14,7 @@ public unsafe class player_control : MonoBehaviour
     {
         update_weapon();
     }
-    public void update_weapon()
+    void update_weapon()
     {
         string type = rweapon.tag;
         //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
