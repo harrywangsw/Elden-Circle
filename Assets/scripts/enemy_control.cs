@@ -14,7 +14,7 @@ public unsafe class enemy_control : MonoBehaviour
     GameObject healthbar, greybar, player;
     public GameObject rweapon;
     Rigidbody2D body;
-    public Listenemy <GameObject> hit_by;
+    public List<GameObject> hit_by;
     void Start()
     {
         player=GameObject.Find("player");
@@ -38,7 +38,7 @@ public unsafe class enemy_control : MonoBehaviour
 
     void face_player()
     {
-        transform.rotation = Quaternion.Euler(0f, 0f, Vector3.Angle(player.transform.position, Vector3.right));
+        transform.rotation = Quaternion.Euler(0f, 0f, -Vector3.Angle(player.transform.position-transform.position, Vector3.up));
     }
 
 

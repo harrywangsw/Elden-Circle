@@ -5,7 +5,7 @@ using System;
 [RequireComponent(typeof(damage_manager))]
 public unsafe class straight_sword : MonoBehaviour
 {
-    public float extend_time, swing_angle;
+    public float extend_time, swing_angle, const_swing_angle;
     public float torque;
     public float angul;
     int swing_dir = 1;
@@ -16,6 +16,7 @@ public unsafe class straight_sword : MonoBehaviour
     damage_manager manager;
     void Start()
     {
+        swing_angle = const_swing_angle;
         body = gameObject.GetComponent<Rigidbody2D>();
         body.rotation = swing_angle;
         manager = gameObject.GetComponent<damage_manager>();
@@ -94,12 +95,14 @@ public unsafe class straight_sword : MonoBehaviour
             //accelerating
             while (body.rotation <= 90f && swing_angle <= body.rotation)
             {
+                Debug.Log(body.rotation);
                 body.AddTorque(torque * swing_dir);
                 yield return new WaitForSeconds(Time.fixedDeltaTime);
             }
             //deccelerating +2 to make sure decce stops
             while (body.rotation <= 180f - swing_angle-18f && 90f <= body.rotation)
             {
+                Debug.Log("other half: "+body.rotation);
                 body.AddTorque(-1f * torque * swing_dir);
                 yield return new WaitForSeconds(Time.fixedDeltaTime);
             }
@@ -126,7 +129,7 @@ public unsafe class straight_sword : MonoBehaviour
         }
         //at the end of swing, check if we need to begin the next swing or retract
         body.angularVelocity = 0f;
-        //Debug.Log("swing ended");
+        Debug.Log("swing ended");
         yield return new WaitForSeconds(0.1f);
         if (!init_attack)
         {
@@ -142,6 +145,7 @@ public unsafe class straight_sword : MonoBehaviour
 
     void Update()
     {
+        swing_angle = const_swing_angle - gameObject.transform.rotation.z;
         new_input = *p_newinput;
         //to trigger the first init_attack
         if (transform.localScale.x == 0f||get_new_input()) init_attack = new_input;
