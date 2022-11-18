@@ -38,7 +38,7 @@ public unsafe class enemy_control : MonoBehaviour
 
     void face_player()
     {
-        transform.rotation = Quaternion.Euler(0f, 0f, -Vector3.Angle(player.transform.position-transform.position, Vector3.up));
+        transform.rotation = Quaternion.Euler(0f, 0f, Vector3.SignedAngle(Vector3.up, player.transform.position-transform.position, Vector3.forward));
     }
 
 

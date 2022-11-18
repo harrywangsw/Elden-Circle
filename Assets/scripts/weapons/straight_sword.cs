@@ -5,10 +5,10 @@ using System;
 [RequireComponent(typeof(damage_manager))]
 public unsafe class straight_sword : MonoBehaviour
 {
-    public float extend_time, swing_angle, const_swing_angle;
+    public float extend_time, swing_angle, const_swing_angle, swing_speed, swing_period;
     public float torque;
     public float angul;
-    int swing_dir = 1;
+    public int swing_dir = 1;
     public int swings = 0;
     public bool init_attack, new_input, attacking, left;
     public bool* p_newinput;
@@ -48,6 +48,7 @@ public unsafe class straight_sword : MonoBehaviour
     {
         attacking = true;
         //retract
+        Debug.Log("retract");
         while (transform.localScale.x > 0f)
         {
             //transition to extend if attack ordered, except for when thrusting
@@ -90,43 +91,10 @@ public unsafe class straight_sword : MonoBehaviour
             yield return extend();
             yield break;
         }
-        if (swing_dir == 1)
-        {
-            //accelerating
-            while (body.rotation <= 90f && swing_angle <= body.rotation)
-            {
-                Debug.Log(body.rotation);
-                body.AddTorque(torque * swing_dir);
-                yield return new WaitForSeconds(Time.fixedDeltaTime);
-            }
-            //deccelerating +2 to make sure decce stops
-            while (body.rotation <= 180f - swing_angle-18f && 90f <= body.rotation)
-            {
-                Debug.Log("other half: "+body.rotation);
-                body.AddTorque(-1f * torque * swing_dir);
-                yield return new WaitForSeconds(Time.fixedDeltaTime);
-            }
-            //Debug.Log(body.rotation.ToString() + ", " + body.angularVelocity.ToString());
-            body.rotation = 180f - swing_angle;
-            body.angularVelocity = 0f;
-        }
-        else
-        {
-            //accelerating
-            while (body.rotation >= 90f && 180f-swing_angle >= body.rotation)
-            {
-                body.AddTorque(torque * swing_dir);
-                yield return new WaitForSeconds(Time.fixedDeltaTime);
-            }
-            //deccelerating, +2 to make sure decce stops
-            while (body.rotation >= 18f+swing_angle && 90f >= body.rotation)
-            {
-                body.AddTorque(-1f * torque * swing_dir);
-                yield return new WaitForSeconds(Time.fixedDeltaTime);
-            }
-            body.rotation = swing_angle;
-            body.angularVelocity = 0f;
-        }
+        Debug.Log(swing_dir);
+        body.AddTorque(torque * swing_dir);
+        //body.angularVelocity = swing_dir*swing_speed;
+        yield return new WaitForSeconds(swing_period);
         //at the end of swing, check if we need to begin the next swing or retract
         body.angularVelocity = 0f;
         Debug.Log("swing ended");
