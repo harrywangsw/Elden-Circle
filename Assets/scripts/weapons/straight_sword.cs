@@ -20,6 +20,11 @@ public unsafe class straight_sword : MonoBehaviour
         body = gameObject.GetComponent<Rigidbody2D>();
         body.rotation = swing_angle;
         manager = gameObject.GetComponent<damage_manager>();
+        //make sure the sword won't heart its owner
+        Collider2D c = transform.parent.gameObject.GetComponent<Collider2D>();
+        Collider2D selfc = gameObject.GetComponent<Collider2D>();
+        Physics2D.IgnoreCollision(selfc, c, true);
+        Physics2D.IgnoreCollision(c, selfc, true);
     }
 
     IEnumerator extend()
