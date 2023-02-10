@@ -5,7 +5,7 @@ using System;
 [RequireComponent(typeof(damage_manager))]
 public unsafe class straight_sword : MonoBehaviour
 {
-    public float extend_time, swing_angle, const_swing_angle, swing_speed, swing_period;
+    public float extend_time, swing_angle, const_swing_angle, swing_period;
     public float torque;
     public float angul;
     public int swing_dir = 1;
@@ -79,7 +79,7 @@ public unsafe class straight_sword : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime);
         }
     }
-
+    ///momentum carry player forward
     IEnumerator swing()
     {
         if(manager.slash<manager.pierce) (manager.slash, manager.pierce) = (manager.pierce, manager.slash);
@@ -96,14 +96,32 @@ public unsafe class straight_sword : MonoBehaviour
             yield return extend();
             yield break;
         }
-        Debug.Log(swing_dir);
-        body.AddTorque(torque * swing_dir);
-        //body.angularVelocity = swing_dir*swing_speed;
-        yield return new WaitForSeconds(swing_period);
+        //Debug.Log(swing_dir);
+        float swing_time = 0f;
+        bool reverse = false;
+        while(swing_time<swing_period)
+        {
+            if(swing_time>swing_period/3f&&swing_time<swing_period*(2f/3f)&&!reverse) {
+                torque/=100f;
+                Debug.Log("asdasds1");
+                //so that torque don't keep decreasing
+                reverse = true;
+            }
+            if(swing_time>swing_period*(2f/3f)&&reverse) {
+                Debug.Log("asdasds");
+                torque*=-100f;
+                reverse = false;
+            }
+            Debug.Log("wtf: "+torque.ToString());
+            body.AddTorque(torque * swing_dir);
+            yield return new WaitForSeconds(0.001f);
+            swing_time+=0.001f;
+        }
+        torque*=-1;
         //at the end of swing, check if we need to begin the next swing or retract
         body.angularVelocity = 0f;
-        Debug.Log("swing ended");
-        yield return new WaitForSeconds(0.1f);
+        //Debug.Log("swing ended");
+        yield return new WaitForSeconds(0.2f);
         if (!init_attack)
         {
             yield return retract();
