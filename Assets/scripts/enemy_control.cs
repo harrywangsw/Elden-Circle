@@ -12,11 +12,13 @@ public unsafe class enemy_control : MonoBehaviour
     public stats enemy_stat;
     damage_manager damages;
     GameObject healthbar, greybar, player;
+    Transform end_marker;
     public GameObject rweapon;
     Rigidbody2D body;
     public List<GameObject> hit_by;
     void Start()
     {
+        end_marker = transform.GetChild(0);
         player=GameObject.Find("player");
         hit_by = new List<GameObject>();
         body = gameObject.GetComponent<Rigidbody2D>();
@@ -80,14 +82,12 @@ public unsafe class enemy_control : MonoBehaviour
         //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
         if (type == "straight_sword")
         {
-            //get adress of attacking from right-hand weapon and save the adress in pattacking
-            fixed (bool* pattack_fixed = &rweapon.GetComponent<straight_sword>().attacking) { pattacking = pattack_fixed; }
             fixed (bool* p_attack_order = &new_input) { rweapon.GetComponent<straight_sword>().p_newinput = p_attack_order; }
         }
         else if (type == "spear")
         {
-            //get adress of attacking from right-hand weapon and save the adress in pattacking
-            fixed (bool* pattack_fixed = &rweapon.GetComponent<spear_attack>().attacking) { pattacking = pattack_fixed; }
+            fixed (bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
+            rweapon.transform.position = new Vector3(end_marker.position.x+0.08f, end_marker.position.y, end_marker.position.z);
         }
     }
 }

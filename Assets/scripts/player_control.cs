@@ -4,8 +4,8 @@ using UnityEngine;
 
 public unsafe class player_control : MonoBehaviour
 {
-    public float speed, walkAcceleration;
-    public bool new_input, attacking, movable;
+    public float speed, walkAcceleration, dash_modifier;
+    public bool new_input, attacking, movable, dashing, dash_command;
     public float health;
     public stats player_stat;
     public bool* pattacking;
@@ -41,7 +41,9 @@ public unsafe class player_control : MonoBehaviour
         attacking = *pattacking;
         if (Input.GetMouseButtonDown(0)) new_input = true;
         else new_input = false;
+        if (Input.GetKeyDown("space")&&!dashing) dash_command = true;
     }
+
 
     void OnCollisionEnter2D(Collision2D c)
     {
@@ -87,7 +89,21 @@ public unsafe class player_control : MonoBehaviour
         float moveInputy = Input.GetAxisRaw("Vertical");
         velocity.x = Mathf.MoveTowards(velocity.x, speed * moveInputx, walkAcceleration * Time.fixedDeltaTime);
         velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInputy, walkAcceleration * Time.fixedDeltaTime);
+        if(dash_command&&!dashing){
+            dash_command = false;
+            StartCoroutine(dash());
+        }
         transform.Translate(velocity * Time.deltaTime);
         Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
+    }
+
+    IEnumerator dash()
+    {
+        dashing = true;
+        Debug.Log("dash");
+        speed*=dash_modifier;
+        yield return new WaitForSeconds(0.5f);
+        speed/=dash_modifier;
+        dashing = false;
     }
 }

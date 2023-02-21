@@ -1,19 +1,50 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-public class spear_attack : MonoBehaviour
+[RequireComponent(typeof(damage_manager))]
+[RequireComponent(typeof(BoxCollider2D))]
+[RequireComponent(typeof(Rigidbody2D))]
+public unsafe class spear_attack : MonoBehaviour
 {
-    public bool attack_order, new_input, attacking;
+    public bool init_attack, new_input, attacking;
+    public float thrust_vel, thrust_period;
+    public bool* p_newinput;
     Rigidbody2D body;
+    Vector2 start_pos;
     void Start()
     {
-        
+        body = gameObject.GetComponent<Rigidbody2D>();
+        start_pos = gameObject.transform.position;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        new_input = *p_newinput;
+        if (get_new_input()) init_attack = new_input;
+        if (init_attack&&!attacking) StartCoroutine(thrust());
+    }
+
+    IEnumerator thrust(){
+        attacking = true;
+        //Debug.Log("wtf"+body.velocity.y.ToString());
+        float time  = 0f;
+        while(time<thrust_period/2f){
+            transform.localPosition+=new Vector3(0f, thrust_vel*Time.deltaTime, 0f);
+            yield return new WaitForSeconds(Time.deltaTime);
+            time+=Time.deltaTime;
+        }
+        yield return new WaitForSeconds(0.08f);
+        while(time>thrust_period/2f&&time<thrust_period){
+            transform.localPosition-=new Vector3(0f, thrust_vel*Time.deltaTime, 0f);
+            yield return new WaitForSeconds(Time.deltaTime);
+            time+=Time.deltaTime;
+        }
+
+        body.position = start_pos;
+        attacking = false;
+    }
+
+    bool get_new_input(){
+        return body.velocity.y<=0f;
     }
 }

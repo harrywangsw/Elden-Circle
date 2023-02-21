@@ -6,6 +6,7 @@ TagManager:
   tags:
   - straight_sword
   - harmable
+  - spear
   layers:
   - Default
   - TransparentFX

@@ -12,12 +12,15 @@ public unsafe class straight_sword : MonoBehaviour
     public int swings = 0;
     public bool init_attack, new_input, attacking, left;
     public bool* p_newinput;
+    Transform end_marker;
     Rigidbody2D body;
+    public GameObject dot;
     damage_manager manager;
     void Start()
     {
         swing_angle = const_swing_angle;
         body = gameObject.GetComponent<Rigidbody2D>();
+        end_marker = transform.GetChild(0);
         body.rotation = swing_angle;
         manager = gameObject.GetComponent<damage_manager>();
         //make sure the sword won't heart its owner
@@ -30,16 +33,16 @@ public unsafe class straight_sword : MonoBehaviour
     IEnumerator extend()
     {
         attacking = true;
+        body.angularVelocity = angul*swing_dir;
         if (manager.slash > manager.pierce) (manager.slash, manager.pierce) = (manager.pierce, manager.slash);
         manager.pierce *= 1.2f;
         //extend
-        while (transform.localScale.x < 1f)
+        while (transform.localScale.x < 0.5f)
         {
             transform.localScale += new Vector3(Time.deltaTime / extend_time, 0f, 0f);
             yield return new WaitForSeconds(Time.deltaTime);
         }
-        transform.localScale = Vector3.one;
-        yield return new WaitForSeconds(0.2f);
+        transform.localScale = Vector3.one/2f;
         manager.pierce /= 1.2f;
         //transition to swing only if not doing thrust
         if (swings != 3)
@@ -87,41 +90,44 @@ public unsafe class straight_sword : MonoBehaviour
         init_attack = false;
         new_input = false;
         swings++;
-        if (swings == 3)
-        {
-            yield return new WaitForSeconds(0.1f);
-            transform.localScale = new Vector3(0f, 1f, 1f);
-            body.rotation = 90f;
-            //Debug.Log("ended with thrust");
-            yield return extend();
-            yield break;
-        }
-        //Debug.Log(swing_dir);
-        float swing_time = 0f;
-        bool reverse = false;
-        while(swing_time<swing_period)
-        {
-            if(swing_time>swing_period/3f&&swing_time<swing_period*(2f/3f)&&!reverse) {
-                torque/=100f;
-                Debug.Log("asdasds1");
-                //so that torque don't keep decreasing
-                reverse = true;
-            }
-            if(swing_time>swing_period*(2f/3f)&&reverse) {
-                Debug.Log("asdasds");
-                torque*=-100f;
-                reverse = false;
-            }
-            Debug.Log("wtf: "+torque.ToString());
-            body.AddTorque(torque * swing_dir);
-            yield return new WaitForSeconds(0.001f);
-            swing_time+=0.001f;
-        }
-        torque*=-1;
-        //at the end of swing, check if we need to begin the next swing or retract
-        body.angularVelocity = 0f;
-        //Debug.Log("swing ended");
-        yield return new WaitForSeconds(0.2f);
+        body.angularVelocity = angul*swing_dir;
+        yield return new WaitForSeconds(swing_period);
+
+        // if (swings == 3)
+        // {
+        //     yield return new WaitForSeconds(0.1f);
+        //     transform.localScale = new Vector3(0f, 1f, 1f);
+        //     body.rotation = 90f;
+        //     //Debug.Log("ended with thrust");
+        //     yield return extend();
+        //     yield break;
+        // }
+        // //Debug.Log(swing_dir);
+        // float swing_time = 0f;
+        // bool reverse = false;
+        // while(swing_time<swing_period)
+        // {
+        //     if(swing_time>swing_period/3f&&swing_time<swing_period*(2f/3f)&&!reverse) {
+        //         torque/=100f;
+        //         Debug.Log("asdasds1");
+        //         //so that torque don't keep decreasing
+        //         reverse = true;
+        //     }
+        //     if(swing_time>swing_period*(2f/3f)&&reverse) {
+        //         Debug.Log("asdasds");
+        //         torque*=-100f;
+        //         reverse = false;
+        //     }
+        //     Debug.Log("wtf: "+torque.ToString());
+        //     body.AddTorque(torque * swing_dir);
+        //     yield return new WaitForSeconds(0.001f);
+        //     swing_time+=0.001f;
+        // }
+        // torque*=-1;
+        // //at the end of swing, check if we need to begin the next swing or retract
+        // body.angularVelocity = 0f;
+        // //Debug.Log("swing ended");
+        // yield return new WaitForSeconds(0.2f);
         if (!init_attack)
         {
             yield return retract();
@@ -141,10 +147,6 @@ public unsafe class straight_sword : MonoBehaviour
         //to trigger the first init_attack
         if (transform.localScale.x == 0f||get_new_input()) init_attack = new_input;
         if (init_attack&&!attacking) StartCoroutine(extend());
-    }
-    void FixedUpdate()
-    {
-        angul = body.angularVelocity;
     }
     void OnCollisionEnter2D(Collision2D c)
     {
