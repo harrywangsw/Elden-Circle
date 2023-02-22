@@ -33,7 +33,7 @@ public unsafe class spear_attack : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime);
             time+=Time.deltaTime;
         }
-        yield return new WaitForSeconds(0.08f);
+        yield return new WaitForSeconds(0.1f);
         while(time>thrust_period/2f&&time<thrust_period){
             transform.localPosition-=new Vector3(0f, thrust_vel*Time.deltaTime, 0f);
             yield return new WaitForSeconds(Time.deltaTime);
@@ -41,6 +41,7 @@ public unsafe class spear_attack : MonoBehaviour
         }
 
         body.position = start_pos;
+        yield return new WaitForSeconds(0.8f);
         attacking = false;
     }
 

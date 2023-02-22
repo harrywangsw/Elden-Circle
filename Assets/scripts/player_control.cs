@@ -8,6 +8,7 @@ public unsafe class player_control : MonoBehaviour
     public bool new_input, attacking, movable, dashing, dash_command;
     public float health;
     public stats player_stat;
+    public inventory player_items;
     public bool* pattacking;
     damage_manager damages;
     Vector2 velocity = new Vector2();
@@ -19,6 +20,7 @@ public unsafe class player_control : MonoBehaviour
     {
         body = gameObject.GetComponent<Rigidbody2D>();
         update_weapon();
+        update_quickslot();
     }
     void update_weapon()
     {
@@ -80,7 +82,10 @@ public unsafe class player_control : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(!attacking) move();
+        if(!attacking) {
+            move();
+            check_quickslot();
+        }
     }
 
     void move()
@@ -95,6 +100,19 @@ public unsafe class player_control : MonoBehaviour
         }
         transform.Translate(velocity * Time.deltaTime);
         Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
+    }
+
+    void check_quickslot(){
+        if(Input.GetKeyDown("R")){
+            use_item(player_items.inv[player_items.quickslot_up].Item1);
+            player_items.inv[player_items.quickslot_up].Item2-=1;
+        }
+    }
+
+    void use_item(string item_name){
+        if(item_name=="health_potion"){
+            current_health+=health_up_amount;
+        }
     }
 
     IEnumerator dash()
