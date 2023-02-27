@@ -7,6 +7,7 @@ using System;
 public unsafe class enemy_control : MonoBehaviour
 {
     public float current_health, previous_health;
+    public int exp;
     public bool new_input, attacking, movable;
     public bool* pattacking;
     public stats enemy_stat;
@@ -55,8 +56,13 @@ public unsafe class enemy_control : MonoBehaviour
             damages = c.gameObject.GetComponent<damage_manager>();           
             current_health -= calc_damage();
             animate_hurt();
-            if (current_health < 0f) Destroy(gameObject);
+            if (current_health < 0f) death();
         }
+    }
+
+    void death(){
+        player.GetComponent<player_control>().exp+=exp;
+        Destroy(gameObject);
     }
 
     IEnumerator animate_hurt()

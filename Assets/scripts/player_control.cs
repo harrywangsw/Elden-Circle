@@ -1,26 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using System;
 
 public unsafe class player_control : MonoBehaviour
 {
-    public float speed, walkAcceleration, dash_modifier;
-    public bool new_input, attacking, movable, dashing, dash_command;
+    public float speed, walkAcceleration, item_speed, health_up_amount;
+    public int exp;
+    public bool new_input, attacking, movable, dashing, dash_command, using_item;
     public float health;
     public stats player_stat;
     public inventory player_items;
     public bool* pattacking;
     damage_manager damages;
     Vector2 velocity = new Vector2();
-    public GameObject rweapon;
+    public GameObject rweapon, ritem, litem, uitem, ditem, overlay, death_screen, menu;
+    public SpriteRenderer player_sprite;
     string type;
     public List<GameObject> hit_by;
     Rigidbody2D body;
     void Start()
     {
+        player_sprite = gameObject.GetComponent<SpriteRenderer>();
+        health = player_stat.health;
         body = gameObject.GetComponent<Rigidbody2D>();
         update_weapon();
-        update_quickslot();
+        //update_quickslot();
     }
     void update_weapon()
     {
@@ -36,14 +42,50 @@ public unsafe class player_control : MonoBehaviour
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<spear_attack>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
         }
     }
+    void update_quickslot(){
+        if(player_items.quickslot_up==-1) return;
+        GameObject item = (GameObject)Resources.Load("prefabs/"+player_items.inv[player_items.quickslot_up].Item1, typeof(GameObject));
+        GameObject slot = GameObject.Find("up");
+        item = GameObject.Instantiate(slot, Vector3.zero, Quaternion.identity);
+        item.transform.GetChild(0).GetComponent<TextMeshPro>().text = player_items.inv[player_items.quickslot_up].Item2.ToString();
+
+        if(player_items.quickslot_down==-1) return;
+        item = (GameObject)Resources.Load("prefabs/"+player_items.quickslot_down, typeof(GameObject));
+        slot = GameObject.Find("down");
+        item=GameObject.Instantiate(slot, Vector3.zero, Quaternion.identity);
+        item.transform.GetChild(0).GetComponent<TextMeshPro>().text = player_items.inv[player_items.quickslot_down].Item2.ToString();
+
+        if(player_items.quickslot_left==-1) return;
+        item = (GameObject)Resources.Load("prefabs/"+player_items.quickslot_left, typeof(GameObject));
+        slot = GameObject.Find("left");
+        item=GameObject.Instantiate(slot, Vector3.zero, Quaternion.identity);
+        item.transform.GetChild(0).GetComponent<TextMeshPro>().text = player_items.inv[player_items.quickslot_left].Item2.ToString();
+
+        if(player_items.quickslot_right==-1) return;
+        item = (GameObject)Resources.Load("prefabs/"+player_items.quickslot_right, typeof(GameObject));
+        slot = GameObject.Find("right");
+        item=GameObject.Instantiate(slot, Vector3.zero, Quaternion.identity);
+        item.transform.GetChild(0).GetComponent<TextMeshPro>().text = player_items.inv[player_items.quickslot_right].Item2.ToString();
+
+
+        // SpriteRenderer up = GameObject.Find("up").transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
+        // if (player_items.quickslot_up!="") up.
+        // SpriteRenderer up = GameObject.Find("up").transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
+        // if (player_items.quickslot_up!="") up.
+    }
+
     void Update()
     {
         attacking = *pattacking;
         if (Input.GetMouseButtonDown(0)) new_input = true;
         else new_input = false;
         if (Input.GetKeyDown("space")&&!dashing) dash_command = true;
+        foreach(Transform child in overlay.transform){
+            if(child.gameObject.name == "Exp") child.gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = exp.ToString();
+        }
     }
 
 
@@ -58,8 +100,15 @@ public unsafe class player_control : MonoBehaviour
             damages = c.gameObject.GetComponent<damage_manager>();           
             health -= calc_damage();
             animate_hurt();
-            if (health < 0f) Destroy(gameObject);
+            if (health < 0f) death();
         }
+    }
+
+    void death(){
+        overlay.SetActive(false);
+        menu.SetActive(false);
+        death_screen.SetActive(true);
+        Destroy(gameObject);
     }
 
     void OnCollisionExit2D(Collision2D c)
@@ -82,9 +131,11 @@ public unsafe class player_control : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(!attacking) {
+        if(!attacking&&!using_item) {
             move();
-            check_quickslot();
+            if(!dashing){
+                check_quickslot();
+            }
         }
     }
 
@@ -103,15 +154,16 @@ public unsafe class player_control : MonoBehaviour
     }
 
     void check_quickslot(){
-        if(Input.GetKeyDown("R")){
+        if(Input.GetKeyDown("r")){
+            if(player_items.inv[player_items.quickslot_up].Item2<=0) return;
+            player_items.inv[player_items.quickslot_up] = Tuple.Create(player_items.inv[player_items.quickslot_up].Item1, player_items.inv[player_items.quickslot_up].Item2-1);
             use_item(player_items.inv[player_items.quickslot_up].Item1);
-            player_items.inv[player_items.quickslot_up].Item2-=1;
         }
     }
 
     void use_item(string item_name){
         if(item_name=="health_potion"){
-            current_health+=health_up_amount;
+            StartCoroutine(health_potion());
         }
     }
 
@@ -119,9 +171,20 @@ public unsafe class player_control : MonoBehaviour
     {
         dashing = true;
         Debug.Log("dash");
-        speed*=dash_modifier;
-        yield return new WaitForSeconds(0.5f);
-        speed/=dash_modifier;
+        speed*=player_stat.dash_modifier;
+        player_sprite.color =  Color.grey;
+        yield return new WaitForSeconds(player_stat.dash_length);
+        speed/=player_stat.dash_modifier;
+        player_sprite.color =  Color.black;
+        yield return new WaitForSeconds(player_stat.dash_length*4f);
         dashing = false;
+    }
+
+    IEnumerator health_potion(){
+        using_item = true;
+        yield return new  WaitForSeconds(player_stat.item_speed/2f);
+        health+=health_up_amount;
+        yield return new WaitForSeconds(player_stat.item_speed/2f);
+        using_item = false;
     }
 }

@@ -1,18 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.IO;
+using System.Numerics;
 
 [System.Serializable]
 public class inventory
 {
-    public vector<tuple<string, int>> inv;
-    public string quickslot_up;
-    public string quickslot_down;
-    public string quickslot_left;
-    public string quickslot_right;
+    public List<Tuple<string, int>> inv;
+    public int quickslot_up = -1;
+    public int quickslot_down = -1;
+    public int quickslot_left = -1;
+    public int quickslot_right = -1;
 
-    public invent()
+    public inventory()
     {
-        inv = new vector<tuple<string, int>>();
+        inv = new List<Tuple<string, int>>();
     }
 }

@@ -37,12 +37,12 @@ public unsafe class straight_sword : MonoBehaviour
         if (manager.slash > manager.pierce) (manager.slash, manager.pierce) = (manager.pierce, manager.slash);
         manager.pierce *= 1.2f;
         //extend
-        while (transform.localScale.x < 0.5f)
+        while (transform.localScale.x < 1f)
         {
             transform.localScale += new Vector3(Time.deltaTime / extend_time, 0f, 0f);
             yield return new WaitForSeconds(Time.deltaTime);
         }
-        transform.localScale = Vector3.one/2f;
+        transform.localScale = Vector3.one;
         manager.pierce /= 1.2f;
         //transition to swing only if not doing thrust
         if (swings != 3)

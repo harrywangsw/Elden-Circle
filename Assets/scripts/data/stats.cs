@@ -8,7 +8,7 @@ using System.IO;
 public class stats
 {
 
-    public float slash_def, strike_def, pierce_def, health;
+    public float slash_def, strike_def, pierce_def, health, dash_length, item_speed, dash_modifier;
 
     public stats()
     {
@@ -16,5 +16,7 @@ public class stats
         strike_def = 0f;
         pierce_def = 0f;
         health = 0f;
+        dash_length = 0f;
+        item_speed = 0f;
     }
 }
