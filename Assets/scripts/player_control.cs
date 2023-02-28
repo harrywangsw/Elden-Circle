@@ -7,6 +7,7 @@ using System;
 public unsafe class player_control : MonoBehaviour
 {
     public float speed, walkAcceleration, item_speed, health_up_amount;
+    public string player_name;
     public int exp;
     public bool new_input, attacking, movable, dashing, dash_command, using_item;
     public float health;
@@ -22,6 +23,9 @@ public unsafe class player_control : MonoBehaviour
     Rigidbody2D body;
     void Start()
     {
+        //player_items.inv.Add(Tuple.Create("health_potion", 8));
+        Debug.Log(player_items.inv[0].Item1);
+        player_items = save_load.LoadPlayerItem(player_name);
         player_sprite = gameObject.GetComponent<SpriteRenderer>();
         health = player_stat.health;
         body = gameObject.GetComponent<Rigidbody2D>();
