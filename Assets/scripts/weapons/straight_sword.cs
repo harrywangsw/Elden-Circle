@@ -56,7 +56,7 @@ public unsafe class straight_sword : MonoBehaviour
     {
         attacking = true;
         //retract
-        Debug.Log("retract");
+        //Debug.Log("retract");
         while (transform.localScale.x > 0f)
         {
             //transition to extend if attack ordered, except for when thrusting

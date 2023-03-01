@@ -6,6 +6,7 @@ public class save_point_behaviour : MonoBehaviour
 {
     GameObject player;
     GameObject message_screen;
+    public float trigger_dist;
     void Start()
     {
         player = GameObject.Find("player");
@@ -15,11 +16,16 @@ public class save_point_behaviour : MonoBehaviour
 
     void Update()
     {
-        if((player.transform.position-transform.position).magnitude<=8f){
+        if((player.transform.position-transform.position).magnitude<=trigger_dist){
             message_screen.GetComponent<TMPro.TextMeshProUGUI>().text = "press enter to save";
             if(Input.GetKeyDown(KeyCode.Return)){
                 save_load.SavePlayer(player.GetComponent<player_control>().player_stat, player.GetComponent<player_control>().player_name);
                 save_load.SavePlayerItem(player.GetComponent<player_control>().player_items, player.GetComponent<player_control>().player_name);
+            }
+        }
+        if((player.transform.position-transform.position).magnitude>=trigger_dist){
+            if(message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to save"){
+                message_screen.GetComponent<TMPro.TextMeshProUGUI>().text="\n";
             }
         }
     }

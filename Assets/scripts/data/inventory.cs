@@ -17,6 +17,6 @@ public class inventory
     public inventory()
     {
         inv = new List<Tuple<string, int>>();
-        inv.Add(Tuple.Create("health_potion", 1));
+        //inv.Add(Tuple.Create("health_potion", 1));
     }
 }

@@ -24,13 +24,16 @@ public unsafe class player_control : MonoBehaviour
     void Start()
     {
         //player_items.inv.Add(Tuple.Create("health_potion", 8));
-        Debug.Log(player_items.inv[0].Item1);
+        //player_items.quickslot_up = 0;
+        player_items = new inventory();
+        Debug.Log(player_items.quickslot_up);
         player_items = save_load.LoadPlayerItem(player_name);
+        Debug.Log(player_items.inv[0].Item1);
         player_sprite = gameObject.GetComponent<SpriteRenderer>();
         health = player_stat.health;
         body = gameObject.GetComponent<Rigidbody2D>();
         update_weapon();
-        //update_quickslot();
+        update_quickslot();
     }
     void update_weapon()
     {
@@ -50,29 +53,31 @@ public unsafe class player_control : MonoBehaviour
         }
     }
     void update_quickslot(){
+        GameObject item;
         if(player_items.quickslot_up==-1) return;
-        GameObject item = (GameObject)Resources.Load("prefabs/"+player_items.inv[player_items.quickslot_up].Item1, typeof(GameObject));
-        GameObject slot = GameObject.Find("up");
-        item = GameObject.Instantiate(slot, Vector3.zero, Quaternion.identity);
-        item.transform.GetChild(0).GetComponent<TextMeshPro>().text = player_items.inv[player_items.quickslot_up].Item2.ToString();
+        Debug.Log("prefab/"+player_items.inv[player_items.quickslot_up].Item1);
+        GameObject i = Resources.Load<GameObject>("prefab/"+player_items.inv[player_items.quickslot_up].Item1);
+        Transform slot = GameObject.Find("up").transform;
+        item = GameObject.Instantiate(i, slot);
+        item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_up].Item2.ToString();
 
         if(player_items.quickslot_down==-1) return;
-        item = (GameObject)Resources.Load("prefabs/"+player_items.quickslot_down, typeof(GameObject));
-        slot = GameObject.Find("down");
-        item=GameObject.Instantiate(slot, Vector3.zero, Quaternion.identity);
-        item.transform.GetChild(0).GetComponent<TextMeshPro>().text = player_items.inv[player_items.quickslot_down].Item2.ToString();
+        i = Resources.Load<GameObject>("prefab/"+player_items.inv[player_items.quickslot_down].Item1);
+        slot = GameObject.Find("down").transform;
+        item = GameObject.Instantiate(i, slot);
+        item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_down].Item2.ToString();
 
         if(player_items.quickslot_left==-1) return;
-        item = (GameObject)Resources.Load("prefabs/"+player_items.quickslot_left, typeof(GameObject));
-        slot = GameObject.Find("left");
-        item=GameObject.Instantiate(slot, Vector3.zero, Quaternion.identity);
-        item.transform.GetChild(0).GetComponent<TextMeshPro>().text = player_items.inv[player_items.quickslot_left].Item2.ToString();
+        i = Resources.Load<GameObject>("prefab/"+player_items.inv[player_items.quickslot_left].Item1);
+        slot = GameObject.Find("left").transform;
+        item = GameObject.Instantiate(i, slot);
+        item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_left].Item2.ToString();
 
         if(player_items.quickslot_right==-1) return;
-        item = (GameObject)Resources.Load("prefabs/"+player_items.quickslot_right, typeof(GameObject));
-        slot = GameObject.Find("right");
-        item=GameObject.Instantiate(slot, Vector3.zero, Quaternion.identity);
-        item.transform.GetChild(0).GetComponent<TextMeshPro>().text = player_items.inv[player_items.quickslot_right].Item2.ToString();
+        i = Resources.Load<GameObject>("prefab/"+player_items.inv[player_items.quickslot_right].Item1);
+        slot = GameObject.Find("right").transform;
+        item = GameObject.Instantiate(i, slot);
+        item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_right].Item2.ToString();
 
 
         // SpriteRenderer up = GameObject.Find("up").transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
