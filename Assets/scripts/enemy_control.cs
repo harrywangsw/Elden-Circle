@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 //[RequireComponent(typeof(BoxCollider2D))]
 public unsafe class enemy_control : MonoBehaviour
@@ -17,6 +16,8 @@ public unsafe class enemy_control : MonoBehaviour
     public GameObject rweapon;
     Rigidbody2D body;
     public List<GameObject> hit_by;
+    public List<string> spawnable_item;
+    public List<float> spawn_chance;
     void Start()
     {
         end_marker = transform.GetChild(0);
@@ -55,6 +56,7 @@ public unsafe class enemy_control : MonoBehaviour
             body.velocity = Vector3.zero;
             damages = c.gameObject.GetComponent<damage_manager>();           
             current_health -= calc_damage();
+            Debug.Log("damage: "+calc_damage().ToString());
             animate_hurt();
             if (current_health < 0f) death();
         }
@@ -62,7 +64,19 @@ public unsafe class enemy_control : MonoBehaviour
 
     void death(){
         player.GetComponent<player_control>().exp+=exp;
+        spawn_item();
         Destroy(gameObject);
+    }
+
+    void spawn_item(){
+        int i;
+        for(i=0; i<spawnable_item.Count; i++){
+            if(Random.Range(0.0f, 1.0f)<=spawn_chance[i]){
+                GameObject item = Resources.Load<GameObject>("prefab/"+spawnable_item[i]);
+                GameObject.Instantiate(item, gameObject.transform);
+                break;
+            }
+        }
     }
 
     IEnumerator animate_hurt()

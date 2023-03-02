@@ -16,6 +16,7 @@ public unsafe class straight_sword : MonoBehaviour
     Rigidbody2D body;
     public GameObject dot;
     damage_manager manager;
+    Collider2D c, selfc;
     void Start()
     {
         swing_angle = const_swing_angle;
@@ -24,15 +25,19 @@ public unsafe class straight_sword : MonoBehaviour
         body.rotation = swing_angle;
         manager = gameObject.GetComponent<damage_manager>();
         //make sure the sword won't heart its owner
-        Collider2D c = transform.parent.gameObject.GetComponent<Collider2D>();
-        Collider2D selfc = gameObject.GetComponent<Collider2D>();
+        c = transform.parent.gameObject.GetComponent<Collider2D>();
+        selfc = gameObject.GetComponent<Collider2D>();
         Physics2D.IgnoreCollision(selfc, c, true);
         Physics2D.IgnoreCollision(c, selfc, true);
+
+        //switch off the collider when sword is retracted
+        //selfc.enabled = false;
     }
 
     IEnumerator extend()
     {
         attacking = true;
+        //selfc.enabled = true;
         body.angularVelocity = angul*swing_dir;
         if (manager.slash > manager.pierce) (manager.slash, manager.pierce) = (manager.pierce, manager.slash);
         manager.pierce *= 1.2f;
@@ -81,6 +86,7 @@ public unsafe class straight_sword : MonoBehaviour
             }
             yield return new WaitForSeconds(Time.deltaTime);
         }
+        //selfc.enabled = false;
     }
     ///momentum carry player forward
     IEnumerator swing()
@@ -148,6 +154,10 @@ public unsafe class straight_sword : MonoBehaviour
         if (transform.localScale.x == 0f||get_new_input()) init_attack = new_input;
         if (init_attack&&!attacking) StartCoroutine(extend());
     }
+
+    void FixedUpdate(){
+        //gameObject.transform.position = Vector2.zero;
+    }
     void OnCollisionEnter2D(Collision2D c)
     {
         Physics2D.IgnoreCollision(c.collider, c.otherCollider, true);
@@ -160,7 +170,7 @@ public unsafe class straight_sword : MonoBehaviour
         else
         {
             body.angularVelocity = angul;
-            Debug.Log(body.angularVelocity);
+            //Debug.Log(body.angularVelocity);
         }
     }
 

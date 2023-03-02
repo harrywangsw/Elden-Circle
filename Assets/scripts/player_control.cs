@@ -163,9 +163,10 @@ public unsafe class player_control : MonoBehaviour
     }
 
     void check_quickslot(){
-        if(Input.GetKeyDown("r")){
+        if(Input.GetKeyDown("e")){
             if(player_items.inv[player_items.quickslot_up].Item2<=0) return;
             player_items.inv[player_items.quickslot_up] = Tuple.Create(player_items.inv[player_items.quickslot_up].Item1, player_items.inv[player_items.quickslot_up].Item2-1);
+            GameObject.Find("up").transform.GetChild(0).GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_up].Item2.ToString();
             use_item(player_items.inv[player_items.quickslot_up].Item1);
         }
     }
@@ -190,6 +191,7 @@ public unsafe class player_control : MonoBehaviour
     }
 
     IEnumerator health_potion(){
+        Debug.Log("h");
         using_item = true;
         yield return new  WaitForSeconds(player_stat.item_speed/2f);
         health+=health_up_amount;
