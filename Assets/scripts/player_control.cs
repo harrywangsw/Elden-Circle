@@ -26,14 +26,14 @@ public unsafe class player_control : MonoBehaviour
         //player_items.inv.Add(Tuple.Create("health_potion", 8));
         //player_items.quickslot_up = 0;
         player_items = new inventory();
-        Debug.Log(player_items.quickslot_up);
+        //Debug.Log(player_items.quickslot_up);
         player_items = save_load.LoadPlayerItem(player_name);
         Debug.Log(player_items.inv[0].Item1);
         player_sprite = gameObject.GetComponent<SpriteRenderer>();
         health = player_stat.health;
         body = gameObject.GetComponent<Rigidbody2D>();
         update_weapon();
-        update_quickslot();
+        spawn_quickslot();
     }
     void update_weapon()
     {
@@ -52,7 +52,9 @@ public unsafe class player_control : MonoBehaviour
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
         }
     }
-    void update_quickslot(){
+    
+    
+    public void spawn_quickslot(){
         GameObject item;
         if(player_items.quickslot_up==-1) return;
         Debug.Log("prefab/"+player_items.inv[player_items.quickslot_up].Item1);
@@ -86,8 +88,28 @@ public unsafe class player_control : MonoBehaviour
         // if (player_items.quickslot_up!="") up.
     }
 
+    public void Update_quickslot(){
+        GameObject it = GameObject.Find("up").transform.GetChild(0).gameObject;
+        it.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_up].Item2.ToString();
+
+        it = GameObject.Find("down").transform.GetChild(0).gameObject;
+        it.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_down].Item2.ToString();
+
+        it = GameObject.Find("left").transform.GetChild(0).gameObject;
+        it.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_left].Item2.ToString();
+
+        it = GameObject.Find("right").transform.GetChild(0).gameObject;
+        it.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_right].Item2.ToString();
+    }
+
     void Update()
     {
+        Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = (Vector2)((worldMousePos - transform.position));
+        //Debug.Log(direction);
+        direction.Normalize();
+        transform.eulerAngles = new Vector3(0f,0f,Vector2.SignedAngle(Vector2.up, direction));
+
         attacking = *pattacking;
         if (Input.GetMouseButtonDown(0)) new_input = true;
         else new_input = false;
@@ -95,6 +117,7 @@ public unsafe class player_control : MonoBehaviour
         foreach(Transform child in overlay.transform){
             if(child.gameObject.name == "Exp") child.gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = exp.ToString();
         }
+        
     }
 
 
@@ -191,7 +214,7 @@ public unsafe class player_control : MonoBehaviour
     }
 
     IEnumerator health_potion(){
-        Debug.Log("h");
+        //Debug.Log("h");
         using_item = true;
         yield return new  WaitForSeconds(player_stat.item_speed/2f);
         health+=health_up_amount;

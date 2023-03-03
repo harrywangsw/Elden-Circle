@@ -45,6 +45,10 @@ public unsafe class straight_sword : MonoBehaviour
         while (transform.localScale.x < 1f)
         {
             transform.localScale += new Vector3(Time.deltaTime / extend_time, 0f, 0f);
+            if(transform.localScale.x>=1f) {
+                transform.localScale=Vector3.one;
+                break;
+            }
             yield return new WaitForSeconds(Time.deltaTime);
         }
         transform.localScale = Vector3.one;
