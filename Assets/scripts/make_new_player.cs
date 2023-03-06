@@ -25,6 +25,7 @@ public class make_new_player : MonoBehaviour
         new_stat.slash_dmg = transform.GetChild(6).GetChild(1).gameObject.GetComponent<edit_stat>().stat;
         new_stat.peirce_dmg = transform.GetChild(7).GetChild(1).gameObject.GetComponent<edit_stat>().stat;
         new_stat.mag_dmg = transform.GetChild(8).GetChild(1).gameObject.GetComponent<edit_stat>().stat;
+        new_stat.name = transform.GetChild(9).GetChild(0).GetChild(1).gameObject.GetComponent<Text>().text.ToString();
     }
 
     public void finish_creation(){

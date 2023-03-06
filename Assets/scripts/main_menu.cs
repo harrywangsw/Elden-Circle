@@ -9,7 +9,7 @@ public class main_menu : MonoBehaviour
     public List<inventory> inventorys; 
     public List<stats> stat; 
     public List<world_details> worlds; 
-    public GameObject buttons, saves;
+    public GameObject buttons, saves, current_obj, player_editor;
     world_details world;
     bool loaded = false, title = true;
     AsyncOperation asyncLoad;
@@ -38,12 +38,19 @@ public class main_menu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(Input.anyKey&&title){
-            buttons.SetActive(true);
-            title = false;
-            transform.GetChild(1).gameObject.SetActive(false);
-            buttons.transform.GetChild(0).gameObject.GetComponent<Button>().onClick.AddListener(delegate{continue_game();});
-            buttons.transform.GetChild(1).gameObject.GetComponent<Button>().onClick.AddListener(delegate{show_saves();});
+        if(Input.anyKey){
+            if(title){
+                buttons.SetActive(true);
+                title = false;
+                transform.GetChild(1).gameObject.SetActive(false);
+                buttons.transform.GetChild(0).gameObject.GetComponent<Button>().onClick.AddListener(delegate{continue_game();});
+                buttons.transform.GetChild(1).gameObject.GetComponent<Button>().onClick.AddListener(delegate{show_saves();});
+                buttons.transform.GetChild(2).gameObject.GetComponent<Button>().onClick.AddListener(delegate{new_player();});
+            }
+            if(Input.GetKeyDown("backspace")&&!title){
+                current_obj.SetActive(false);
+                buttons.SetActive(true);
+            }
         }
     }
 
@@ -59,8 +66,15 @@ public class main_menu : MonoBehaviour
         loaded = true;
     }
 
+    public void new_player(){
+        player_editor.SetActive(true);
+        current_obj = player_editor;
+        buttons.SetActive(false);
+    }
+
     public void show_saves(){
         int i;
+        current_obj = saves;
         buttons.SetActive(false);
         saves.SetActive(true);
         for(i=0; i<worlds.Count; i++){

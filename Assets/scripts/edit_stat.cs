@@ -6,10 +6,12 @@ using UnityEngine.UI;
 public class edit_stat : MonoBehaviour
 {
     public float increment, stat;
+    string start_text;
     void Start()
     {
         transform.GetChild(0).gameObject.GetComponent<Button>().onClick.AddListener(delegate{change_stat(false);});
         transform.GetChild(1).gameObject.GetComponent<Button>().onClick.AddListener(delegate{change_stat(true);});
+        start_text = transform.parent.GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text;
     }
 
     public void change_stat(bool decrease){
@@ -19,6 +21,6 @@ public class edit_stat : MonoBehaviour
 
     void Update()
     {
-        transform.parent.GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = stat.ToString();
+        transform.parent.GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = start_text+stat.ToString();
     }
 }
