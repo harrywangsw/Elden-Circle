@@ -13,22 +13,19 @@ public unsafe class player_control : MonoBehaviour
     public float health;
     public stats player_stat;
     public inventory player_items;
+    public world_details current_world;
     public bool* pattacking;
     damage_manager damages;
-    Vector2 velocity = new Vector2();
-    public GameObject rweapon, ritem, litem, uitem, ditem, overlay, death_screen, menu;
+    public Vector2 velocity = new Vector2();
+    public GameObject rweapon, overlay, death_screen, menu;
     public SpriteRenderer player_sprite;
     string type;
     public List<GameObject> hit_by;
     Rigidbody2D body;
     void Start()
     {
-        //player_items.inv.Add(Tuple.Create("health_potion", 8));
-        //player_items.quickslot_up = 0;
+        player_name = player_stat.name;
         player_items = new inventory();
-        //Debug.Log(player_items.quickslot_up);
-        player_items = save_load.LoadPlayerItem(player_name);
-        Debug.Log(player_items.inv[0].Item1);
         player_sprite = gameObject.GetComponent<SpriteRenderer>();
         health = player_stat.health;
         body = gameObject.GetComponent<Rigidbody2D>();
@@ -177,6 +174,7 @@ public unsafe class player_control : MonoBehaviour
         float moveInputy = Input.GetAxisRaw("Vertical");
         velocity.x = Mathf.MoveTowards(velocity.x, speed * moveInputx, walkAcceleration * Time.fixedDeltaTime);
         velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInputy, walkAcceleration * Time.fixedDeltaTime);
+        //velocity = Quaternion.AngleAxis(-transform.eulerAngles.z, Vector3.forward) * velocity;
         if(dash_command&&!dashing){
             dash_command = false;
             StartCoroutine(dash());
@@ -216,7 +214,7 @@ public unsafe class player_control : MonoBehaviour
     IEnumerator health_potion(){
         //Debug.Log("h");
         using_item = true;
-        yield return new  WaitForSeconds(player_stat.item_speed/2f);
+        yield return new WaitForSeconds(player_stat.item_speed/2f);
         health+=health_up_amount;
         yield return new WaitForSeconds(player_stat.item_speed/2f);
         using_item = false;

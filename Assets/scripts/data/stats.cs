@@ -9,14 +9,10 @@ public class stats
 {
 
     public float slash_def, strike_def, pierce_def, health, dash_length, item_speed, dash_modifier;
-
+    public float slash_dmg, strike_dmg, peirce_dmg, mag_dmg;
+    public string name;
     public stats()
     {
-        slash_def = 0f;
-        strike_def = 0f;
-        pierce_def = 0f;
-        health = 0f;
-        dash_length = 0f;
-        item_speed = 0f;
+        name = "";
     }
 }

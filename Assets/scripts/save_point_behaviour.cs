@@ -19,8 +19,9 @@ public class save_point_behaviour : MonoBehaviour
         if((player.transform.position-transform.position).magnitude<=trigger_dist){
             message_screen.GetComponent<TMPro.TextMeshProUGUI>().text = "press enter to save";
             if(Input.GetKeyDown(KeyCode.Return)){
-                save_load.SavePlayer(player.GetComponent<player_control>().player_stat, player.GetComponent<player_control>().player_name);
+                save_load.SavePlayer(player.GetComponent<player_control>().player_stat);
                 save_load.SavePlayerItem(player.GetComponent<player_control>().player_items, player.GetComponent<player_control>().player_name);
+                save_load.Saveworld(player.GetComponent<player_control>().current_world, player.GetComponent<player_control>().player_name);
             }
         }
         if((player.transform.position-transform.position).magnitude>=trigger_dist){
