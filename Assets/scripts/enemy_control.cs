@@ -5,21 +5,24 @@ using UnityEngine;
 //[RequireComponent(typeof(BoxCollider2D))]
 public unsafe class enemy_control : MonoBehaviour
 {
-    public float current_health, previous_health;
+    public float current_health, previous_health, speed, walkAcceleration, dash_modifier, dash_length, rweapon_range;
     public int exp;
-    public bool new_input, attacking, movable;
+    public bool new_input, attacking, movable, dashing, dash_command;
     public bool* pattacking;
     public stats enemy_stat;
+    Vector2 velocity = new Vector2();
     damage_manager damages;
     GameObject healthbar, greybar, player;
     Transform end_marker;
     public GameObject rweapon;
     Rigidbody2D body;
+    SpriteRenderer sprite;
     public List<GameObject> hit_by;
     public List<string> spawnable_item;
     public List<float> spawn_chance;
     void Start()
     {
+        sprite = gameObject.GetComponent<SpriteRenderer>();
         end_marker = transform.GetChild(0);
         player=GameObject.Find("player");
         hit_by = new List<GameObject>();
@@ -35,9 +38,54 @@ public unsafe class enemy_control : MonoBehaviour
 
     void Update()
     {
-        if ((player.transform.position - transform.position).magnitude<=3f) new_input = true;
+        if ((player.transform.position - transform.position).magnitude<=rweapon_range) new_input = true;
         else new_input = false;
+        attacking = *pattacking;
+        if(!attacking){
+            follow_player();
+        }
+    }
+
+    public void follow_player(){
         face_player();
+        if((player.transform.position - transform.position).magnitude<=rweapon_range){
+
+        }
+        if(Physics.Linecast(transform.position,player.transform.position))
+        {
+             
+        }
+        else{
+            move(-(player.transform.position-transform.position)Quaternion.AngleAxis(-transform.eulerAngles.z, Vector3.forward) * velocity);
+        }
+    }
+
+    void move(Vector3 moveInput)
+    {
+        moveInput.Normalize();
+        velocity.x = Mathf.MoveTowards(velocity.x, speed * moveInput.x, walkAcceleration * Time.fixedDeltaTime);
+        velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInput.y, walkAcceleration * Time.fixedDeltaTime);
+        //velocity = Quaternion.AngleAxis(-transform.eulerAngles.z, Vector3.forward) * velocity;
+        if(dash_command&&!dashing){
+            dash_command = false;
+            StartCoroutine(dash());
+        }
+        transform.Translate(velocity * Time.deltaTime);
+        Camera.main.transform.Translate(velocity * Time.deltaTime);
+        Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
+    }
+
+    IEnumerator dash()
+    {
+        dashing = true;
+        //Debug.Log("dash");
+        speed*=dash_modifier;
+        sprite.color =  Color.grey;
+        yield return new WaitForSeconds(dash_length);
+        speed/=dash_modifier;
+        sprite.color =  Color.black;
+        yield return new WaitForSeconds(dash_length*4f);
+        dashing = false;
     }
 
     void face_player()
@@ -104,12 +152,18 @@ public unsafe class enemy_control : MonoBehaviour
         //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
         if (type == "straight_sword")
         {
-            fixed (bool* p_attack_order = &new_input) { rweapon.GetComponent<straight_sword>().p_newinput = p_attack_order; }
+            straight_sword s = rweapon.GetComponent<straight_sword>();
+            fixed (bool* pattack_fixed = &s.attacking) { pattacking = pattack_fixed; }
+            fixed (bool* p_attack_order = &new_input) { s.p_newinput = p_attack_order; }
+            rweapon_range = s.range;
         }
         else if (type == "spear")
         {
-            fixed (bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
+            spear_attack s = rweapon.GetComponent<spear_attack>();
+            fixed (bool* pattack_fixed = &s.attacking) { pattacking = pattack_fixed; }
+            fixed (bool* p_attack_order = &new_input) { s.p_newinput = p_attack_order; }
             rweapon.transform.position = new Vector3(end_marker.position.x+0.08f, end_marker.position.y, end_marker.position.z);
+            rweapon_range = s.range;
         }
     }
 }

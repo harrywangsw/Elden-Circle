@@ -201,7 +201,7 @@ public unsafe class player_control : MonoBehaviour
     IEnumerator dash()
     {
         dashing = true;
-        Debug.Log("dash");
+        //Debug.Log("dash");
         speed*=player_stat.dash_modifier;
         player_sprite.color =  Color.grey;
         yield return new WaitForSeconds(player_stat.dash_length);

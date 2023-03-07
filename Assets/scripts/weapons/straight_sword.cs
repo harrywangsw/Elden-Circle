@@ -5,7 +5,7 @@ using System;
 [RequireComponent(typeof(damage_manager))]
 public unsafe class straight_sword : MonoBehaviour
 {
-    public float extend_time, swing_angle, const_swing_angle, swing_period;
+    public float extend_time, swing_angle, const_swing_angle, swing_period, range;
     public float torque;
     public float angul;
     public int swing_dir = 1;
