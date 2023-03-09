@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 //[RequireComponent(typeof(BoxCollider2D))]
 public unsafe class enemy_control : MonoBehaviour
@@ -34,6 +35,7 @@ public unsafe class enemy_control : MonoBehaviour
             if (transform.GetChild(i).gameObject.name == "health_bar") healthbar = transform.GetChild(i).gameObject;
         }
         update_weapon();
+        //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<Collider2D>(), false);
     }
 
     void Update()
@@ -152,16 +154,15 @@ public unsafe class enemy_control : MonoBehaviour
 
     public void update_weapon()
     {
-        string type = rweapon.tag;
         //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
-        if (type == "straight_sword")
+        if (rweapon.GetComponent<straight_sword>()!=null)
         {
             straight_sword s = rweapon.GetComponent<straight_sword>();
             fixed (bool* pattack_fixed = &s.attacking) { pattacking = pattack_fixed; }
             fixed (bool* p_attack_order = &new_input) { s.p_newinput = p_attack_order; }
             rweapon_range = s.range;
         }
-        else if (type == "spear")
+        else if (rweapon.GetComponent<spear_attack>()!=null)
         {
             spear_attack s = rweapon.GetComponent<spear_attack>();
             fixed (bool* pattack_fixed = &s.attacking) { pattacking = pattack_fixed; }

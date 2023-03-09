@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
+using UnityEngine.Tilemaps;
 
 public unsafe class player_control : MonoBehaviour
 {
@@ -17,33 +18,35 @@ public unsafe class player_control : MonoBehaviour
     public bool* pattacking;
     damage_manager damages;
     public Vector2 velocity = new Vector2();
+    Vector3 previous_pos = new Vector3();
     public GameObject rweapon, overlay, death_screen, menu;
     public SpriteRenderer player_sprite;
     string type;
-    public List<GameObject> hit_by;
     Rigidbody2D body;
     void Start()
     {
         player_name = player_stat.name;
+        speed = player_stat.spd;
         player_items = new inventory();
         player_sprite = gameObject.GetComponent<SpriteRenderer>();
         health = player_stat.health;
         body = gameObject.GetComponent<Rigidbody2D>();
         update_weapon();
         spawn_quickslot();
+        //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<CircleCollider2D>(), true);
+        //GameObject.Find("ground").GetComponent<TilemapCollider2D>().enabled = false;
     }
     void update_weapon()
     {
-        string type = rweapon.tag;
         //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
-        if (type == "straight_sword")
+        if (rweapon.GetComponent<straight_sword>()!=null)
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<straight_sword>().attacking) { pattacking = pattack_fixed; }
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<straight_sword>().p_newinput = p_attack_order; }
             range = rweapon.GetComponent<straight_sword>().range;
         }
-        else if (type == "spear")
+        else if (rweapon.GetComponent<straight_sword>()!=null)
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<spear_attack>().attacking) { pattacking = pattack_fixed; }
@@ -103,6 +106,9 @@ public unsafe class player_control : MonoBehaviour
 
     void Update()
     {
+        // if(control_functions.out_of_bound(transform.position)){
+        //     death();
+        // }
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (Vector2)((worldMousePos - transform.position));
         //Debug.Log(direction);
@@ -122,12 +128,9 @@ public unsafe class player_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
-        if (hit_by.Contains(c.gameObject)) return;
-        else hit_by.Add(c.gameObject);
-        if (c.gameObject.tag == "harmable") return;
-        else
+        transform.position = previous_pos;
+        if (c.gameObject.tag == "harmful")
         {
-            body.velocity = Vector3.zero;
             damages = c.gameObject.GetComponent<damage_manager>();           
             health -= calc_damage();
             animate_hurt();
@@ -140,11 +143,6 @@ public unsafe class player_control : MonoBehaviour
         menu.SetActive(false);
         death_screen.SetActive(true);
         Destroy(gameObject);
-    }
-
-    void OnCollisionExit2D(Collision2D c)
-    {
-        if (hit_by.Contains(c.gameObject)) hit_by.Remove(c.gameObject);
     }
 
 
@@ -162,6 +160,7 @@ public unsafe class player_control : MonoBehaviour
 
     void FixedUpdate()
     {
+        previous_pos = transform.position;
         if(!attacking&&!using_item) {
             move();
             if(!dashing){

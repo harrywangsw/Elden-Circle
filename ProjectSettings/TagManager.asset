@@ -8,6 +8,7 @@ TagManager:
   - harmable
   - spear
   - item
+  - harmful
   layers:
   - Default
   - TransparentFX
