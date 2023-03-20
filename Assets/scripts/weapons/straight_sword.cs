@@ -5,24 +5,24 @@ using System;
 [RequireComponent(typeof(damage_manager))]
 public unsafe class straight_sword : MonoBehaviour
 {
-    public float extend_time, swing_angle, const_swing_angle, swing_period, range;
+    public float extend_time, swing_angle, const_swing_angle, swing_period, range, attack_cool_off;
     public float torque;
     public float angul;
     public int swing_dir = 1;
     public int swings = 0;
     public bool init_attack, new_input, attacking, left;
     public bool* p_newinput;
-    Transform end_marker;
     Rigidbody2D body;
     public GameObject dot;
     damage_manager manager;
     Collider2D c, selfc;
+    public SpriteRenderer sword_sprite;
     void Start()
     {
         swing_angle = const_swing_angle;
         body = gameObject.GetComponent<Rigidbody2D>();
-        end_marker = transform.GetChild(0);
-        body.rotation = swing_angle;
+        sword_sprite = gameObject.GetComponent<SpriteRenderer>();
+        //body.rotation = swing_angle;
         manager = gameObject.GetComponent<damage_manager>();
         //make sure the sword won't heart its owner
         c = transform.parent.gameObject.GetComponent<Collider2D>();
@@ -155,8 +155,25 @@ public unsafe class straight_sword : MonoBehaviour
         swing_angle = const_swing_angle - gameObject.transform.rotation.z;
         new_input = *p_newinput;
         //to trigger the first init_attack
-        if (transform.localScale.x == 0f||get_new_input()) init_attack = new_input;
-        if (init_attack&&!attacking) StartCoroutine(extend());
+        //if (transform.localScale.x == 0f||get_new_input()) init_attack = new_input;
+        if (new_input&&!attacking) StartCoroutine(attack_animate());
+    }
+
+    IEnumerator attack_animate(){
+        attacking = true;
+        while(transform.localScale.x<1f){
+            transform.localScale+=new Vector3(Time.deltaTime/swing_period, Time.deltaTime/swing_period, Time.deltaTime/swing_period);
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+        yield return new WaitForSeconds(swing_period);
+        while(sword_sprite.color.a>0f){
+            sword_sprite.color = new Color(0f, 0f, 0f, sword_sprite.color.a-Time.deltaTime/(swing_period));
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+        transform.localScale = Vector3.zero;
+        sword_sprite.color = Color.black;
+        yield return new WaitForSeconds(attack_cool_off);
+        attacking = false;
     }
 
     void FixedUpdate(){

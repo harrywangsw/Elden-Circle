@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 
 public unsafe class player_control : MonoBehaviour
 {
-    public float speed, walkAcceleration, item_speed, health_up_amount, range;
+    public float speed, walkAcceleration, item_speed, health_up_amount, range, death_period;
     public string player_name;
     public int exp;
     public bool new_input, attacking, movable, dashing, dash_command, using_item;
@@ -109,11 +109,6 @@ public unsafe class player_control : MonoBehaviour
         // if(control_functions.out_of_bound(transform.position)){
         //     death();
         // }
-        Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = (Vector2)((worldMousePos - transform.position));
-        //Debug.Log(direction);
-        direction.Normalize();
-        transform.eulerAngles = new Vector3(0f,0f,Vector2.SignedAngle(Vector2.up, direction));
 
         attacking = *pattacking;
         if (Input.GetMouseButtonDown(0)) new_input = true;
@@ -129,19 +124,24 @@ public unsafe class player_control : MonoBehaviour
     void OnCollisionEnter2D(Collision2D c)
     {
         transform.position = previous_pos;
+        if(c.gameObject.name=="tilemap") StartCoroutine(death());
         if (c.gameObject.tag == "harmful")
         {
             damages = c.gameObject.GetComponent<damage_manager>();           
             health -= calc_damage();
-            animate_hurt();
-            if (health < 0f) death();
+            StartCoroutine(animate_hurt());
+            if (health < 0f) StartCoroutine(death());
         }
     }
 
-    void death(){
+    IEnumerator death(){
         overlay.SetActive(false);
         menu.SetActive(false);
         death_screen.SetActive(true);
+        while(player_sprite.color.a>0f){
+            player_sprite.color = new Color(0f, 0f, 0f, player_sprite.color.a-Time.deltaTime/death_period);
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
         Destroy(gameObject);
     }
 
@@ -153,9 +153,9 @@ public unsafe class player_control : MonoBehaviour
 
     IEnumerator animate_hurt()
     {
-        gameObject.GetComponent<SpriteRenderer>().color = Color.red;
+        player_sprite.color = Color.red;
         yield return new WaitForSeconds(0.1f);
-        gameObject.GetComponent<SpriteRenderer>().color = Color.black;
+        player_sprite.color = Color.black;
     }
 
     void FixedUpdate()
@@ -171,6 +171,7 @@ public unsafe class player_control : MonoBehaviour
 
     void move()
     {
+        transform.rotation = Quaternion.identity;
         Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         //moveInput = control_functions.rotate(moveInput, transform.eulerAngles.z);
         velocity.x = Mathf.MoveTowards(velocity.x, speed * moveInput.x, walkAcceleration * Time.fixedDeltaTime);
@@ -180,8 +181,14 @@ public unsafe class player_control : MonoBehaviour
             dash_command = false;
             StartCoroutine(dash());
         }
-        transform.Translate(velocity * Time.deltaTime);
+        transform.Translate(velocity * Time.fixedDeltaTime);
         Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
+
+        Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 direction = (Vector2)((worldMousePos - transform.position));
+        //Debug.Log(direction);
+        direction.Normalize();
+        transform.eulerAngles = new Vector3(0f,0f,Vector2.SignedAngle(Vector2.up, direction));
     }
 
     void check_quickslot(){
