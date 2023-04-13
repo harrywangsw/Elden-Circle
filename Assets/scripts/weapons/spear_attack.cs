@@ -20,6 +20,7 @@ public unsafe class spear_attack : MonoBehaviour
     void Update()
     {
         new_input = *p_newinput;
+        thrust_vel = range/thrust_period;
         if (get_new_input()) init_attack = new_input;
         if (init_attack&&!attacking) StartCoroutine(thrust());
     }
@@ -41,7 +42,7 @@ public unsafe class spear_attack : MonoBehaviour
         }
 
         body.position = start_marker.transform.position;
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(0.1f);
         attacking = false;
     }
 

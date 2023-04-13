@@ -51,20 +51,21 @@ public unsafe class enemy_control : MonoBehaviour
     public void follow_player(){
         float stray_angle = 0f;
         face_player();
-        if((player.transform.position - transform.position).magnitude<=rweapon_range){
-            if(Random.value<0.5f){
-                stray_angle = 90f;
-            }
-            else{
-                stray_angle = -90f;
-            }
-        }
+        //code for dodging
+        // if((player.transform.position - transform.position).magnitude<=rweapon_range){
+        //     if(Random.value<0.5f){
+        //         stray_angle = 90f;
+        //     }
+        //     else{
+        //         stray_angle = -90f;
+        //     }
+        // }
         if(Physics.Linecast(transform.position, player.transform.position))
         {
              
         }
         else{
-            move(Quaternion.AngleAxis(stray_angle, (player.transform.position-transform.position))*(transform.position-player.transform.position));
+            move(/*Quaternion.AngleAxis(stray_angle, (player.transform.position-transform.position))*/(transform.position-player.transform.position));
         }
     }
 
@@ -111,7 +112,7 @@ public unsafe class enemy_control : MonoBehaviour
             damages = c.gameObject.GetComponent<damage_manager>();           
             current_health -= calc_damage();
             //Debug.Log("damage: "+calc_damage().ToString());
-            animate_hurt();
+            control_functions.animate_hurt(sprite);
             if (current_health < 0f) death();
         }
     }
@@ -133,13 +134,6 @@ public unsafe class enemy_control : MonoBehaviour
                 break;
             }
         }
-    }
-
-    IEnumerator animate_hurt()
-    {
-        gameObject.GetComponent<SpriteRenderer>().color = Color.red;
-        yield return new WaitForSeconds(0.1f);
-        gameObject.GetComponent<SpriteRenderer>().color = Color.black;
     }
 
     void OnCollisionExit2D(Collision2D c)

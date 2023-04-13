@@ -7,8 +7,8 @@ using UnityEngine.UI;
 using System;
 public static class save_load 
 {
-    //public static string save_path = Application.persistentDataPath;
-    public static string save_path = "P:/GitHub/saves";
+    public static string save_path = Application.persistentDataPath;
+    //public static string save_path = "P:/GitHub/saves";
     public static void SavePlayer(stats stattobesaved)
     {
         BinaryFormatter formatter = new BinaryFormatter();

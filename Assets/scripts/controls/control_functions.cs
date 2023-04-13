@@ -11,4 +11,10 @@ public static class control_functions
     public static bool out_of_bound(Vector3 pos){
         return(Physics.Linecast(pos, Vector3.down));
     }
+    public static IEnumerator animate_hurt(SpriteRenderer damaged_sprite)
+    {
+        damaged_sprite.color = Color.red;
+        yield return new WaitForSeconds(0.1f);
+        damaged_sprite.color = Color.black;
+    }
 }

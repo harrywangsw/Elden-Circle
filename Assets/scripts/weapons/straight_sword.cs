@@ -16,6 +16,7 @@ public unsafe class straight_sword : MonoBehaviour
     public GameObject dot;
     damage_manager manager;
     Collider2D c, selfc;
+    Animator sword_animator;
     public SpriteRenderer sword_sprite;
     void Start()
     {
@@ -29,6 +30,8 @@ public unsafe class straight_sword : MonoBehaviour
         selfc = gameObject.GetComponent<Collider2D>();
         Physics2D.IgnoreCollision(selfc, c, true);
         Physics2D.IgnoreCollision(c, selfc, true);
+
+        sword_animator = gameObject.GetComponent<Animator>();
 
         //switch off the collider when sword is retracted
         //selfc.enabled = false;
@@ -156,7 +159,10 @@ public unsafe class straight_sword : MonoBehaviour
         new_input = *p_newinput;
         //to trigger the first init_attack
         //if (transform.localScale.x == 0f||get_new_input()) init_attack = new_input;
-        if (new_input&&!attacking) StartCoroutine(attack_animate());
+        if (new_input&&!attacking) {
+            sword_animator.SetTrigger("new_input");
+            //StartCoroutine(attack_animate());
+        }
     }
 
     IEnumerator attack_animate(){

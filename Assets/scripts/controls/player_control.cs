@@ -25,6 +25,9 @@ public unsafe class player_control : MonoBehaviour
     Rigidbody2D body;
     void Start()
     {
+        if(rweapon == null){
+            rweapon = transform.GetChild(0).gameObject;
+        }
         player_name = player_stat.name;
         speed = player_stat.spd;
         player_items = new inventory();
@@ -46,12 +49,19 @@ public unsafe class player_control : MonoBehaviour
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<straight_sword>().p_newinput = p_attack_order; }
             range = rweapon.GetComponent<straight_sword>().range;
         }
-        else if (rweapon.GetComponent<straight_sword>()!=null)
+        else if (rweapon.GetComponent<spear_attack>()!=null)
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<spear_attack>().attacking) { pattacking = pattack_fixed; }
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
             range = rweapon.GetComponent<spear_attack>().range;
+        }
+        else if (rweapon.GetComponent<fire_crackers>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<fire_crackers>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<fire_crackers>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<fire_crackers>().range;
         }
     }
     
@@ -129,7 +139,7 @@ public unsafe class player_control : MonoBehaviour
         {
             damages = c.gameObject.GetComponent<damage_manager>();           
             health -= calc_damage();
-            StartCoroutine(animate_hurt());
+            StartCoroutine(control_functions.animate_hurt(player_sprite));
             if (health < 0f) StartCoroutine(death());
         }
     }
@@ -149,13 +159,6 @@ public unsafe class player_control : MonoBehaviour
     float calc_damage()
     {
         return player_stat.slash_def* damages.slash + player_stat.strike_def * damages.strike + player_stat.pierce_def * damages.pierce;
-    }
-
-    IEnumerator animate_hurt()
-    {
-        player_sprite.color = Color.red;
-        yield return new WaitForSeconds(0.1f);
-        player_sprite.color = Color.black;
     }
 
     void FixedUpdate()
