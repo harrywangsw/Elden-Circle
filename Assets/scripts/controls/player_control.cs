@@ -133,7 +133,8 @@ public unsafe class player_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
-        if(c.gameObject.name=="tilemap") StartCoroutine(death());
+        //if(c.gameObject.name=="tilemap") StartCoroutine(death());
+
         if (c.gameObject.tag == "harmful")
         {
             damages = c.gameObject.GetComponent<damage_manager>();           
@@ -183,7 +184,8 @@ public unsafe class player_control : MonoBehaviour
             dash_command = false;
             StartCoroutine(dash());
         }
-        transform.Translate(velocity * Time.fixedDeltaTime);
+        body.velocity = velocity;
+        //transform.Translate(velocity * Time.fixedDeltaTime);
         Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
 
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);

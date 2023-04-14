@@ -49,6 +49,7 @@ public unsafe class fire_crackers : MonoBehaviour
             yield return new WaitForSeconds(period*(final_num-1));
             transform.SetParent(GameObject.FindWithTag("Player").transform);
             transform.localPosition = init_loc;
+            transform.localRotation = Quaternion.identity;
             init_new_attack = true;
             yield break;
         }
