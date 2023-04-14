@@ -16,7 +16,7 @@ public class item_behaviour : MonoBehaviour
     void Update()
     {
         if((player.transform.position-transform.position).magnitude<=trigger_dist){
-            message_screen.GetComponent<TMPro.TextMeshProUGUI>().text = "press enter to pick up item";
+            message_screen.GetComponent<switchmessages>().messages.Add("press enter to pick up item");
             if(Input.GetKeyDown(KeyCode.Return)){
                 int i;
                 for(i=0; i<player.GetComponent<player_control>().player_items.inv.Count; i++){
@@ -32,8 +32,9 @@ public class item_behaviour : MonoBehaviour
             }
         }
         if((player.transform.position-transform.position).magnitude>=trigger_dist){
-            if(message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to pick up item"){
-                message_screen.GetComponent<TMPro.TextMeshProUGUI>().text="\n";
+            int ind = message_screen.GetComponent<switchmessages>().messages.FindIndex("press enter to pick up item")
+            if(ind>=0){
+                message_screen.GetComponent<switchmessages>().messages.Remove(ind);
             }
         }
     }
