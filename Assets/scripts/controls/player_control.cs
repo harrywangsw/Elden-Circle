@@ -18,7 +18,7 @@ public unsafe class player_control : MonoBehaviour
     public bool* pattacking;
     damage_manager damages;
     public Vector2 velocity = new Vector2();
-    Vector3 previous_pos = new Vector3();
+    public Vector3 previous_pos = new Vector3();
     public GameObject rweapon, overlay, death_screen, menu;
     public SpriteRenderer player_sprite;
     string type;
@@ -133,7 +133,6 @@ public unsafe class player_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
-        transform.position = previous_pos;
         if(c.gameObject.name=="tilemap") StartCoroutine(death());
         if (c.gameObject.tag == "harmful")
         {
@@ -152,7 +151,7 @@ public unsafe class player_control : MonoBehaviour
             player_sprite.color = new Color(0f, 0f, 0f, player_sprite.color.a-Time.deltaTime/death_period);
             yield return new WaitForSeconds(Time.deltaTime);
         }
-        Destroy(gameObject);
+        player_sprite.sprite = null;
     }
 
 

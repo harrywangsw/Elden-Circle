@@ -2,18 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System;
+using Random=UnityEngine.Random;
 
 //[RequireComponent(typeof(BoxCollider2D))]
 public unsafe class enemy_control : MonoBehaviour
 {
-    public float current_health, previous_health, speed, walkAcceleration, dash_modifier, dash_length, rweapon_range;
+    public float current_health, previous_health, const_speed, walkAcceleration, dash_modifier, dash_length, rweapon_range;
+    float speed;
     public int exp;
-    public bool new_input, attacking, movable, dashing, dash_command, stray;
+    public bool new_input, attacking, movable, dashing, dash_command, stray, sight_lost = false, chasing = false;
     public bool* pattacking;
     public stats enemy_stat;
     Vector2 velocity = new Vector2();
     damage_manager damages;
     GameObject healthbar, greybar, player;
+    Vector3 prev_player_pos;
     Transform end_marker;
     public GameObject rweapon;
     Rigidbody2D body;
@@ -23,6 +27,7 @@ public unsafe class enemy_control : MonoBehaviour
     public List<float> spawn_chance;
     void Start()
     {
+        prev_player_pos = new Vector3();
         sprite = gameObject.GetComponent<SpriteRenderer>();
         end_marker = transform.GetChild(0);
         player=GameObject.Find("player");
@@ -38,17 +43,32 @@ public unsafe class enemy_control : MonoBehaviour
         //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<Collider2D>(), false);
     }
 
-    void Update()
+    void FixedUpdate()
     {
         attacking = *pattacking;
-        if(!attacking){
-            follow_player();
+        if(attacking) speed = const_speed/8f;
+        else speed = const_speed;
+        RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, player.transform.position);
+        if(Array.FindIndex(objs, obj => obj.collider.name == "tilemap")<0){
+            chasing = true;
+        }
+        else chasing = false;
+        if(chasing) follow_player();
+        else{
+            patrol();
         }
         if ((player.transform.position - transform.position).magnitude<=rweapon_range) new_input = true;
         else new_input = false;
     }
 
+    public void patrol(){
+        // body.angularVelocity = 0f;
+        // body.velocity = Vector2.zero;
+        // move(new Vector3(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f)));
+    }
+
     public void follow_player(){
+        if(sight_lost&&!chasing) return;
         float stray_angle = 0f;
         face_player();
         //code for dodging
@@ -60,18 +80,36 @@ public unsafe class enemy_control : MonoBehaviour
         //         stray_angle = -90f;
         //     }
         // }
-        if(Physics.Linecast(transform.position, player.transform.position))
+        RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, player.transform.position);
+        // for(int i = 0; i<objs.Length; i++){
+        //     Debug.Log("i: "+i.ToString()+" name: "+objs[i].collider.name);
+        // }
+        Debug.Log(Array.FindIndex(objs, obj => obj.collider.name == "tilemap").ToString());
+
+        if(Array.FindIndex(objs, obj => obj.collider.name == "tilemap")>=0)
         {
-             
+            Debug.Log(prev_player_pos);
+            if(!sight_lost) {
+                prev_player_pos = player.transform.position;
+                sight_lost = true;
+            }
+            if((transform.position-prev_player_pos).magnitude<=0.1f){
+                chasing = false;
+            }
+            move(transform.position-prev_player_pos);
         }
         else{
+            sight_lost = false;
+            chasing = true;
             move(/*Quaternion.AngleAxis(stray_angle, (player.transform.position-transform.position))*/(transform.position-player.transform.position));
         }
     }
 
     void move(Vector3 moveInput)
     {
+        Debug.DrawRay(transform.position, -moveInput, Color.green);
         moveInput.Normalize();
+
         velocity.x = Mathf.MoveTowards(velocity.x, speed * moveInput.x, walkAcceleration * Time.fixedDeltaTime);
         velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInput.y, walkAcceleration * Time.fixedDeltaTime);
         //velocity = Quaternion.AngleAxis(-transform.eulerAngles.z, Vector3.forward) * velocity;
@@ -79,7 +117,8 @@ public unsafe class enemy_control : MonoBehaviour
             dash_command = false;
             StartCoroutine(dash());
         }
-        transform.Translate(velocity * Time.deltaTime);
+        body.velocity = -velocity;
+        //transform.Translate(velocity * Time.deltaTime);
     }
 
     IEnumerator dash()
