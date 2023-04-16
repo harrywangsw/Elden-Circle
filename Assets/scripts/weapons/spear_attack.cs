@@ -10,11 +10,11 @@ public unsafe class spear_attack : MonoBehaviour
     public float thrust_vel, thrust_period, range;
     public bool* p_newinput;
     Rigidbody2D body;
-    GameObject start_marker;
+    public Vector3 init_loc;
+
     void Start()
     {
         body = gameObject.GetComponent<Rigidbody2D>();
-        start_marker = transform.parent.GetChild(0).gameObject;
     }
 
     void Update()
@@ -41,7 +41,7 @@ public unsafe class spear_attack : MonoBehaviour
             time+=Time.deltaTime;
         }
 
-        body.position = start_marker.transform.position;
+        body.position = init_loc;
         yield return new WaitForSeconds(0.1f);
         attacking = false;
     }

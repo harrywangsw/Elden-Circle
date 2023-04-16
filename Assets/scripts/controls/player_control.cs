@@ -19,14 +19,17 @@ public unsafe class player_control : MonoBehaviour
     damage_manager damages;
     public Vector2 velocity = new Vector2();
     public Vector3 previous_pos = new Vector3();
+    Vector3 init_loc = new Vector3();
     public GameObject rweapon, overlay, death_screen, menu;
     public SpriteRenderer player_sprite;
     string type;
     Rigidbody2D body;
     void Start()
     {
-        if(rweapon == null){
-            rweapon = transform.GetChild(0).gameObject;
+        if(rweapon!=null){
+            update_weapon();
+            GameObject.Instantiate(rweapon, init_loc, Quaternion.identity, transform);
+            gameObject.GetComponent<damage_manager>().enabled = false;
         }
         player_name = player_stat.name;
         speed = player_stat.spd;
@@ -34,7 +37,6 @@ public unsafe class player_control : MonoBehaviour
         player_sprite = gameObject.GetComponent<SpriteRenderer>();
         health = player_stat.health;
         body = gameObject.GetComponent<Rigidbody2D>();
-        update_weapon();
         spawn_quickslot();
         //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<CircleCollider2D>(), true);
         //GameObject.Find("ground").GetComponent<TilemapCollider2D>().enabled = false;
@@ -42,19 +44,13 @@ public unsafe class player_control : MonoBehaviour
     void update_weapon()
     {
         //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
-        if (rweapon.GetComponent<straight_sword>()!=null)
-        {
-            //get adress of attacking from right-hand weapon and save the adress in pattacking
-            fixed (bool* pattack_fixed = &rweapon.GetComponent<straight_sword>().attacking) { pattacking = pattack_fixed; }
-            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<straight_sword>().p_newinput = p_attack_order; }
-            range = rweapon.GetComponent<straight_sword>().range;
-        }
-        else if (rweapon.GetComponent<spear_attack>()!=null)
+        if (rweapon.GetComponent<spear_attack>()!=null)
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<spear_attack>().attacking) { pattacking = pattack_fixed; }
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
             range = rweapon.GetComponent<spear_attack>().range;
+            init_loc = rweapon.GetComponent<spear_attack>().init_loc;
         }
         else if (rweapon.GetComponent<fire_crackers>()!=null)
         {
@@ -62,6 +58,15 @@ public unsafe class player_control : MonoBehaviour
             fixed (bool* pattack_fixed = &rweapon.GetComponent<fire_crackers>().attacking) { pattacking = pattack_fixed; }
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<fire_crackers>().p_newinput = p_attack_order; }
             range = rweapon.GetComponent<fire_crackers>().range;
+            init_loc = rweapon.GetComponent<fire_crackers>().init_loc;
+        }
+        else if (rweapon.GetComponent<dagger_fan>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<dagger_fan>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<dagger_fan>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<dagger_fan>().range;
+            init_loc = rweapon.GetComponent<dagger_fan>().init_loc;
         }
     }
     
@@ -121,6 +126,10 @@ public unsafe class player_control : MonoBehaviour
         // }
 
         attacking = *pattacking;
+        if(Input.GetKeyDown(KeyCode.Escape)){
+            if(menu.activeSelf) menu.SetActive(false);
+            else menu.SetActive(true);
+        }
         if (Input.GetMouseButtonDown(0)) new_input = true;
         else new_input = false;
         if (Input.GetKeyDown("space")&&!dashing) dash_command = true;
@@ -226,9 +235,24 @@ public unsafe class player_control : MonoBehaviour
     IEnumerator health_potion(){
         //Debug.Log("h");
         using_item = true;
-        yield return new WaitForSeconds(player_stat.item_speed/2f);
+        float time = 0f;
+        while(time<player_stat.item_speed*0.5f){
+            player_sprite.color = Color.green;
+            yield return new WaitForSeconds(Time.deltaTime*8f);
+            time+=Time.deltaTime*8f;
+            player_sprite.color = Color.black;
+            yield return new WaitForSeconds(Time.deltaTime*8f);
+            time+=Time.deltaTime*8f;
+        }
         health+=health_up_amount;
-        yield return new WaitForSeconds(player_stat.item_speed/2f);
+        while(time<player_stat.item_speed){
+            player_sprite.color = Color.green;
+            yield return new WaitForSeconds(Time.deltaTime*8f);
+            time+=Time.deltaTime*8f;
+            player_sprite.color = Color.black;
+            yield return new WaitForSeconds(Time.deltaTime*8f);
+            time+=Time.deltaTime*8f;
+        }
         using_item = false;
     }
 }

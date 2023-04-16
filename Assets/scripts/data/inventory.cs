@@ -8,6 +8,7 @@ using System.Numerics;
 [System.Serializable]
 public class inventory
 {
+    //tracks the name of the object and how many the player has
     public List<Tuple<string, int>> inv;
     public int quickslot_up;
     public int quickslot_down;

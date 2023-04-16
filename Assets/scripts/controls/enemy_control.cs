@@ -167,9 +167,10 @@ public unsafe class enemy_control : MonoBehaviour
         for(i=0; i<spawnable_item.Count; i++){
             if(Random.Range(0.0f, 1.0f)<=spawn_chance[i]){
                 Debug.Log("prefab/"+spawnable_item[i]);
-                GameObject item = Resources.Load<GameObject>("item_spawns/"+spawnable_item[i]);
+                GameObject item = Resources.Load<GameObject>("prefabs/spawned_item");
                 GameObject spawned = GameObject.Instantiate(item, gameObject.transform.position, Quaternion.identity);
                 spawned.name = spawnable_item[i];
+                spawned.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("sprites/"+spawnable_item[i]);
                 break;
             }
         }

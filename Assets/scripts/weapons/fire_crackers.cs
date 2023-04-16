@@ -10,10 +10,12 @@ public unsafe class fire_crackers : MonoBehaviour
     public bool attacking, new_input, init_new_attack=true;
     Sprite explosion, cracker;
     public Vector3 init_loc, init_size;
+    GameObject user;
 
     void Start(){
         explosion = Resources.Load<Sprite>("sprites/explosion");
         cracker = Resources.Load<Sprite>("sprites/firecracker");
+        if(transform.parent!=null) user = transform.parent.gameObject;
         if(num==final_num){
             Destroy(gameObject);
         }
@@ -47,7 +49,7 @@ public unsafe class fire_crackers : MonoBehaviour
             //gameObject.GetComponent<SpriteRenderer>().sprite = cracker;
             transform.localScale = Vector3.zero;
             yield return new WaitForSeconds(period*(final_num-1));
-            transform.SetParent(GameObject.FindWithTag("Player").transform);
+            transform.SetParent(user.transform);
             transform.localPosition = init_loc;
             transform.localRotation = Quaternion.identity;
             init_new_attack = true;
