@@ -8,17 +8,17 @@ using Random=UnityEngine.Random;
 //[RequireComponent(typeof(BoxCollider2D))]
 public unsafe class enemy_control : MonoBehaviour
 {
-    public float current_health, previous_health, const_speed, walkAcceleration, dash_modifier, dash_length, rweapon_range;
-    float speed;
+    public float current_health, previous_health, const_speed, walkAcceleration, dash_modifier, dash_length, rweapon_range, poise_broken_period;
+    float speed, triggertime, parriable_window;
     public int exp;
-    public bool new_input, attacking, movable, dashing, dash_command, stray, sight_lost = false, chasing = false;
+    bool trigger_time_not_set;
+    public bool new_input, attacking, movable, dashing, dash_command, stray, sight_lost, chasing, poise_broken;
     public bool* pattacking;
     public stats enemy_stat;
     Vector2 velocity = new Vector2();
     damage_manager damages;
-    GameObject healthbar, greybar, player;
+    GameObject greybar, player, broken_word;
     Vector3 prev_player_pos;
-    Transform end_marker;
     public GameObject rweapon;
     Rigidbody2D body;
     SpriteRenderer sprite;
@@ -29,16 +29,12 @@ public unsafe class enemy_control : MonoBehaviour
     {
         prev_player_pos = new Vector3();
         sprite = gameObject.GetComponent<SpriteRenderer>();
-        end_marker = transform.GetChild(0);
         player=GameObject.Find("player");
         hit_by = new List<GameObject>();
         body = gameObject.GetComponent<Rigidbody2D>();
+        broken_word = Resources.Load<GameObject>("prefab/broken_word");
         current_health = enemy_stat.health;
         previous_health = current_health;
-        for (int i = 0; i < transform.childCount; i++) 
-        {
-            if (transform.GetChild(i).gameObject.name == "health_bar") healthbar = transform.GetChild(i).gameObject;
-        }
         update_weapon();
         //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<Collider2D>(), false);
     }
@@ -46,8 +42,17 @@ public unsafe class enemy_control : MonoBehaviour
     void FixedUpdate()
     {
         attacking = *pattacking;
+        //tracking the time when attack started to determine if enemy can be parried right now
+        if(attacking&&trigger_time_not_set){
+            triggertime = Time.time;
+            trigger_time_not_set = false;
+        }
+        if(!attacking){
+            trigger_time_not_set = true;
+        }
         if(attacking) speed = const_speed/8f;
         else speed = const_speed;
+        if(poise_broken) return;
         RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, player.transform.position);
         if(Array.FindIndex(objs, obj => obj.collider.name == "tilemap")<0){
             chasing = true;
@@ -84,7 +89,7 @@ public unsafe class enemy_control : MonoBehaviour
         // for(int i = 0; i<objs.Length; i++){
         //     Debug.Log("i: "+i.ToString()+" name: "+objs[i].collider.name);
         // }
-        Debug.Log(Array.FindIndex(objs, obj => obj.collider.name == "tilemap").ToString());
+        //Debug.Log(Array.FindIndex(objs, obj => obj.collider.name == "tilemap").ToString());
 
         if(Array.FindIndex(objs, obj => obj.collider.name == "tilemap")>=0)
         {
@@ -142,10 +147,13 @@ public unsafe class enemy_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
+        //Debug.Log(c.gameObject.tag);
+        if(c.collider.gameObject.tag=="poise_breaker"&&attacking&&Math.Abs(Time.time-triggertime)>parriable_window){
+            StartCoroutine(break_poise());
+        }
         if (hit_by.Contains(c.gameObject)) return;
         else hit_by.Add(c.gameObject);
-        if (c.gameObject.tag == "harmable") return;
-        else
+        if (c.gameObject.GetComponent<damage_manager>()!=null)
         {
             body.velocity = Vector3.zero;
             damages = c.gameObject.GetComponent<damage_manager>();           
@@ -154,6 +162,32 @@ public unsafe class enemy_control : MonoBehaviour
             control_functions.animate_hurt(sprite);
             if (current_health < 0f) death();
         }
+    }
+
+    IEnumerator break_poise(){
+        Debug.Log("wtf");
+        bool turn_dark = true;
+        bool poise_broken = true;
+        GameObject b = GameObject.Instantiate(broken_word, transform, false);
+        float time = 0f;
+        while(time<poise_broken_period){
+            time+=Time.deltaTime;
+            if(turn_dark){
+                sprite.color = sprite.color+new Color(0f, 0f, 0f, Time.deltaTime/(poise_broken_period/8f));
+            }
+            else{
+                sprite.color = sprite.color-new Color(0f, 0f, 0f, Time.deltaTime/(poise_broken_period/8f));
+            }
+            if(sprite.color.a>=1f){
+                turn_dark = false;
+            }
+            if(sprite.color.a<=0){
+                turn_dark = true;
+            }
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+        Destroy(b);
+        poise_broken = false;
     }
 
     void death(){
@@ -188,21 +222,34 @@ public unsafe class enemy_control : MonoBehaviour
 
     public void update_weapon()
     {
+        rweapon = GameObject.Instantiate(rweapon, transform, false);
         //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
-        if (rweapon.GetComponent<straight_sword>()!=null)
+        if (rweapon.GetComponent<spear_attack>()!=null)
         {
-            straight_sword s = rweapon.GetComponent<straight_sword>();
-            fixed (bool* pattack_fixed = &s.attacking) { pattacking = pattack_fixed; }
-            fixed (bool* p_attack_order = &new_input) { s.p_newinput = p_attack_order; }
-            rweapon_range = s.range;
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<spear_attack>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
+            parriable_window = rweapon.GetComponent<spear_attack>().parriable_window;
+            rweapon_range = rweapon.GetComponent<spear_attack>().range;
         }
-        else if (rweapon.GetComponent<spear_attack>()!=null)
+        else if (rweapon.GetComponent<fire_crackers>()!=null)
         {
-            spear_attack s = rweapon.GetComponent<spear_attack>();
-            fixed (bool* pattack_fixed = &s.attacking) { pattacking = pattack_fixed; }
-            fixed (bool* p_attack_order = &new_input) { s.p_newinput = p_attack_order; }
-            rweapon.transform.position = new Vector3(end_marker.position.x+0.08f, end_marker.position.y, end_marker.position.z);
-            rweapon_range = s.range;
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<fire_crackers>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<fire_crackers>().p_newinput = p_attack_order; }
+            
+        }
+        else if (rweapon.GetComponent<dagger_fan>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<dagger_fan>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<dagger_fan>().p_newinput = p_attack_order; }
+        }
+        else if (rweapon.GetComponent<parry_shield>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<parry_shield>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<parry_shield>().p_newinput = p_attack_order; }
         }
     }
 }

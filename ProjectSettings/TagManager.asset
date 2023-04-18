@@ -9,6 +9,7 @@ TagManager:
   - spear
   - item
   - harmful
+  - poise_breaker
   layers:
   - Default
   - TransparentFX

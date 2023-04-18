@@ -28,7 +28,6 @@ public unsafe class player_control : MonoBehaviour
     {
         if(rweapon!=null){
             update_weapon();
-            GameObject.Instantiate(rweapon, init_loc, Quaternion.identity, transform);
             gameObject.GetComponent<damage_manager>().enabled = false;
         }
         player_name = player_stat.name;
@@ -43,6 +42,7 @@ public unsafe class player_control : MonoBehaviour
     }
     void update_weapon()
     {
+        rweapon = GameObject.Instantiate(rweapon, transform, false);
         //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
         if (rweapon.GetComponent<spear_attack>()!=null)
         {
@@ -67,6 +67,14 @@ public unsafe class player_control : MonoBehaviour
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<dagger_fan>().p_newinput = p_attack_order; }
             range = rweapon.GetComponent<dagger_fan>().range;
             init_loc = rweapon.GetComponent<dagger_fan>().init_loc;
+        }
+        else if (rweapon.GetComponent<parry_shield>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<parry_shield>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<parry_shield>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<parry_shield>().range;
+            init_loc = rweapon.GetComponent<parry_shield>().init_loc;
         }
     }
     
@@ -144,7 +152,7 @@ public unsafe class player_control : MonoBehaviour
     {
         //if(c.gameObject.name=="tilemap") StartCoroutine(death());
 
-        if (c.gameObject.tag == "harmful")
+        if (c.gameObject.GetComponent<damage_manager>()!=null)
         {
             damages = c.gameObject.GetComponent<damage_manager>();           
             health -= calc_damage();
@@ -224,10 +232,10 @@ public unsafe class player_control : MonoBehaviour
         dashing = true;
         //Debug.Log("dash");
         speed*=player_stat.dash_modifier;
-        player_sprite.color =  Color.grey;
+        player_sprite.color = new Color(1f, 1f, 1f, 0.5f);
         yield return new WaitForSeconds(player_stat.dash_length);
         speed/=player_stat.dash_modifier;
-        player_sprite.color =  Color.black;
+        player_sprite.color = new Color(1f, 1f, 1f, 1f);
         yield return new WaitForSeconds(player_stat.dash_length*4f);
         dashing = false;
     }

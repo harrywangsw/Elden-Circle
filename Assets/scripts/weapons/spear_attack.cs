@@ -3,26 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 [RequireComponent(typeof(damage_manager))]
 [RequireComponent(typeof(BoxCollider2D))]
-[RequireComponent(typeof(Rigidbody2D))]
 public unsafe class spear_attack : MonoBehaviour
 {
     public bool init_attack, new_input, attacking;
-    public float thrust_vel, thrust_period, range;
+    public float thrust_vel, thrust_period, range, parriable_window;
     public bool* p_newinput;
-    Rigidbody2D body;
     public Vector3 init_loc;
 
     void Start()
     {
-        body = gameObject.GetComponent<Rigidbody2D>();
+        
     }
 
     void Update()
     {
         new_input = *p_newinput;
         thrust_vel = range/thrust_period;
-        if (get_new_input()) init_attack = new_input;
-        if (init_attack&&!attacking) StartCoroutine(thrust());
+        if (new_input&&!attacking) StartCoroutine(thrust());
     }
 
     IEnumerator thrust(){
@@ -41,12 +38,8 @@ public unsafe class spear_attack : MonoBehaviour
             time+=Time.deltaTime;
         }
 
-        body.position = init_loc;
+        transform.localPosition = init_loc;
         yield return new WaitForSeconds(0.1f);
         attacking = false;
-    }
-
-    bool get_new_input(){
-        return body.velocity.y<=0f;
     }
 }

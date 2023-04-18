@@ -15,9 +15,13 @@ public class item_behaviour : MonoBehaviour
 
     void Update()
     {
+        int ind = message_screen.GetComponent<switchmessages>().messages.IndexOf("press enter to pick up item");
         if((player.transform.position-transform.position).magnitude<=trigger_dist){
-            message_screen.GetComponent<switchmessages>().messages.Add("press enter to pick up item");
-            if(Input.GetKeyDown(KeyCode.Return)){
+            if(ind<0){
+                message_screen.GetComponent<switchmessages>().messages.Add("press enter to pick up item");
+                message_screen.GetComponent<switchmessages>().current = message_screen.GetComponent<switchmessages>().messages.Count-1;
+            }
+            if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to pick up item"){
                 int i;
                 for(i=0; i<player.GetComponent<player_control>().player_items.inv.Count; i++){
                     Debug.Log(player.GetComponent<player_control>().player_items.inv[i].Item1);
@@ -32,8 +36,7 @@ public class item_behaviour : MonoBehaviour
                 player.GetComponent<player_control>().player_items.inv.Add(Tuple.Create(gameObject.name, 1));
             }
         }
-        if((player.transform.position-transform.position).magnitude>=trigger_dist){
-            int ind = message_screen.GetComponent<switchmessages>().messages.IndexOf("press enter to pick up item");
+        else{
             if(ind>=0){
                 message_screen.GetComponent<switchmessages>().messages.RemoveAt(ind);
             }

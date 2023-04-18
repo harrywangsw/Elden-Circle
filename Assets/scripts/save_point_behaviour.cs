@@ -16,9 +16,13 @@ public class save_point_behaviour : MonoBehaviour
 
     void Update()
     {
+        int ind = message_screen.GetComponent<switchmessages>().messages.IndexOf("press enter to save");
         if((player.transform.position-transform.position).magnitude<=trigger_dist){
-            message_screen.GetComponent<switchmessages>().messages.Add("press enter to save");
-            if(Input.GetKeyDown(KeyCode.Return)){
+            if(ind<0){
+                message_screen.GetComponent<switchmessages>().messages.Add("press enter to save");
+                message_screen.GetComponent<switchmessages>().current = message_screen.GetComponent<switchmessages>().messages.Count-1;
+            }
+            if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to save"){
                 save_load.SavePlayer(player.GetComponent<player_control>().player_stat);
                 save_load.SavePlayerItem(player.GetComponent<player_control>().player_items, player.GetComponent<player_control>().player_name);
                 player.GetComponent<player_control>().current_world.player_pos_x = player.transform.position.x;
@@ -27,7 +31,6 @@ public class save_point_behaviour : MonoBehaviour
             }
         }
         else{
-            int ind = message_screen.GetComponent<switchmessages>().messages.IndexOf("press enter to save");
             if(ind>=0){
                 message_screen.GetComponent<switchmessages>().messages.RemoveAt(ind);
             }
