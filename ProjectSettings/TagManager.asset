@@ -10,6 +10,7 @@ TagManager:
   - item
   - harmful
   - poise_breaker
+  - weapon
   layers:
   - Default
   - TransparentFX

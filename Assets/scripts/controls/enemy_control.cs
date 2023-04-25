@@ -17,7 +17,7 @@ public unsafe class enemy_control : MonoBehaviour
     public stats enemy_stat;
     Vector2 velocity = new Vector2();
     damage_manager damages;
-    GameObject greybar, player, broken_word;
+    GameObject greybar, player, broken_word, generic_item;
     Vector3 prev_player_pos;
     public GameObject rweapon;
     Rigidbody2D body;
@@ -28,6 +28,7 @@ public unsafe class enemy_control : MonoBehaviour
     void Start()
     {
         prev_player_pos = new Vector3();
+        generic_item = Resources.Load<GameObject>("prefab/spawned_item");
         sprite = gameObject.GetComponent<SpriteRenderer>();
         player=GameObject.Find("player");
         hit_by = new List<GameObject>();
@@ -52,7 +53,10 @@ public unsafe class enemy_control : MonoBehaviour
         }
         if(attacking) speed = const_speed/8f;
         else speed = const_speed;
-        if(poise_broken) return;
+        if(poise_broken) {
+            new_input = false;
+            return;
+        }
         RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, player.transform.position);
         if(Array.FindIndex(objs, obj => obj.collider.name == "tilemap")<0){
             chasing = true;
@@ -159,16 +163,19 @@ public unsafe class enemy_control : MonoBehaviour
             damages = c.gameObject.GetComponent<damage_manager>();           
             current_health -= calc_damage();
             //Debug.Log("damage: "+calc_damage().ToString());
-            control_functions.animate_hurt(sprite);
+            statics.animate_hurt(sprite);
             if (current_health < 0f) death();
         }
     }
 
     IEnumerator break_poise(){
-        Debug.Log("wtf");
+        //Debug.Log("wtf");
+        enemy_stat.strike_def/=3f;
+        enemy_stat.pierce_def/=3f;
+        enemy_stat.slash_def/=3f;
         bool turn_dark = true;
-        bool poise_broken = true;
-        GameObject b = GameObject.Instantiate(broken_word, transform, false);
+        poise_broken = true;
+        //GameObject b = GameObject.Instantiate(broken_word, transform, false);
         float time = 0f;
         while(time<poise_broken_period){
             time+=Time.deltaTime;
@@ -186,7 +193,8 @@ public unsafe class enemy_control : MonoBehaviour
             }
             yield return new WaitForSeconds(Time.deltaTime);
         }
-        Destroy(b);
+        sprite.color = Color.black;
+        //Destroy(b);
         poise_broken = false;
     }
 
@@ -198,13 +206,13 @@ public unsafe class enemy_control : MonoBehaviour
 
     void spawn_item(){
         int i;
+        //THIS GIVES THE WRONG PROBABILITY!!!!! BUT WHATEVER
         for(i=0; i<spawnable_item.Count; i++){
             if(Random.Range(0.0f, 1.0f)<=spawn_chance[i]){
-                Debug.Log("prefab/"+spawnable_item[i]);
-                GameObject item = Resources.Load<GameObject>("prefabs/spawned_item");
-                GameObject spawned = GameObject.Instantiate(item, gameObject.transform.position, Quaternion.identity);
+                //Debug.Log("prefab/"+spawnable_item[i]);
+                GameObject spawned = GameObject.Instantiate(generic_item, gameObject.transform.position, Quaternion.identity);
                 spawned.name = spawnable_item[i];
-                spawned.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("sprites/"+spawnable_item[i]);
+                spawned.GetComponent<item_behaviour>().type = statics.item_types[spawnable_item[i]];
                 break;
             }
         }
@@ -217,7 +225,7 @@ public unsafe class enemy_control : MonoBehaviour
 
     float calc_damage()
     {
-        return enemy_stat.slash_def* damages.slash + enemy_stat.strike_def * damages.strike + enemy_stat.pierce_def * damages.pierce;
+        return enemy_stat.slash_def * damages.slash + enemy_stat.strike_def * damages.strike + enemy_stat.pierce_def * damages.pierce;
     }
 
     public void update_weapon()

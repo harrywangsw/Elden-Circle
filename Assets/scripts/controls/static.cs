@@ -3,8 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public static class control_functions
+public static class statics
 {
+    public static Dictionary<string, string> item_types = new Dictionary<string, string>(){
+        {"fire_cracker", "weapon"},
+	    {"health_potion", "item"},
+	    {"spear", "weapon"},
+        {"dagger_fan", "weapon"},
+        {"parry_shield", "weapon"},
+    };
+
     public static Vector2 rotate(Vector2 original, float angle){
         return new Vector2(original.x*Mathf.Cos(angle)-original.y*Mathf.Sin(angle), original.x*Mathf.Sin(angle)+original.y*Mathf.Cos(angle));
     }
@@ -16,5 +24,8 @@ public static class control_functions
         damaged_sprite.color = Color.red;
         yield return new WaitForSeconds(0.1f);
         damaged_sprite.color = Color.black;
+    }
+    public static int search_for_item(inventory inv, string item){
+        return 0;
     }
 }

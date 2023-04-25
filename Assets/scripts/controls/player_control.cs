@@ -7,11 +7,11 @@ using UnityEngine.Tilemaps;
 
 public unsafe class player_control : MonoBehaviour
 {
-    public float speed, walkAcceleration, item_speed, health_up_amount, range, death_period;
+    public float const_speed, walkAcceleration, item_speed, health_up_amount, range, death_period, health;
+    float speed;
     public string player_name;
     public int exp;
     public bool new_input, attacking, movable, dashing, dash_command, using_item;
-    public float health;
     public stats player_stat;
     public inventory player_items;
     public world_details current_world;
@@ -24,6 +24,8 @@ public unsafe class player_control : MonoBehaviour
     public SpriteRenderer player_sprite;
     string type;
     Rigidbody2D body;
+    List<GameObject> u_gameobjects = new List<GameObject>(), l_gameobjects = new List<GameObject>(), r_gameobjects = new List<GameObject>();
+
     void Start()
     {
         if(rweapon!=null){
@@ -80,37 +82,34 @@ public unsafe class player_control : MonoBehaviour
     
     
     public void spawn_quickslot(){
+        //quickslot_up/down/left/right_indexes are the indexes of inv that represent the items in each respective quickslot
+        //u/d/l/r_gameobjects are the gameobject for each item
+        Debug.Log(player_items.quickslot_up_indexes.Count);
+        foreach(int x in player_items.quickslot_up_indexes){
+            u_gameobjects.Add(Resources.Load<GameObject>("prefab/UI_items/"+player_items.inv[x].Item1));
+        }
+        foreach(int x in player_items.quickslot_left_indexes){
+            l_gameobjects.Add(Resources.Load<GameObject>("prefab/UI_items/"+player_items.inv[x].Item1));
+        }
+        foreach(int x in player_items.quickslot_right_indexes){
+            r_gameobjects.Add(Resources.Load<GameObject>("prefab/UI_items/"+player_items.inv[x].Item1));
+        }
+        
         GameObject item;
-        if(player_items.quickslot_up==-1) return;
-        Debug.Log("prefab/"+player_items.inv[player_items.quickslot_up].Item1);
-        GameObject i = Resources.Load<GameObject>("prefab/"+player_items.inv[player_items.quickslot_up].Item1);
-        Transform slot = GameObject.Find("up").transform;
-        item = GameObject.Instantiate(i, slot);
-        item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_up].Item2.ToString();
-
-        if(player_items.quickslot_down==-1) return;
-        i = Resources.Load<GameObject>("prefab/"+player_items.inv[player_items.quickslot_down].Item1);
-        slot = GameObject.Find("down").transform;
-        item = GameObject.Instantiate(i, slot);
-        item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_down].Item2.ToString();
-
-        if(player_items.quickslot_left==-1) return;
-        i = Resources.Load<GameObject>("prefab/"+player_items.inv[player_items.quickslot_left].Item1);
-        slot = GameObject.Find("left").transform;
-        item = GameObject.Instantiate(i, slot);
-        item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_left].Item2.ToString();
-
-        if(player_items.quickslot_right==-1) return;
-        i = Resources.Load<GameObject>("prefab/"+player_items.inv[player_items.quickslot_right].Item1);
-        slot = GameObject.Find("right").transform;
-        item = GameObject.Instantiate(i, slot);
-        item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_right].Item2.ToString();
-
-
-        // SpriteRenderer up = GameObject.Find("up").transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
-        // if (player_items.quickslot_up!="") up.
-        // SpriteRenderer up = GameObject.Find("up").transform.GetChild(0).gameObject.GetComponent<SpriteRenderer>();
-        // if (player_items.quickslot_up!="") up.
+        //player_item.quickslot_up is the index of u_gameobject and quickslot_up_items
+        if(u_gameobjects.Count>0){
+            Transform slot = GameObject.Find("up").transform;
+            item = GameObject.Instantiate(u_gameobjects[player_items.quickslot_up], slot);
+            item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_up_indexes[player_items.quickslot_up]].Item2.ToString();
+        }
+        if(l_gameobjects.Count>0){
+            Transform slot = GameObject.Find("left").transform;
+            item = GameObject.Instantiate(l_gameobjects[player_items.quickslot_left], slot);            
+        }
+        if(r_gameobjects.Count>0){
+            Transform slot = GameObject.Find("right").transform;
+            item = GameObject.Instantiate(r_gameobjects[player_items.quickslot_right], slot);
+        }
     }
 
     public void Update_quickslot(){
@@ -119,32 +118,52 @@ public unsafe class player_control : MonoBehaviour
 
         it = GameObject.Find("down").transform.GetChild(0).gameObject;
         it.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_down].Item2.ToString();
+    }
 
-        it = GameObject.Find("left").transform.GetChild(0).gameObject;
-        it.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_left].Item2.ToString();
-
-        it = GameObject.Find("right").transform.GetChild(0).gameObject;
-        it.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_right].Item2.ToString();
+    void check_quickslot(){
+        if(Input.GetKeyDown(KeyCode.LeftShift)){
+            if(player_items.inv[player_items.quickslot_up].Item2<=0) return;
+            player_items.inv[player_items.quickslot_up] = Tuple.Create(player_items.inv[player_items.quickslot_up].Item1, player_items.inv[player_items.quickslot_up].Item2-1, player_items.inv[player_items.quickslot_up].Item3);
+            GameObject.Find("up").transform.GetChild(0).GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_up].Item2.ToString();
+            use_item(player_items.inv[player_items.quickslot_up].Item1);
+        }
+        if(Input.GetKeyDown("e")){
+            player_items.quickslot_right+=1;
+            player_items.quickslot_right = player_items.quickslot_right%player_items.quickslot_right_indexes.Count;
+            Destroy(GameObject.Find("right").transform.GetChild(0).gameObject);
+            GameObject item;
+            Transform slot = GameObject.Find("right").transform;
+            item = GameObject.Instantiate(r_gameobjects[player_items.quickslot_right], slot);
+            item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_right_indexes[player_items.quickslot_right]].Item2.ToString();
+        }
     }
 
     void Update()
     {
-        // if(control_functions.out_of_bound(transform.position)){
+        // if(statics.out_of_bound(transform.position)){
         //     death();
         // }
 
         attacking = *pattacking;
-        if(Input.GetKeyDown(KeyCode.Escape)){
-            if(menu.activeSelf) menu.SetActive(false);
-            else menu.SetActive(true);
+        if(attacking||using_item) speed = const_speed/8f;
+        else speed = const_speed;
+
+        if(Input.GetKeyDown("escape")){
+            //Debug.Log("wtf");
+            menu.SetActive(!menu.activeSelf);
         }
-        if (Input.GetMouseButtonDown(0)) new_input = true;
+        if (Input.GetMouseButtonDown(0)) {
+            //Debug.Log("wtffffff");
+            new_input = true;
+        }
         else new_input = false;
         if (Input.GetKeyDown("space")&&!dashing) dash_command = true;
         foreach(Transform child in overlay.transform){
             if(child.gameObject.name == "Exp") child.gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = exp.ToString();
         }
-        
+        if(!dashing){
+            check_quickslot();
+        }
     }
 
 
@@ -156,7 +175,7 @@ public unsafe class player_control : MonoBehaviour
         {
             damages = c.gameObject.GetComponent<damage_manager>();           
             health -= calc_damage();
-            StartCoroutine(control_functions.animate_hurt(player_sprite));
+            StartCoroutine(statics.animate_hurt(player_sprite));
             if (health < 0f) StartCoroutine(death());
         }
     }
@@ -181,19 +200,14 @@ public unsafe class player_control : MonoBehaviour
     void FixedUpdate()
     {
         previous_pos = transform.position;
-        if(!attacking&&!using_item) {
-            move();
-            if(!dashing){
-                check_quickslot();
-            }
-        }
+        move();
     }
 
     void move()
     {
         transform.rotation = Quaternion.identity;
         Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        //moveInput = control_functions.rotate(moveInput, transform.eulerAngles.z);
+        //moveInput = statics.rotate(moveInput, transform.eulerAngles.z);
         velocity.x = Mathf.MoveTowards(velocity.x, speed * moveInput.x, walkAcceleration * Time.fixedDeltaTime);
         velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInput.y, walkAcceleration * Time.fixedDeltaTime);
         //velocity = Quaternion.AngleAxis(-transform.eulerAngles.z, Vector3.forward) * velocity;
@@ -212,15 +226,6 @@ public unsafe class player_control : MonoBehaviour
         transform.eulerAngles = new Vector3(0f,0f,Vector2.SignedAngle(Vector2.up, direction));
     }
 
-    void check_quickslot(){
-        if(Input.GetKeyDown("e")){
-            if(player_items.inv[player_items.quickslot_up].Item2<=0) return;
-            player_items.inv[player_items.quickslot_up] = Tuple.Create(player_items.inv[player_items.quickslot_up].Item1, player_items.inv[player_items.quickslot_up].Item2-1);
-            GameObject.Find("up").transform.GetChild(0).GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = player_items.inv[player_items.quickslot_up].Item2.ToString();
-            use_item(player_items.inv[player_items.quickslot_up].Item1);
-        }
-    }
-
     void use_item(string item_name){
         if(item_name=="health_potion"){
             StartCoroutine(health_potion());
@@ -231,10 +236,10 @@ public unsafe class player_control : MonoBehaviour
     {
         dashing = true;
         //Debug.Log("dash");
-        speed*=player_stat.dash_modifier;
+        const_speed*=player_stat.dash_modifier;
         player_sprite.color = new Color(1f, 1f, 1f, 0.5f);
         yield return new WaitForSeconds(player_stat.dash_length);
-        speed/=player_stat.dash_modifier;
+        const_speed/=player_stat.dash_modifier;
         player_sprite.color = new Color(1f, 1f, 1f, 1f);
         yield return new WaitForSeconds(player_stat.dash_length*4f);
         dashing = false;

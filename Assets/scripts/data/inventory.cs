@@ -8,8 +8,9 @@ using System.Numerics;
 [System.Serializable]
 public class inventory
 {
-    //tracks the name of the object and how many the player has
-    public List<Tuple<string, int>> inv;
+    //tracks the name of the object and how many the player has, the third string is its type
+    public List<Tuple<string, int, string>> inv;
+    public List<int> quickslot_up_indexes, quickslot_left_indexes, quickslot_right_indexes;
     public int quickslot_up;
     public int quickslot_down;
     public int quickslot_left;
@@ -17,8 +18,10 @@ public class inventory
 
     public inventory()
     {
-        inv = new List<Tuple<string, int>>();
-        //inv.Add(Tuple.Create("health_potion", 1));
+        inv = new List<Tuple<string, int, string>>();
+        quickslot_left_indexes = new List<int>();
+        quickslot_right_indexes = new List<int>();
+        quickslot_up_indexes = new List<int>();
         quickslot_up = -1;
         quickslot_down = -1;
         quickslot_left = -1;

@@ -21,7 +21,7 @@ public unsafe class parry_shield : MonoBehaviour
     void Update()
     {
         new_input = *p_newinput;
-        if(new_input){
+        if(new_input&&!attacking){
             StartCoroutine(shield_up());
         }
     }
