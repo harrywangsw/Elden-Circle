@@ -30,10 +30,10 @@ public class make_new_player : MonoBehaviour
 
     public void finish_creation(){
         save_load.SavePlayer(new_stat);
+        save_load.Saveworld(new world_details(), new_stat.name);
         main_menu m = transform.parent.gameObject.GetComponent<main_menu>();
         m.worlds.Add(new world_details());
-        m.stat.Add(new stats());
-        m.inventorys.Add(new inventory());
-        StartCoroutine(m.load_game(m.worlds.Count-1));
+        m.stat.Add(new_stat);
+        StartCoroutine(m.LoadYourAsyncScene(m.worlds.Count-1));
     }
 }

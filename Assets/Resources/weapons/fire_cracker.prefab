@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1245795144259552199}
   - component: {fileID: 612486752}
   m_Layer: 0
-  m_Name: firecracker
+  m_Name: fire_cracker
   m_TagString: harmful
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -26,6 +26,23 @@ public static class statics
         damaged_sprite.color = Color.black;
     }
     public static int search_for_item(inventory inv, string item){
-        return 0;
+        Debug.Log(item+" "+inv.inv.FindIndex(obj => obj.Item1 == item));
+        return inv.inv.FindIndex(obj => obj.Item1 == item);
+    }
+
+    public static void apply_world_details(world_details w){
+        int i;
+        GameObject p = GameObject.Find("player");
+        p.GetComponent<Transform>().position = new Vector2(w.player_pos_x, w.player_pos_y);
+        GameObject[] doors = GameObject.FindGameObjectsWithTag("door");
+        for(i=0; i<doors.Length; i++){
+            doors[i].GetComponent<doors>().num = i;
+            bool closed = doors[i].GetComponent<Collider2D>().enabled;
+            if(i>=w.opened_doors.Count) w.opened_doors.Add(!closed);
+            //if door is closed but saved world detail say it's open, then open it
+            if(closed&&w.opened_doors[i]){
+                doors[i].GetComponent<Collider2D>().enabled = false;
+            }
+        }
     }
 }

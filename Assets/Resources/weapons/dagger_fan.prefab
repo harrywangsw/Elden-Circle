@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7143697092929835653}
   - component: {fileID: 7642130161620681770}
   m_Layer: 0
-  m_Name: dagger
+  m_Name: dagger_fan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class main_menu : MonoBehaviour
 {
-    public List<inventory> inventorys; 
     public List<stats> stat; 
     public List<world_details> worlds; 
     public GameObject buttons, saves, current_obj, player_editor;
@@ -17,7 +16,6 @@ public class main_menu : MonoBehaviour
     {
         worlds = new List<world_details>();
         stat = new List<stats>();
-        inventorys = new List<inventory>();
         //string path = "P:/GitHub/saves"+"/";
         string path = save_load.save_path;
         foreach (string file in System.IO.Directory.GetFiles(path)){
@@ -28,16 +26,14 @@ public class main_menu : MonoBehaviour
             if(file.Split(".")[1]=="pl"){
                 stat.Add(save_load.LoadPlayer(file));
             }
-            if(file.Split(".")[1]=="inv"){
-                inventorys.Add(save_load.LoadPlayerItem(file));
-            }
         }
-        StartCoroutine(LoadYourAsyncScene());
+        DontDestroyOnLoad(gameObject);
     }
 
     // Update is called once per frame
     void Update()
     {
+        Debug.Log(loaded.ToString());
         if(Input.anyKey){
             if(title){
                 buttons.SetActive(true);
@@ -54,16 +50,30 @@ public class main_menu : MonoBehaviour
         }
     }
 
-    IEnumerator LoadYourAsyncScene(){
-        asyncLoad = SceneManager.LoadSceneAsync("main_scene");
-        asyncLoad.allowSceneActivation = false;
+    public IEnumerator LoadYourAsyncScene(int index){
+        Debug.Log(index.ToString());
+        string scene_name = worlds[index].world_name;
+        if(scene_name==null){
+            scene_name = "main_scene";
+        }
+        Debug.Log(scene_name);
+        asyncLoad = SceneManager.LoadSceneAsync(scene_name);
         // Wait until the asynchronous scene fully loads
         while (!asyncLoad.isDone)
         {
             yield return null;
         }
-        Debug.Log("finished loading scene");
-        loaded = true;
+        saves.SetActive(false);
+
+        Debug.Log(GameObject.Find("player").transform.position.z);
+        player_control p = GameObject.Find("player").GetComponent<player_control>();
+        p.transform.position = new Vector2(worlds[index].player_pos_x, worlds[index].player_pos_y);
+        p.player_stat = stat[index];
+        GameObject.Find("inventory_content").GetComponent<inventory_manager>().player_items = p.player_stat.inv;
+        Debug.Log("finished loading scene?");
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(scene_name));
+        asyncLoad.allowSceneActivation = true;
+        Destroy(gameObject);
     }
 
     public void new_player(){
@@ -78,24 +88,11 @@ public class main_menu : MonoBehaviour
         buttons.SetActive(false);
         saves.SetActive(true);
         for(i=0; i<worlds.Count; i++){
+            int tmp = i;
+            saves.transform.GetChild(i).gameObject.name = i.ToString();
             saves.transform.GetChild(i).GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = stat[i].name;
-            saves.transform.GetChild(i).gameObject.GetComponent<Button>().onClick.AddListener(delegate{StartCoroutine(load_game(i));});
+            saves.transform.GetChild(i).gameObject.GetComponent<Button>().onClick.AddListener(delegate{StartCoroutine(LoadYourAsyncScene(tmp));});
         }
-    }
-
-    public IEnumerator load_game(int index){
-        Debug.Log("started loading game");
-        asyncLoad.allowSceneActivation = true;
-        saves.SetActive(false);
-        while(!loaded){
-            yield return null;
-        }
-        player_control p = GameObject.Find("player").GetComponent<player_control>();
-        p.transform.position = new Vector2(worlds[index].player_pos_x, worlds[index].player_pos_y);
-        p.player_stat = stat[index];
-        p.player_items = inventorys[index];
-        Debug.Log("finished?");
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName("main_scene"));
     }
 
     public void continue_game(){

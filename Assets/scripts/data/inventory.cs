@@ -23,7 +23,6 @@ public class inventory
         quickslot_right_indexes = new List<int>();
         quickslot_up_indexes = new List<int>();
         quickslot_up = -1;
-        quickslot_down = -1;
         quickslot_left = -1;
         quickslot_right = -1;
     }

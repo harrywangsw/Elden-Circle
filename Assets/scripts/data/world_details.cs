@@ -10,6 +10,8 @@ public class world_details
 {
     public float player_pos_x;
     public float player_pos_y;
+    public List<bool> opened_doors;
+    public string world_name;
 
     public world_details(){
         player_pos_x = 0f;

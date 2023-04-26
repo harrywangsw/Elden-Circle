@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class doors : MonoBehaviour
 {
+    public int num;
     public bool open_right;
     public bool open_left;
     public float triggerdist, period;
@@ -57,6 +58,8 @@ public class doors : MonoBehaviour
             sp.color=sp.color-new Color(0f, 0f, 0f, Time.deltaTime/period);
             yield return new WaitForSeconds(Time.deltaTime);
         }
-        Destroy(gameObject);
+        gameObject.GetComponent<Collider2D>().enabled = false;
+        gameObject.GetComponent<SpriteRenderer>().enabled = false;
+        player.GetComponent<player_control>().current_world.opened_doors[num] = false;
     }
 }

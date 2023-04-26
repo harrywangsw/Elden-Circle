@@ -12,8 +12,10 @@ public class stats
     public float slash_dmg, strike_dmg, peirce_dmg, mag_dmg;
     public float spd;
     public string name;
+    public inventory inv;
     public stats()
     {
         name = "";
+        inv = new inventory();
     }
 }
