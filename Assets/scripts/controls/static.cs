@@ -26,7 +26,7 @@ public static class statics
         damaged_sprite.color = Color.black;
     }
     public static int search_for_item(inventory inv, string item){
-        Debug.Log(item+" "+inv.inv.FindIndex(obj => obj.Item1 == item));
+        //Debug.Log(item+" "+inv.inv.FindIndex(obj => obj.Item1 == item));
         return inv.inv.FindIndex(obj => obj.Item1 == item);
     }
 

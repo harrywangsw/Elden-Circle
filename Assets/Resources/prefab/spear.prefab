@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: -9123705176534374660}
   - component: {fileID: 5755904181329858602}
   - component: {fileID: -5601936534360234386}
+  - component: {fileID: 1754550334421053697}
   m_Layer: 0
   m_Name: spear
   m_TagString: Untagged
@@ -101,6 +102,9 @@ MonoBehaviour:
   slash: 0
   strike: 0
   pierce: 0
+  fire: 0
+  magic: 0
+  lightning: 0
 --- !u!114 &-5601936534360234386
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -118,3 +122,32 @@ MonoBehaviour:
   attacking: 0
   thrust_vel: 0
   thrust_period: 0
+  range: 0
+  parriable_window: 0
+  init_loc: {x: 0, y: 0, z: 0}
+--- !u!61 &1754550334421053697
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8065386095162540131}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.13471869, y: 0.98705375}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.44237548, y: 0.5017778}
+    oldSize: {x: 3.7021277, y: 3}
+    newSize: {x: 6.96, y: 5.64}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 0.4970714, y: 0.6765783}
+  m_EdgeRadius: 0

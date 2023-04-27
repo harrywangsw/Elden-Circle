@@ -11,7 +11,7 @@ public unsafe class player_control : MonoBehaviour
     float speed;
     public string player_name;
     public int exp;
-    public bool new_input, attacking, movable, dashing, dash_command, using_item;
+    public bool new_input, attacking, movable, dashing, dash_command, using_item, ramming = true;
     public stats player_stat;
     public world_details current_world;
     public bool* pattacking;
@@ -19,7 +19,7 @@ public unsafe class player_control : MonoBehaviour
     public Vector2 velocity = new Vector2();
     public Vector3 previous_pos = new Vector3();
     Vector3 init_loc = new Vector3();
-    public GameObject rweapon, overlay, death_screen, menu, inventory_content;
+    public GameObject rweapon, overlay, death_screen, menu, inventory_content, lweapon;
     public SpriteRenderer player_sprite;
     string type;
     Rigidbody2D body;
@@ -29,22 +29,28 @@ public unsafe class player_control : MonoBehaviour
     {
         inventory_content = GameObject.Find("inventory_content");
         if(rweapon!=null){
-            update_weapon();
+            update_weapon(rweapon);
             gameObject.GetComponent<damage_manager>().enabled = false;
+            ramming = false;
         }
         player_name = player_stat.name;
         const_speed = player_stat.spd;
         player_sprite = gameObject.GetComponent<SpriteRenderer>();
         health = player_stat.health;
         body = gameObject.GetComponent<Rigidbody2D>();
-        spawn_quickslot();
         //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<CircleCollider2D>(), true);
         //GameObject.Find("ground").GetComponent<TilemapCollider2D>().enabled = false;
     }
 
-    void update_weapon()
+    public void update_weapon(GameObject new_weapon)
     {
-        rweapon = GameObject.Instantiate(rweapon, transform, false);
+        if(rweapon!=null){
+            if(rweapon.transform.parent==transform){
+                Destroy(rweapon);
+            }
+        }
+        rweapon = GameObject.Instantiate(new_weapon, transform, false);
+        ramming = false;
         //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
         if (rweapon.GetComponent<spear_attack>()!=null)
         {
@@ -80,77 +86,24 @@ public unsafe class player_control : MonoBehaviour
         }
     }
     
-    
-    public void spawn_quickslot(){
-        //quickslot_up/down/left/right_indexes are the indexes of inv that represent the items in each respective quickslot
-        //u/d/l/r_gameobjects are the gameobject for each item
-        foreach(int x in player_stat.inv.quickslot_up_indexes){
-            u_gameobjects.Add(Resources.Load<GameObject>("prefab/UI_items/"+player_stat.inv.inv[x].Item1));
-        }
-        foreach(int x in player_stat.inv.quickslot_left_indexes){
-            l_gameobjects.Add(Resources.Load<GameObject>("prefab/UI_items/"+player_stat.inv.inv[x].Item1));
-        }
-        foreach(int x in player_stat.inv.quickslot_right_indexes){
-            r_gameobjects.Add(Resources.Load<GameObject>("prefab/UI_items/"+player_stat.inv.inv[x].Item1));
-        }
-        
-        GameObject item;
-        //player_item.quickslot_up is the index of u_gameobject and quickslot_up_items
-        if(u_gameobjects.Count>0){
-            Transform slot = GameObject.Find("up").transform;
-            item = GameObject.Instantiate(u_gameobjects[player_stat.inv.quickslot_up], slot);
-            item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_stat.inv.inv[player_stat.inv.quickslot_up_indexes[player_stat.inv.quickslot_up]].Item2.ToString();
-        }
-        if(l_gameobjects.Count>0){
-            Transform slot = GameObject.Find("left").transform;
-            item = GameObject.Instantiate(l_gameobjects[player_stat.inv.quickslot_left], slot);            
-        }
-        if(r_gameobjects.Count>0){
-            Transform slot = GameObject.Find("right").transform;
-            item = GameObject.Instantiate(r_gameobjects[player_stat.inv.quickslot_right], slot);
-        }
-    }
-
-    public void Update_quickslot(){
-        GameObject it = GameObject.Find("up").transform.GetChild(0).gameObject;
-        it.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_stat.inv.inv[player_stat.inv.quickslot_up].Item2.ToString();
-
-        it = GameObject.Find("down").transform.GetChild(0).gameObject;
-        it.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_stat.inv.inv[player_stat.inv.quickslot_down].Item2.ToString();
-    }
-
-    void check_quickslot(){
-        if(Input.GetKeyDown("e")){
-            if(player_stat.inv.inv[player_stat.inv.quickslot_up].Item2<=0) return;
-            player_stat.inv.inv[player_stat.inv.quickslot_up] = Tuple.Create(player_stat.inv.inv[player_stat.inv.quickslot_up].Item1, player_stat.inv.inv[player_stat.inv.quickslot_up].Item2-1, player_stat.inv.inv[player_stat.inv.quickslot_up].Item3);
-            GameObject.Find("up").transform.GetChild(0).GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = player_stat.inv.inv[player_stat.inv.quickslot_up].Item2.ToString();
-            use_item(player_stat.inv.inv[player_stat.inv.quickslot_up].Item1);
-        }
-        if(!attacking&&Input.GetKeyDown(KeyCode.LeftShift)){
-            player_stat.inv.quickslot_right+=1;
-            player_stat.inv.quickslot_right = player_stat.inv.quickslot_right%player_stat.inv.quickslot_right_indexes.Count;
-            Destroy(GameObject.Find("right").transform.GetChild(0).gameObject);
-            GameObject item;
-            Transform slot = GameObject.Find("right").transform;
-            item = GameObject.Instantiate(r_gameobjects[player_stat.inv.quickslot_right], slot);
-
-            rweapon = Resources.Load<GameObject>("prefab/weapon/"+item.name);
-
-        }
-    }
 
     void Update()
     {
         // if(statics.out_of_bound(transform.position)){
         //     death();
         // }
-        attacking = *pattacking;
+        if(!ramming) attacking = *pattacking;
+        else attacking = dashing;
         if(attacking||using_item) speed = const_speed/8f;
         else speed = const_speed;
 
         if(Input.GetKeyDown("escape")){
             //Debug.Log("wtf");
-            menu.SetActive(!menu.activeSelf);
+            if(menu.GetComponent<RectTransform>().localScale==Vector3.one) menu.GetComponent<RectTransform>().localScale= Vector3.zero;
+            else menu.GetComponent<RectTransform>().localScale=Vector3.one;
+        }
+        if(menu.GetComponent<RectTransform>().localScale == Vector3.one){
+            return;
         }
         if (Input.GetMouseButtonDown(0)) {
             //Debug.Log("wtffffff");
@@ -160,9 +113,6 @@ public unsafe class player_control : MonoBehaviour
         if (Input.GetKeyDown("space")&&!dashing) dash_command = true;
         foreach(Transform child in overlay.transform){
             if(child.gameObject.name == "Exp") child.gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = exp.ToString();
-        }
-        if(!dashing&&!inventory_content.activeSelf){
-            check_quickslot();
         }
     }
 
@@ -226,7 +176,7 @@ public unsafe class player_control : MonoBehaviour
         transform.eulerAngles = new Vector3(0f,0f,Vector2.SignedAngle(Vector2.up, direction));
     }
 
-    void use_item(string item_name){
+    public void use_item(string item_name){
         if(item_name=="health_potion"){
             StartCoroutine(health_potion());
         }
