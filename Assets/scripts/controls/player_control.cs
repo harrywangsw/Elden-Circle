@@ -119,12 +119,9 @@ public unsafe class player_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
-        //if(c.gameObject.name=="tilemap") StartCoroutine(death());
-
-        if (c.gameObject.GetComponent<damage_manager>()!=null)
-        {
-            damages = c.gameObject.GetComponent<damage_manager>();           
-            health -= calc_damage();
+        if (c.collider.gameObject.GetComponent<damage_manager>()!=null)
+        {       
+            health -= calc_damage(c.collider.gameObject.GetComponent<damage_manager>());
             StartCoroutine(statics.animate_hurt(player_sprite));
             if (health < 0f) StartCoroutine(death());
         }
@@ -142,7 +139,7 @@ public unsafe class player_control : MonoBehaviour
     }
 
 
-    float calc_damage()
+    float calc_damage(damage_manager damages)
     {
         return player_stat.slash_def* damages.slash + player_stat.strike_def * damages.strike + player_stat.pierce_def * damages.pierce;
     }

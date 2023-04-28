@@ -46,28 +46,49 @@ public class iventory_button : MonoBehaviour
     void Update()
     {
         if(!wait_for_input) return;
-        if(Input.GetKeyDown(KeyCode.LeftShift)&&player_items.inv[item_index].Item3=="weapon"&&!in_rquick_slot){
+        if(Input.GetKeyDown(KeyCode.LeftShift)&&player_items.inv[item_index].Item3=="weapon"){
             //Debug.Log("addpls");
-            player_items.quickslot_right_indexes.Add(item_index);
-            in_rquick_slot = true;
-            in_lquick_slot = false;
-            inv.r_gameobjects.Add(gameObject);
-            inv.current_itemr = inv.r_gameobjects.Count-1;
-            inv.switchr();
+            if(!in_rquick_slot){
+                player_items.quickslot_right_indexes.Add(item_index);
+                in_rquick_slot = true;
+                inv.r_gameobjects.Add(gameObject);
+                inv.current_itemr = inv.r_gameobjects.Count-1;
+                inv.switchr();
+            }
+            else{
+                player_items.quickslot_right_indexes.Remove(item_index);
+                in_rquick_slot = false;
+                inv.r_gameobjects.Remove(gameObject);
+            }
         }
-        if(Input.GetKeyDown(KeyCode.LeftAlt)&&player_items.inv[item_index].Item3=="weapon"&&!in_lquick_slot){
-            player_items.quickslot_left_indexes.Add(item_index);
-            in_rquick_slot = false;
-            in_lquick_slot = true;
-            inv.l_gameobjects.Add(gameObject);
-            inv.current_iteml = inv.l_gameobjects.Count-1;
-            inv.switchl();
+        if(Input.GetKeyDown(KeyCode.LeftAlt)&&player_items.inv[item_index].Item3=="weapon"){
+            if(!in_lquick_slot){
+                player_items.quickslot_left_indexes.Add(item_index);
+                in_rquick_slot = false;
+                in_lquick_slot = true;
+                inv.l_gameobjects.Add(gameObject);
+                inv.current_iteml = inv.l_gameobjects.Count-1;
+                inv.switchl();
+            }
+            else{
+                player_items.quickslot_left_indexes.Remove(item_index);
+                in_lquick_slot = false;
+                inv.l_gameobjects.Remove(gameObject);
+            }
         }
-        if(Input.GetKeyDown("e")&&player_items.inv[item_index].Item3=="item"&&!in_uquick_slot){
-            player_items.quickslot_up_indexes.Add(item_index);
-            inv.u_gameobjects.Add(gameObject);
-            inv.current_itemu = inv.u_gameobjects.Count-1;
-            inv.switchu();
+        if(Input.GetKeyDown("e")&&player_items.inv[item_index].Item3=="item"){
+            if(!in_uquick_slot){
+                player_items.quickslot_up_indexes.Add(item_index);
+                inv.u_gameobjects.Add(gameObject);
+                in_uquick_slot = true;
+                inv.current_itemu = inv.u_gameobjects.Count-1;
+                inv.switchu();
+            }
+            else{
+                player_items.quickslot_up_indexes.Remove(item_index);
+                inv.u_gameobjects.Remove(gameObject);
+                in_uquick_slot = false;
+            }
         }
         if(in_lquick_slot){
             transform.GetChild(2).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "L";

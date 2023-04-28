@@ -56,6 +56,7 @@ public class inventory_manager : MonoBehaviour
         GameObject slot = right;
         Destroy(slot.transform.GetChild(0).gameObject);
         GameObject weapon = GameObject.Instantiate(r_gameobjects[current_itemr], slot.transform);
+        weapon.GetComponent<RectTransform>().localPosition = Vector3.zero;
         Destroy(weapon.transform.GetChild(0).gameObject);
         Destroy(weapon.transform.GetChild(1).gameObject);
         Destroy(weapon.transform.GetChild(2).gameObject);
@@ -66,6 +67,7 @@ public class inventory_manager : MonoBehaviour
         GameObject slot = left;
         Destroy(slot.transform.GetChild(0).gameObject);
         GameObject weapon = GameObject.Instantiate(l_gameobjects[current_iteml], slot.transform);
+        weapon.GetComponent<RectTransform>().localPosition = Vector3.zero;
         Destroy(weapon.transform.GetChild(0).gameObject);
         Destroy(weapon.transform.GetChild(1).gameObject);
         Destroy(weapon.transform.GetChild(2).gameObject);
