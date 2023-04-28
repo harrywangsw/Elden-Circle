@@ -17,7 +17,7 @@ public unsafe class player_control : MonoBehaviour
     public bool* pattacking;
     damage_manager damages;
     public Vector2 velocity = new Vector2();
-    public Vector3 previous_pos = new Vector3();
+    public Vector3 previous_pos = new Vector3(), previous_angle = new Vector3();
     Vector3 init_loc = new Vector3();
     public GameObject rweapon, overlay, death_screen, menu, inventory_content, lweapon;
     public SpriteRenderer player_sprite;
@@ -89,9 +89,6 @@ public unsafe class player_control : MonoBehaviour
 
     void Update()
     {
-        // if(statics.out_of_bound(transform.position)){
-        //     death();
-        // }
         if(!ramming) attacking = *pattacking;
         else attacking = dashing;
         if(attacking||using_item) speed = const_speed/8f;
@@ -166,11 +163,15 @@ public unsafe class player_control : MonoBehaviour
         //transform.Translate(velocity * Time.fixedDeltaTime);
         Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
 
+        if(attacking) {
+            transform.eulerAngles = previous_angle;
+            return;
+        }
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction = (Vector2)((worldMousePos - transform.position));
-        //Debug.Log(direction);
         direction.Normalize();
         transform.eulerAngles = new Vector3(0f,0f,Vector2.SignedAngle(Vector2.up, direction));
+        previous_angle = transform.eulerAngles;
     }
 
     public void use_item(string item_name){
@@ -184,10 +185,10 @@ public unsafe class player_control : MonoBehaviour
         dashing = true;
         //Debug.Log("dash");
         const_speed*=player_stat.dash_modifier;
-        player_sprite.color = new Color(1f, 1f, 1f, 0.5f);
+        player_sprite.color = new Color(0f, 0f, 0f, 0.5f);
         yield return new WaitForSeconds(player_stat.dash_length);
         const_speed/=player_stat.dash_modifier;
-        player_sprite.color = new Color(1f, 1f, 1f, 1f);
+        player_sprite.color = Color.black;
         yield return new WaitForSeconds(player_stat.dash_length*4f);
         dashing = false;
     }

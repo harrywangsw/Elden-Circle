@@ -25,8 +25,12 @@ public unsafe class enemy_control : MonoBehaviour
     public List<GameObject> hit_by;
     public List<string> spawnable_item;
     public List<float> spawn_chance;
+    UnityEngine.AI.NavMeshAgent agent;
     void Start()
     {
+        agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        agent.updateRotation = false;
+		agent.updateUpAxis = false;
         prev_player_pos = new Vector3();
         generic_item = Resources.Load<GameObject>("prefab/spawned_item");
         sprite = gameObject.GetComponent<SpriteRenderer>();
@@ -57,15 +61,9 @@ public unsafe class enemy_control : MonoBehaviour
             new_input = false;
             return;
         }
-        RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, player.transform.position);
-        if(Array.FindIndex(objs, obj => obj.collider.name == "tilemap")<0){
-            chasing = true;
-        }
-        else chasing = false;
+
         if(chasing) follow_player();
-        else{
-            patrol();
-        }
+        else patrol();
         if ((player.transform.position - transform.position).magnitude<=rweapon_range) new_input = true;
         else new_input = false;
     }
@@ -77,7 +75,7 @@ public unsafe class enemy_control : MonoBehaviour
     }
 
     public void follow_player(){
-        if(sight_lost&&!chasing) return;
+        if(!sight_lost) chasing = true;
         float stray_angle = 0f;
         face_player();
         //code for dodging
@@ -90,28 +88,20 @@ public unsafe class enemy_control : MonoBehaviour
         //     }
         // }
         RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, player.transform.position);
-        // for(int i = 0; i<objs.Length; i++){
-        //     Debug.Log("i: "+i.ToString()+" name: "+objs[i].collider.name);
-        // }
-        //Debug.Log(Array.FindIndex(objs, obj => obj.collider.name == "tilemap").ToString());
 
-        if(Array.FindIndex(objs, obj => obj.collider.name == "tilemap")>=0)
+        if(Array.FindIndex(objs, obj => obj.collider.name == "Grid")>=0)
         {
-            Debug.Log(prev_player_pos);
-            if(!sight_lost) {
-                prev_player_pos = player.transform.position;
-                sight_lost = true;
-            }
+            //Debug.Log(prev_player_pos);
+            //only set prev_player_pos once when sight has just been lost
+            if(!sight_lost) prev_player_pos = player.transform.position;
+            sight_lost = true;
             if((transform.position-prev_player_pos).magnitude<=0.1f){
                 chasing = false;
             }
-            move(transform.position-prev_player_pos);
+            agent.SetDestination(prev_player_pos);
+            //move(transform.position-prev_player_pos);
         }
-        else{
-            sight_lost = false;
-            chasing = true;
-            move(/*Quaternion.AngleAxis(stray_angle, (player.transform.position-transform.position))*/(transform.position-player.transform.position));
-        }
+        else agent.SetDestination(player.transform.position);
     }
 
     void move(Vector3 moveInput)
@@ -162,8 +152,7 @@ public unsafe class enemy_control : MonoBehaviour
             body.velocity = Vector3.zero;
             damages = c.gameObject.GetComponent<damage_manager>();           
             current_health -= calc_damage();
-            //Debug.Log("damage: "+calc_damage().ToString());
-            statics.animate_hurt(sprite);
+            StartCoroutine(statics.animate_hurt(sprite));
             if (current_health < 0f) death();
         }
     }
