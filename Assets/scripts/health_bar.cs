@@ -12,8 +12,7 @@ public class health_bar : MonoBehaviour
     {
         p = GameObject.Find("player");
         control = p.GetComponent<player_control>();
-        p_health = control.health;
-        max_p_health = p_health;
+        max_p_health = control.player_stat.health;
     }
 
     void Update()

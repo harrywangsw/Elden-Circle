@@ -60,7 +60,7 @@ public class inventory_manager : MonoBehaviour
         Destroy(weapon.transform.GetChild(0).gameObject);
         Destroy(weapon.transform.GetChild(1).gameObject);
         Destroy(weapon.transform.GetChild(2).gameObject);
-        p.update_weapon(Resources.Load<GameObject>("weapons/"+r_gameobjects[current_itemr].name));
+        p.update_weapon(Resources.Load<GameObject>("weapons/"+r_gameobjects[current_itemr].name), null);
     }
 
     public void switchl(){
@@ -71,13 +71,14 @@ public class inventory_manager : MonoBehaviour
         Destroy(weapon.transform.GetChild(0).gameObject);
         Destroy(weapon.transform.GetChild(1).gameObject);
         Destroy(weapon.transform.GetChild(2).gameObject);
-        p.update_weapon(Resources.Load<GameObject>("weapons/"+r_gameobjects[current_itemr].name));
+        p.update_weapon(Resources.Load<GameObject>("weapons/"+l_gameobjects[current_iteml].name), null);
     }
 
     public void switchu(){
         GameObject slot = up;
         Destroy(slot.transform.GetChild(0).gameObject);
-        GameObject weapon = GameObject.Instantiate(r_gameobjects[current_itemr], slot.transform);
+        GameObject weapon = GameObject.Instantiate(u_gameobjects[current_itemu], slot.transform);
+        weapon.GetComponent<RectTransform>().localPosition = Vector3.zero;
         Destroy(weapon.transform.GetChild(0).gameObject);
         Destroy(weapon.transform.GetChild(2).gameObject);
     }
@@ -95,7 +96,7 @@ public class inventory_manager : MonoBehaviour
             player_items.inv[ind] = Tuple.Create(player_items.inv[ind].Item1, player_items.inv[ind].Item2-1, player_items.inv[ind].Item3);
             int num_left = player_items.inv[ind].Item2;
             u_gameobjects[current_itemu].transform.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = num_left.ToString();
-            up.transform.GetChild(0).GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = num_left.ToString();
+            up.transform.GetChild(0).GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = num_left.ToString();
             if(player_items.inv[ind].Item2==0) {
                 player_items.inv.RemoveAt(ind);
                 Destroy(u_gameobjects[current_itemu]);

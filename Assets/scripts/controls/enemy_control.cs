@@ -76,6 +76,10 @@ public unsafe class enemy_control : MonoBehaviour
 
     public void follow_player(){
         if(!sight_lost) chasing = true;
+        if((player.transform.position - transform.position).magnitude>=40f){
+            sight_lost = true;
+            chasing = false;
+        }
         float stray_angle = 0f;
         face_player();
         //code for dodging
@@ -98,7 +102,7 @@ public unsafe class enemy_control : MonoBehaviour
             if((transform.position-prev_player_pos).magnitude<=0.1f){
                 chasing = false;
             }
-            agent.SetDestination(prev_player_pos);
+            agent.SetDestination(prev_player_pos+rweapon_range*(transform.position-prev_player_pos).normalized);
             //move(transform.position-prev_player_pos);
         }
         else agent.SetDestination(player.transform.position);

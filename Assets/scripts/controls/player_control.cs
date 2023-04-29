@@ -29,7 +29,7 @@ public unsafe class player_control : MonoBehaviour
     {
         inventory_content = GameObject.Find("inventory_content");
         if(rweapon!=null){
-            update_weapon(rweapon);
+            update_weapon(rweapon, null);
             gameObject.GetComponent<damage_manager>().enabled = false;
             ramming = false;
         }
@@ -42,47 +42,50 @@ public unsafe class player_control : MonoBehaviour
         //GameObject.Find("ground").GetComponent<TilemapCollider2D>().enabled = false;
     }
 
-    public void update_weapon(GameObject new_weapon)
+    public void update_weapon(GameObject new_rweapon, GameObject new_lweapon)
     {
+        //if a weapon is currently equippted, destroy it
         if(rweapon!=null){
             if(rweapon.transform.parent==transform){
                 Destroy(rweapon);
             }
         }
-        rweapon = GameObject.Instantiate(new_weapon, transform, false);
-        ramming = false;
-        //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
-        if (rweapon.GetComponent<spear_attack>()!=null)
-        {
-            //get adress of attacking from right-hand weapon and save the adress in pattacking
-            fixed (bool* pattack_fixed = &rweapon.GetComponent<spear_attack>().attacking) { pattacking = pattack_fixed; }
-            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
-            range = rweapon.GetComponent<spear_attack>().range;
-            init_loc = rweapon.GetComponent<spear_attack>().init_loc;
-        }
-        else if (rweapon.GetComponent<fire_crackers>()!=null)
-        {
-            //get adress of attacking from right-hand weapon and save the adress in pattacking
-            fixed (bool* pattack_fixed = &rweapon.GetComponent<fire_crackers>().attacking) { pattacking = pattack_fixed; }
-            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<fire_crackers>().p_newinput = p_attack_order; }
-            range = rweapon.GetComponent<fire_crackers>().range;
-            init_loc = rweapon.GetComponent<fire_crackers>().init_loc;
-        }
-        else if (rweapon.GetComponent<dagger_fan>()!=null)
-        {
-            //get adress of attacking from right-hand weapon and save the adress in pattacking
-            fixed (bool* pattack_fixed = &rweapon.GetComponent<dagger_fan>().attacking) { pattacking = pattack_fixed; }
-            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<dagger_fan>().p_newinput = p_attack_order; }
-            range = rweapon.GetComponent<dagger_fan>().range;
-            init_loc = rweapon.GetComponent<dagger_fan>().init_loc;
-        }
-        else if (rweapon.GetComponent<parry_shield>()!=null)
-        {
-            //get adress of attacking from right-hand weapon and save the adress in pattacking
-            fixed (bool* pattack_fixed = &rweapon.GetComponent<parry_shield>().attacking) { pattacking = pattack_fixed; }
-            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<parry_shield>().p_newinput = p_attack_order; }
-            range = rweapon.GetComponent<parry_shield>().range;
-            init_loc = rweapon.GetComponent<parry_shield>().init_loc;
+        if(new_rweapon!=null){
+            rweapon = GameObject.Instantiate(new_rweapon, transform, false);
+            ramming = false;
+            //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
+            if (rweapon.GetComponent<spear_attack>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &rweapon.GetComponent<spear_attack>().attacking) { pattacking = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
+                range = rweapon.GetComponent<spear_attack>().range;
+                init_loc = rweapon.GetComponent<spear_attack>().init_loc;
+            }
+            else if (rweapon.GetComponent<fire_crackers>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &rweapon.GetComponent<fire_crackers>().attacking) { pattacking = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<fire_crackers>().p_newinput = p_attack_order; }
+                range = rweapon.GetComponent<fire_crackers>().range;
+                init_loc = rweapon.GetComponent<fire_crackers>().init_loc;
+            }
+            else if (rweapon.GetComponent<dagger_fan>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &rweapon.GetComponent<dagger_fan>().attacking) { pattacking = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<dagger_fan>().p_newinput = p_attack_order; }
+                range = rweapon.GetComponent<dagger_fan>().range;
+                init_loc = rweapon.GetComponent<dagger_fan>().init_loc;
+            }
+            else if (rweapon.GetComponent<parry_shield>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &rweapon.GetComponent<parry_shield>().attacking) { pattacking = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<parry_shield>().p_newinput = p_attack_order; }
+                range = rweapon.GetComponent<parry_shield>().range;
+                init_loc = rweapon.GetComponent<parry_shield>().init_loc;
+            }
         }
     }
     

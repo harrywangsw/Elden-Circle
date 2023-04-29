@@ -22,6 +22,9 @@ public unsafe class fire_crackers : MonoBehaviour
         if(num!=0){
             StartCoroutine(explode());
         }
+        else{
+            transform.localPosition = init_loc;
+        }
     }
 
     IEnumerator explode(){
