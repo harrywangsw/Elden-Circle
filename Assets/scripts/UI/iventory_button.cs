@@ -61,7 +61,7 @@ public class iventory_button : MonoBehaviour
                 inv.r_gameobjects.Remove(gameObject);
             }
         }
-        if(Input.GetKeyDown(KeyCode.LeftAlt)&&player_items.inv[item_index].Item3=="weapon"){
+        if(Input.GetKeyDown(KeyCode.LeftControl)&&player_items.inv[item_index].Item3=="weapon"){
             if(!in_lquick_slot){
                 player_items.quickslot_left_indexes.Add(item_index);
                 in_rquick_slot = false;

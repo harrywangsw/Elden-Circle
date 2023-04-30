@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
  using UnityEngine.SceneManagement;
+using TMPro;
 
 public class main_menu : MonoBehaviour
 {
     public List<stats> stat; 
     public List<world_details> worlds; 
-    public GameObject buttons, saves, current_obj, player_editor;
+    public GameObject buttons, saves, current_obj, your_name;
     world_details world;
     bool loaded = false, title = true;
     AsyncOperation asyncLoad;
@@ -65,7 +66,7 @@ public class main_menu : MonoBehaviour
         }
         saves.SetActive(false);
 
-        Debug.Log(GameObject.Find("player").transform.position.z);
+        //Debug.Log(GameObject.Find("player").transform.position.z);
         player_control p = GameObject.Find("player").GetComponent<player_control>();
         p.transform.position = new Vector2(worlds[index].player_pos_x, worlds[index].player_pos_y);
         p.player_stat = stat[index];
@@ -77,9 +78,18 @@ public class main_menu : MonoBehaviour
     }
 
     public void new_player(){
-        player_editor.SetActive(true);
-        current_obj = player_editor;
+        your_name.SetActive(true);
+        current_obj = your_name;
         buttons.SetActive(false);
+        world_details new_world = new world_details();
+        worlds.Add(new_world);
+        stat.Add(new stats());
+        your_name.GetComponent<TMP_InputField>().onEndEdit.AddListener(delegate{start_new(your_name.GetComponent<TMP_InputField>().text);});
+    }
+
+    public void start_new(string name){
+        stat[worlds.Count-1].name = name;
+        StartCoroutine(LoadYourAsyncScene(worlds.Count-1));
     }
 
     public void show_saves(){

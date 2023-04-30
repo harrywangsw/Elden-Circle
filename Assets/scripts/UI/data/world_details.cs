@@ -16,5 +16,7 @@ public class world_details
     public world_details(){
         player_pos_x = 0f;
         player_pos_y = 0f;
+        opened_doors = new List<bool>();
+        world_name = "main_scene";
     }
 }

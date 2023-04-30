@@ -8,7 +8,7 @@ using Random=UnityEngine.Random;
 //[RequireComponent(typeof(BoxCollider2D))]
 public unsafe class enemy_control : MonoBehaviour
 {
-    public float current_health, previous_health, const_speed, walkAcceleration, dash_modifier, dash_length, rweapon_range, poise_broken_period;
+    public float current_health, previous_health, const_speed, walkAcceleration, dash_modifier, dash_dura, rweapon_range, poise_broken_period;
     float speed, triggertime, parriable_window;
     public int exp;
     bool trigger_time_not_set;
@@ -130,10 +130,10 @@ public unsafe class enemy_control : MonoBehaviour
         //Debug.Log("dash");
         speed*=dash_modifier;
         sprite.color =  Color.grey;
-        yield return new WaitForSeconds(dash_length);
+        yield return new WaitForSeconds(dash_dura);
         speed/=dash_modifier;
         sprite.color =  Color.black;
-        yield return new WaitForSeconds(dash_length*4f);
+        yield return new WaitForSeconds(dash_dura*4f);
         dashing = false;
     }
 
@@ -153,6 +153,7 @@ public unsafe class enemy_control : MonoBehaviour
         else hit_by.Add(c.gameObject);
         if (c.gameObject.GetComponent<damage_manager>()!=null)
         {
+            if(dashing) return;
             body.velocity = Vector3.zero;
             damages = c.gameObject.GetComponent<damage_manager>();           
             current_health -= calc_damage();
@@ -192,7 +193,7 @@ public unsafe class enemy_control : MonoBehaviour
     }
 
     void death(){
-        player.GetComponent<player_control>().exp+=exp;
+        player.GetComponent<player_control>().player_stat.exp+=exp;
         spawn_item();
         Destroy(gameObject);
     }

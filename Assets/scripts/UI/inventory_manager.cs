@@ -71,7 +71,7 @@ public class inventory_manager : MonoBehaviour
         Destroy(weapon.transform.GetChild(0).gameObject);
         Destroy(weapon.transform.GetChild(1).gameObject);
         Destroy(weapon.transform.GetChild(2).gameObject);
-        p.update_weapon(Resources.Load<GameObject>("weapons/"+l_gameobjects[current_iteml].name), null);
+        p.update_weapon(null, Resources.Load<GameObject>("weapons/"+l_gameobjects[current_iteml].name));
     }
 
     public void switchu(){
