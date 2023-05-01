@@ -20,7 +20,11 @@ public class inventory_manager : MonoBehaviour
         up = GameObject.Find("up");
         right = GameObject.Find("right");
         left = GameObject.Find("left");
-        player_items = GameObject.Find("player").GetComponent<player_control>().player_stat.inv;
+        refresh_inv_menu();
+    }
+
+    public void refresh_inv_menu(){
+        player_items = p.player_stat.inv;
         last_slot = transform.GetChild(0).GetChild(0).gameObject;
         for (i = 0; i<player_items.inv.Count; i++)
         {
@@ -39,16 +43,16 @@ public class inventory_manager : MonoBehaviour
             if(player_items.quickslot_left_indexes.FindIndex(x=>x==i)>=0){
                 l_gameobjects.Add(it);
             }
-        }
 
-        if(r_gameobjects.Count>0){
+            if(r_gameobjects.Count>0){
             switchr();
-        }
-        if(l_gameobjects.Count>0){
-            switchl();
-        }
-        if(u_gameobjects.Count>0){
-            switchu();
+            }
+            if(l_gameobjects.Count>0){
+                switchl();
+            }
+            if(u_gameobjects.Count>0){
+                switchu();
+            }
         }
     }
 

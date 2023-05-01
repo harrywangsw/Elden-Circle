@@ -11,6 +11,7 @@ TagManager:
   - harmful
   - poise_breaker
   - weapon
+  - enemy
   layers:
   - Default
   - TransparentFX

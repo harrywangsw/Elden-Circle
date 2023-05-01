@@ -13,9 +13,6 @@ public static class statics
         {"parry_shield", "weapon"},
     };
 
-    public static Vector2 rotate(Vector2 original, float angle){
-        return new Vector2(original.x*Mathf.Cos(angle)-original.y*Mathf.Sin(angle), original.x*Mathf.Sin(angle)+original.y*Mathf.Cos(angle));
-    }
 
     public static IEnumerator animate_hurt(SpriteRenderer damaged_sprite)
     {
@@ -42,5 +39,9 @@ public static class statics
                 doors[i].GetComponent<Collider2D>().enabled = false;
             }
         }
+    }
+
+    public static float calc_damage(stats s, damage_manager damages) {
+        return damages.slash/s.slash_def + damages.strike/s.strike_def +damages.pierce/s.pierce_def +damages.magic/s.mag_def;
     }
 }

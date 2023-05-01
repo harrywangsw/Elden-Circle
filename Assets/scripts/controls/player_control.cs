@@ -7,10 +7,9 @@ using UnityEngine.Tilemaps;
 
 public unsafe class player_control : MonoBehaviour
 {
-    public float walkAcceleration, item_speed, range, death_period, health;
-    float speed;
-    public string player_name;
-    public bool new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
+    public float walkAcceleration, item_speed, range, death_period, health, lock_dura;
+    public float speed;
+    public bool locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
     public stats player_stat;
     public world_details current_world;
     public bool* pattacking, pattacking_l;
@@ -18,14 +17,20 @@ public unsafe class player_control : MonoBehaviour
     public Vector2 velocity = new Vector2();
     public Vector3 previous_pos = new Vector3(), previous_angle = new Vector3();
     Vector3 init_loc = new Vector3();
-    public GameObject rweapon, overlay, death_screen, menu, inventory_content, lweapon, Exp;
+    public GameObject locked_enemy, marker, rweapon, overlay, death_screen, menu, inventory_content, lweapon, Exp, lock_on_marker;
     public SpriteRenderer player_sprite;
+    List<SpriteRenderer> enemies = new List<SpriteRenderer>();
     string type;
     Rigidbody2D body;
     List<GameObject> u_gameobjects = new List<GameObject>(), l_gameobjects = new List<GameObject>(), r_gameobjects = new List<GameObject>();
 
     void Start()
     {
+        foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("enemy")){
+            Debug.Log(enemy.name);
+            enemies.Add(enemy.GetComponent<SpriteRenderer>());
+        }
+        player_stat = new stats();
         inventory_content = GameObject.Find("inventory_content");
         if(rweapon!=null){
             update_weapon(rweapon, null);
@@ -36,6 +41,7 @@ public unsafe class player_control : MonoBehaviour
         body = gameObject.GetComponent<Rigidbody2D>();
         //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<CircleCollider2D>(), true);
         //GameObject.Find("ground").GetComponent<TilemapCollider2D>().enabled = false;
+        update_stats();
     }
 
     public void update_stats(){
@@ -94,6 +100,14 @@ public unsafe class player_control : MonoBehaviour
                 range = rweapon.GetComponent<parry_shield>().range;
                 init_loc = rweapon.GetComponent<parry_shield>().init_loc;
             }
+            else if (rweapon.GetComponent<lightning_strike>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &rweapon.GetComponent<lightning_strike>().attacking) { pattacking = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<lightning_strike>().p_newinput = p_attack_order; }
+                range = rweapon.GetComponent<lightning_strike>().range;
+                init_loc = rweapon.GetComponent<lightning_strike>().init_loc;
+            }
         }
 
         if(new_lweapon!=null){
@@ -132,6 +146,14 @@ public unsafe class player_control : MonoBehaviour
                 range = lweapon.GetComponent<parry_shield>().range;
                 init_loc = lweapon.GetComponent<parry_shield>().init_loc;
             }
+            else if (lweapon.GetComponent<lightning_strike>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &lweapon.GetComponent<lightning_strike>().attacking) { pattacking_l = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<lightning_strike>().p_newinput = p_attack_order; }
+                range = lweapon.GetComponent<lightning_strike>().range;
+                init_loc = lweapon.GetComponent<lightning_strike>().init_loc;
+            }
         }
     }
     
@@ -144,6 +166,7 @@ public unsafe class player_control : MonoBehaviour
         }
         else attacking = dashing;
         if(attacking||using_item) speed = player_stat.spd/8f;
+        else if(dashing) speed = player_stat.spd*2f;
         else speed = player_stat.spd;
 
         if(Input.GetKeyDown("escape")){
@@ -159,6 +182,8 @@ public unsafe class player_control : MonoBehaviour
         if (Input.GetMouseButtonDown(0)) new_input_l = true;
         else new_input_l = false;
         if (Input.GetKeyDown("space")&&!dashing) dash_command = true;
+        if(Input.GetKeyDown(KeyCode.LeftAlt)) lock_on();
+        if(locked_on) switch_target();
         Exp.GetComponent<TMPro.TextMeshProUGUI>().text = player_stat.exp.ToString();
     }
 
@@ -168,7 +193,7 @@ public unsafe class player_control : MonoBehaviour
         if (c.collider.gameObject.GetComponent<damage_manager>()!=null)
         {      
             if(dashing) return;
-            health -= calc_damage(c.collider.gameObject.GetComponent<damage_manager>());
+            health -= statics.calc_damage(player_stat, c.collider.gameObject.GetComponent<damage_manager>());
             StartCoroutine(statics.animate_hurt(player_sprite));
             if (health < 0f) StartCoroutine(death());
         }
@@ -186,10 +211,6 @@ public unsafe class player_control : MonoBehaviour
     }
 
 
-    float calc_damage(damage_manager damages) {
-        return damages.slash/player_stat.slash_def + damages.strike/player_stat.strike_def +damages.pierce/player_stat.pierce_def +damages.magic/player_stat.mag_def;
-    }
-
     void FixedUpdate()
     {
         previous_pos = transform.position;
@@ -198,6 +219,7 @@ public unsafe class player_control : MonoBehaviour
 
     void move()
     {
+        walkAcceleration = speed*10f;
         transform.rotation = Quaternion.identity;
         Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         //moveInput = statics.rotate(moveInput, transform.eulerAngles.z);
@@ -233,11 +255,8 @@ public unsafe class player_control : MonoBehaviour
     IEnumerator dash()
     {
         dashing = true;
-        //Debug.Log("dash");
-        speed*=888f;
         player_sprite.color = new Color(0f, 0f, 0f, 0.5f);
         yield return new WaitForSeconds(player_stat.dash_dura);
-        speed/=888f;
         player_sprite.color = Color.black;
         yield return new WaitForSeconds(player_stat.dash_dura*3f);
         dashing = false;
@@ -265,5 +284,50 @@ public unsafe class player_control : MonoBehaviour
             time+=Time.deltaTime*8f;
         }
         using_item = false;
+    }
+
+    public void lock_on(){
+        if(!locked_on) locked_on = true;
+        else {
+            Destroy(marker);
+            locked_on = false;
+            return;
+        }
+        Debug.DrawRay(transform.position, transform.rotation*Vector3.up*30f, Color.green);
+        RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, transform.rotation*Vector3.up*30f);
+        if(objs[0].collider.gameObject.GetComponent<enemy_control>()==null)return;
+        if(objs[0].collider.gameObject.GetComponent<enemy_control>().visible){
+            locked_enemy = objs[0].collider.gameObject;
+            marker = GameObject.Instantiate(lock_on_marker, objs[0].collider.gameObject.transform, false);
+            StartCoroutine(lock_anim());
+        }
+    }
+
+    void switch_target(){
+        foreach(SpriteRenderer enemy_sprite in enemies){
+            if(!enemy_sprite.isVisible) continue;
+            if(enemy_sprite.gameObject == locked_enemy) continue;
+            //use dot product=cos(a) to determine which enemy has the least angulare seperation from the direction
+            //the player's facing
+            float dot1 = Vector3.Dot(enemy_sprite.gameObject.transform.position, transform.rotation*Vector3.up);
+            float dot2 = Vector3.Dot(transform.rotation*Vector3.up, locked_enemy.transform.position);
+            if(dot1>dot2){
+                locked_enemy = enemy_sprite.gameObject;
+                Destroy(marker);
+                marker = GameObject.Instantiate(lock_on_marker, enemy_sprite.gameObject.transform, false);
+                StartCoroutine(lock_anim());
+            }
+        }
+    }
+
+    IEnumerator lock_anim(){
+        float size = locked_enemy.GetComponent<SpriteRenderer>().bounds.extents.magnitude;
+        marker.transform.localScale = 4f*size*Vector3.one;
+        float time = 0f;
+        while(time<lock_dura){
+            marker.transform.localScale-=Vector3.one*Time.deltaTime*lock_dura/(2f*size);
+            marker.transform.Rotate(new Vector3(0f, 0f, Time.deltaTime*lock_dura/90f));
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
     }
 }

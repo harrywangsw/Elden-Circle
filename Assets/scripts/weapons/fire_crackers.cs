@@ -8,12 +8,11 @@ public unsafe class fire_crackers : MonoBehaviour
     public int num = 0, final_num;
     public bool* p_newinput;
     public bool attacking, new_input, init_new_attack=true;
-    Sprite explosion, cracker;
+    Sprite cracker;
     public Vector3 init_loc, init_size;
     GameObject user;
 
     void Start(){
-        explosion = Resources.Load<Sprite>("sprites/explosion");
         cracker = Resources.Load<Sprite>("sprites/firecracker");
         if(transform.parent!=null) user = transform.parent.gameObject;
         if(num==final_num){

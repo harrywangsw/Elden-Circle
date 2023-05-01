@@ -53,12 +53,10 @@ public class main_menu : MonoBehaviour
 
     public IEnumerator LoadYourAsyncScene(int index){
         Debug.Log(index.ToString());
-        string scene_name = worlds[index].world_name;
-        if(scene_name==null){
-            scene_name = "main_scene";
+        if(worlds[index].world_name==""){
+            worlds[index].world_name = "start";
         }
-        Debug.Log(scene_name);
-        asyncLoad = SceneManager.LoadSceneAsync(scene_name);
+        asyncLoad = SceneManager.LoadSceneAsync(worlds[index].world_name);
         // Wait until the asynchronous scene fully loads
         while (!asyncLoad.isDone)
         {
@@ -69,10 +67,12 @@ public class main_menu : MonoBehaviour
         //Debug.Log(GameObject.Find("player").transform.position.z);
         player_control p = GameObject.Find("player").GetComponent<player_control>();
         p.transform.position = new Vector2(worlds[index].player_pos_x, worlds[index].player_pos_y);
+        Debug.Log(stat[index].inv.inv[0].Item1);
         p.player_stat = stat[index];
-        GameObject.Find("inventory_content").GetComponent<inventory_manager>().player_items = p.player_stat.inv;
+        p.update_stats();
+        GameObject.Find("inventory_content").GetComponent<inventory_manager>().refresh_inv_menu();
         Debug.Log("finished loading scene?");
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(scene_name));
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(worlds[index].world_name));
         asyncLoad.allowSceneActivation = true;
         Destroy(gameObject);
     }
@@ -99,6 +99,7 @@ public class main_menu : MonoBehaviour
         saves.SetActive(true);
         for(i=0; i<worlds.Count; i++){
             int tmp = i;
+            Debug.Log(worlds[i].world_name);
             saves.transform.GetChild(i).gameObject.name = i.ToString();
             saves.transform.GetChild(i).GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = stat[i].name;
             saves.transform.GetChild(i).gameObject.GetComponent<Button>().onClick.AddListener(delegate{StartCoroutine(LoadYourAsyncScene(tmp));});

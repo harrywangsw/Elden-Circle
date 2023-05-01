@@ -7,9 +7,11 @@ public class save_point_behaviour : MonoBehaviour
     GameObject player;
     GameObject message_screen;
     public float trigger_dist;
+    player_control p;
     void Start()
     {
         player = GameObject.Find("player");
+        p = player.GetComponent<player_control>();
         message_screen = GameObject.Find("message_screen");
     }
 
@@ -22,12 +24,12 @@ public class save_point_behaviour : MonoBehaviour
                 message_screen.GetComponent<switchmessages>().messages.Add("press enter to save");
                 message_screen.GetComponent<switchmessages>().current = message_screen.GetComponent<switchmessages>().messages.Count-1;
             }
-            if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to save"){
-                save_load.SavePlayer(player.GetComponent<player_control>().player_stat);
-                //save_load.SavePlayerItem(player.GetComponent<player_control>().player_stat.inv, player.GetComponent<player_control>().player_name);
-                player.GetComponent<player_control>().current_world.player_pos_x = player.transform.position.x;
-                player.GetComponent<player_control>().current_world.player_pos_y = player.transform.position.y;
-                save_load.Saveworld(player.GetComponent<player_control>().current_world, player.GetComponent<player_control>().player_name);
+            if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to save"&&!p.dashing){
+                save_load.SavePlayer(p.player_stat);
+                //save_load.SavePlayerItem(p.player_stat.inv, p.player_name);
+                p.current_world.player_pos_x = player.transform.position.x;
+                p.current_world.player_pos_y = player.transform.position.y;
+                save_load.Saveworld(p.current_world, p.player_stat.name);
             }
         }
         else{

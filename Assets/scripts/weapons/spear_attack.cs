@@ -20,6 +20,8 @@ public unsafe class spear_attack : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         c.enabled = false;
         sprite.enabled = false;
+        GameObject user = transform.parent.gameObject;
+        Physics2D.IgnoreCollision(user.GetComponent<Collider2D>(), GetComponent<Collider2D>(), true);
     }
 
     void Update()
