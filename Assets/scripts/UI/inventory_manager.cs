@@ -7,7 +7,6 @@ using System;
 
 public class inventory_manager : MonoBehaviour
 {
-    public inventory player_items;
     public GameObject row, last_slot, up, right, left;
     player_control p;
     public int i, current_itemr, current_iteml, current_itemu;
@@ -24,23 +23,22 @@ public class inventory_manager : MonoBehaviour
     }
 
     public void refresh_inv_menu(){
-        player_items = p.player_stat.inv;
         last_slot = transform.GetChild(0).GetChild(0).gameObject;
-        for (i = 0; i<player_items.inv.Count; i++)
+        for (i = 0; i<p.player_stat.inv.inv.Count; i++)
         {
-            if(player_items.inv[i].Item2==0) continue;
-            GameObject it = Resources.Load<GameObject>("prefab/UI_items/"+player_items.inv[i].Item1);
-            add_item(it, player_items.inv[i].Item2);
+            if(p.player_stat.inv.inv[i].Item2==0) continue;
+            GameObject it = Resources.Load<GameObject>("prefab/UI_items/"+p.player_stat.inv.inv[i].Item1);
+            add_item(it, p.player_stat.inv.inv[i].Item2);
 
             //quickslot_up/down/left/right_indexes are the indexes of inv that represent the items in each respective quickslot
             //u/d/l/r_gameobjects are the gameobject for each item
-            if(player_items.quickslot_up_indexes.FindIndex(x=>x==i)>=0){
+            if(p.player_stat.inv.quickslot_up_indexes.FindIndex(x=>x==i)>=0){
                 u_gameobjects.Add(it);
             }
-            if(player_items.quickslot_right_indexes.FindIndex(x=>x==i)>=0){
+            if(p.player_stat.inv.quickslot_right_indexes.FindIndex(x=>x==i)>=0){
                 r_gameobjects.Add(it);
             }
-            if(player_items.quickslot_left_indexes.FindIndex(x=>x==i)>=0){
+            if(p.player_stat.inv.quickslot_left_indexes.FindIndex(x=>x==i)>=0){
                 l_gameobjects.Add(it);
             }
 
@@ -96,13 +94,13 @@ public class inventory_manager : MonoBehaviour
 
         if(!p.attacking&&!p.dashing&&Input.GetKeyDown("e")&&u_gameobjects.Count>0){
             p.use_item(u_gameobjects[current_itemu].name);
-            int ind = player_items.inv.FindIndex(obj=>obj.Item1==u_gameobjects[current_itemu].name);
-            player_items.inv[ind] = Tuple.Create(player_items.inv[ind].Item1, player_items.inv[ind].Item2-1, player_items.inv[ind].Item3);
-            int num_left = player_items.inv[ind].Item2;
+            int ind = p.player_stat.inv.inv.FindIndex(obj=>obj.Item1==u_gameobjects[current_itemu].name);
+            p.player_stat.inv.inv[ind] = Tuple.Create(p.player_stat.inv.inv[ind].Item1, p.player_stat.inv.inv[ind].Item2-1, p.player_stat.inv.inv[ind].Item3);
+            int num_left = p.player_stat.inv.inv[ind].Item2;
             u_gameobjects[current_itemu].transform.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = num_left.ToString();
             up.transform.GetChild(0).GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = num_left.ToString();
-            if(player_items.inv[ind].Item2==0) {
-                player_items.inv.RemoveAt(ind);
+            if(p.player_stat.inv.inv[ind].Item2==0) {
+                p.player_stat.inv.inv.RemoveAt(ind);
                 Destroy(u_gameobjects[current_itemu]);
                 u_gameobjects.RemoveAt(current_itemu);
             }
@@ -127,19 +125,20 @@ public class inventory_manager : MonoBehaviour
 
     void Update()
     {
+        p.player_stat.inv = p.player_stat.inv;
         if(transform.parent.parent.parent.parent.localScale == Vector3.zero) switch_quickslot_item();
     }
 
     //add an item into the inventory menu and hope that it has already been added to player_stat.inv
     public void add_item(GameObject item, int num){
+        p.player_stat.inv.inv.Add(Tuple.Create(item.name, 1, statics.item_types[item.name]));
         Transform tran = last_slot.transform;
         tran.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = num.ToString();
         GameObject item_inserted = GameObject.Instantiate(item, tran);
         item_inserted.name = item_inserted.name.Replace("(Clone)", "");
         tran.gameObject.name = item_inserted.name;
         tran.gameObject.GetComponent<iventory_button>().item = item_inserted;
-        //player_items = GameObject.Find("player").GetComponent<player_control>().player_stat.inv;
-        tran.gameObject.GetComponent<iventory_button>().item_index = statics.search_for_item(player_items, item_inserted.name);
+        tran.gameObject.GetComponent<iventory_button>().item_index = statics.search_for_item(p.player_stat.inv, item_inserted.name);
         if(tran.GetSiblingIndex()+1< tran.parent.childCount) last_slot = tran.parent.GetChild(tran.GetSiblingIndex() + 1).gameObject;
         else{
             GameObject new_row = GameObject.Instantiate(row, transform);

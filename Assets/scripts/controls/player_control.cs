@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 
 public unsafe class player_control : MonoBehaviour
 {
-    public float walkAcceleration, item_speed, range, death_period, health, lock_dura;
+    public float walkAcceleration, item_speed, range, death_period, health, lock_dura, lock_angle;
     public float speed;
     public bool locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
     public stats player_stat;
@@ -27,7 +27,6 @@ public unsafe class player_control : MonoBehaviour
     void Start()
     {
         foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("enemy")){
-            Debug.Log(enemy.name);
             enemies.Add(enemy.GetComponent<SpriteRenderer>());
         }
         player_stat = new stats();
@@ -214,6 +213,7 @@ public unsafe class player_control : MonoBehaviour
     void FixedUpdate()
     {
         previous_pos = transform.position;
+        Debug.DrawRay(transform.position, transform.rotation*Vector3.up*30f, Color.green);
         move();
     }
 
@@ -287,24 +287,32 @@ public unsafe class player_control : MonoBehaviour
     }
 
     public void lock_on(){
-        if(!locked_on) locked_on = true;
-        else {
+        if(locked_on){
             Destroy(marker);
             locked_on = false;
             return;
         }
-        Debug.DrawRay(transform.position, transform.rotation*Vector3.up*30f, Color.green);
-        RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, transform.rotation*Vector3.up*30f);
-        if(objs[0].collider.gameObject.GetComponent<enemy_control>()==null)return;
-        if(objs[0].collider.gameObject.GetComponent<enemy_control>().visible){
-            locked_enemy = objs[0].collider.gameObject;
-            marker = GameObject.Instantiate(lock_on_marker, objs[0].collider.gameObject.transform, false);
-            StartCoroutine(lock_anim());
+        
+        foreach(SpriteRenderer enemy_sprite in enemies){
+            if(!enemy_sprite.isVisible) continue;
+            // Debug.Log(Vector2.Angle(transform.rotation*Vector2.up, (Vector2)(enemy_sprite.gameObject.transform.position-transform.position)).ToString());
+            if(Vector2.Angle(transform.rotation*Vector2.up, (Vector2)(enemy_sprite.gameObject.transform.position-transform.position))<=lock_angle){
+                locked_enemy = enemy_sprite.gameObject;
+                Destroy(marker);
+                marker = GameObject.Instantiate(lock_on_marker, enemy_sprite.gameObject.transform, false);
+                StartCoroutine(lock_anim());
+                locked_on = true;
+                return;
+            }     
         }
     }
 
     void switch_target(){
         foreach(SpriteRenderer enemy_sprite in enemies){
+            if(enemy_sprite==null) {
+                enemies.Remove(enemy_sprite);
+                continue;
+            }
             if(!enemy_sprite.isVisible) continue;
             if(enemy_sprite.gameObject == locked_enemy) continue;
             //use dot product=cos(a) to determine which enemy has the least angulare seperation from the direction
@@ -322,12 +330,16 @@ public unsafe class player_control : MonoBehaviour
 
     IEnumerator lock_anim(){
         float size = locked_enemy.GetComponent<SpriteRenderer>().bounds.extents.magnitude;
-        marker.transform.localScale = 4f*size*Vector3.one;
+        //Debug.Log(size.ToString());
+        marker.transform.localScale = 2f*size*Vector3.one;
         float time = 0f;
         while(time<lock_dura){
-            marker.transform.localScale-=Vector3.one*Time.deltaTime*lock_dura/(2f*size);
-            marker.transform.Rotate(new Vector3(0f, 0f, Time.deltaTime*lock_dura/90f));
+            //Quaternion.RotateTowards(marker.transform.rotation, Quaternion.Euler(0f, 0f, 90f), Time.deltaTime*90f/lock_dura);
+            if(marker==null) break;
+            marker.transform.localScale-=Vector3.one*(Time.deltaTime*size/lock_dura);
             yield return new WaitForSeconds(Time.deltaTime);
+            time+=Time.deltaTime;
         }
+        marker.transform.localScale = size*Vector3.one;
     }
 }

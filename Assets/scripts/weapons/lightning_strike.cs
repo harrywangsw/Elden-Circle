@@ -11,11 +11,20 @@ public unsafe class lightning_strike : MonoBehaviour
     public bool attacking, new_input, init_new_attack=true;
     public Vector3 offset, new_loc, init_loc;
     public GameObject lightning_piece;
+    damage_manager selfd;
     Collider2D userc;
+    stats enemy_stat, player_stat;
 
     void Start()
     {
         userc = transform.parent.gameObject.GetComponent<Collider2D>();
+        selfd = GetComponent<damage_manager>();
+        if(transform.parent.GetComponent<enemy_control>()!=null){
+            enemy_stat = transform.parent.GetComponent<enemy_control>().enemy_stat;
+        }
+        else if(transform.parent.GetComponent<player_control>()!=null){
+            player_stat = transform.parent.GetComponent<player_control>().player_stat;
+        }
     }
 
     
@@ -32,12 +41,12 @@ public unsafe class lightning_strike : MonoBehaviour
         List<GameObject> pieces = new List<GameObject>();
         int i;
         for(i=0; i<num; i++){
-            float angle = branch_angle+Random.Range(0f, 28f);
+            float angle = branch_angle+Random.Range(-18f, 18f);
             pieces.Add(spawn_new_piece(angle, new_loc));
             new_loc = new_loc+Quaternion.AngleAxis(angle, Vector3.forward)*offset;
             if(Random.Range(0f, 1f)<=prob){
                 prob/=2f;
-                StartCoroutine(strike(Random.Range(4, max_count/2), new_loc, prob, Random.Range(60f, 80f), false));
+                StartCoroutine(strike(Random.Range(4, max_count/2), new_loc, prob, angle+Random.Range(40f, 60f), false));
             }
             yield return new WaitForSeconds(0.01f);
         }
@@ -49,7 +58,9 @@ public unsafe class lightning_strike : MonoBehaviour
     }
 
     GameObject spawn_new_piece(float angle, Vector3 new_location){
-        GameObject p = GameObject.Instantiate(lightning_piece, new_location, Quaternion.AngleAxis(angle, Vector3.forward));
+        GameObject p = GameObject.Instantiate(lightning_piece, new_location, Quaternion.AngleAxis(angle, Vector3.forward));    
+        if(player_stat!=null) statics.apply_stats(p.GetComponent<damage_manager>(), player_stat);
+        else if(enemy_stat!=null) statics.apply_stats(p.GetComponent<damage_manager>(), enemy_stat);
         Physics2D.IgnoreCollision(p.GetComponent<Collider2D>(), userc, true);
         return p;
     }

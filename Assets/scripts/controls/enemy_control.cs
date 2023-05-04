@@ -12,7 +12,7 @@ public unsafe class enemy_control : MonoBehaviour
     float speed, triggertime, parriable_window;
     public int exp;
     bool trigger_time_not_set;
-    public bool new_input, attacking, movable, dashing, dash_command, stray, sight_lost = true, chasing, poise_broken, visible;
+    public bool dead, new_input, attacking, movable, dashing, dash_command, stray, sight_lost = true, chasing, poise_broken, visible;
     public bool* pattacking;
     public stats enemy_stat;
     Vector2 velocity = new Vector2();
@@ -31,7 +31,7 @@ public unsafe class enemy_control : MonoBehaviour
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.updateRotation = false;
 		agent.updateUpAxis = false;
-        agent.SetDestination(target.transform.position);
+        // agent.SetDestination(target.transform.position);
         prev_player_pos = new Vector3();
         generic_item = Resources.Load<GameObject>("prefab/spawned_item");
         sprite = gameObject.GetComponent<SpriteRenderer>();
@@ -65,6 +65,13 @@ public unsafe class enemy_control : MonoBehaviour
 
         if(chasing) follow_player();
         else patrol();
+        if((player.transform.position - transform.position).magnitude>=40f){
+            sight_lost = true;
+            chasing = false;
+        }
+        if((agent.destination-transform.position).magnitude<=0.1f){
+            chasing = false;
+        }
         if ((player.transform.position - transform.position).magnitude<=rweapon_range) new_input = true;
         else new_input = false;
     }
@@ -77,11 +84,6 @@ public unsafe class enemy_control : MonoBehaviour
 
     public void follow_player(){
         if(!sight_lost) chasing = true;
-        if((player.transform.position - transform.position).magnitude>=40f){
-            sight_lost = true;
-            chasing = false;
-            return;
-        }
         float stray_angle = 0f;
         face_player();
         //code for dodging
@@ -103,17 +105,13 @@ public unsafe class enemy_control : MonoBehaviour
                 prev_player_pos = player.transform.position;
                 sight_lost = true;
             }
-            else{
-                chasing = false;
-                return;
-            }
-            if((transform.position-prev_player_pos).magnitude<=0.1f){
-                chasing = false;
-            }
             agent.SetDestination(prev_player_pos);
             //move(transform.position-prev_player_pos);
         }
-        else agent.SetDestination(player.transform.position);
+        else {
+            sight_lost = false;
+            agent.SetDestination(player.transform.position);
+        }
     }
 
     void move(Vector3 moveInput)
@@ -152,6 +150,7 @@ public unsafe class enemy_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
+        if(dead) return;
         //Debug.Log(c.gameObject.tag);
         if(c.collider.gameObject.tag=="poise_breaker"&&attacking&&Math.Abs(Time.time-triggertime)>parriable_window){
             StartCoroutine(break_poise());
@@ -165,7 +164,9 @@ public unsafe class enemy_control : MonoBehaviour
             damages = c.gameObject.GetComponent<damage_manager>();           
             current_health -= statics.calc_damage(enemy_stat, damages);
             StartCoroutine(statics.animate_hurt(sprite));
-            if (current_health < 0f) death();
+            if (current_health < 0f) {
+                death();
+            }
         }
     }
 
@@ -200,6 +201,8 @@ public unsafe class enemy_control : MonoBehaviour
     }
 
     void death(){
+        if(dead) return;
+        dead = true;
         player.GetComponent<player_control>().player_stat.exp+=exp;
         spawn_item();
         Destroy(gameObject);
@@ -255,6 +258,13 @@ public unsafe class enemy_control : MonoBehaviour
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<parry_shield>().attacking) { pattacking = pattack_fixed; }
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<parry_shield>().p_newinput = p_attack_order; }
+        }
+        else if (rweapon.GetComponent<spawn_bees>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<spawn_bees>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spawn_bees>().p_newinput = p_attack_order; }
+            rweapon_range = rweapon.GetComponent<spawn_bees>().range;
         }
         agent.stoppingDistance = rweapon_range;
     }

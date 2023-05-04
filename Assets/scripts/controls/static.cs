@@ -11,6 +11,8 @@ public static class statics
 	    {"spear", "weapon"},
         {"dagger_fan", "weapon"},
         {"parry_shield", "weapon"},
+        {"lightning_strike", "weapon"},
+        {"spawn_bees", "weapon"}
     };
 
 
@@ -21,7 +23,7 @@ public static class statics
         damaged_sprite.color = Color.black;
     }
     public static int search_for_item(inventory inv, string item){
-        //Debug.Log(item+" "+inv.inv.FindIndex(obj => obj.Item1 == item));
+        Debug.Log(item+" "+inv.inv.FindIndex(obj => obj.Item1 == item));
         return inv.inv.FindIndex(obj => obj.Item1 == item);
     }
 
@@ -43,5 +45,12 @@ public static class statics
 
     public static float calc_damage(stats s, damage_manager damages) {
         return damages.slash/s.slash_def + damages.strike/s.strike_def +damages.pierce/s.pierce_def +damages.magic/s.mag_def;
+    }
+
+    public static void apply_stats(damage_manager base_damage, stats modifers){
+        base_damage.magic*=modifers.mag_dmg;
+        base_damage.slash*=modifers.slash_dmg;
+        base_damage.strike*=modifers.strike_dmg;
+        base_damage.pierce*=modifers.peirce_dmg;
     }
 }

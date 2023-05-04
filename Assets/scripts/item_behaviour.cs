@@ -55,7 +55,6 @@ public class item_behaviour : MonoBehaviour
                         Destroy(gameObject);
                     }
                 }
-                plac.player_stat.inv.inv.Add(Tuple.Create(gameObject.name, 1, statics.item_types[gameObject.name]));
                 inv_manager.add_item(Resources.Load<GameObject>("prefab/UI_items/"+gameObject.name), 1);
                 if(ind>=0) message_screen.GetComponent<switchmessages>().messages.RemoveAt(ind);
                 Destroy(gameObject);
