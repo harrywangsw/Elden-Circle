@@ -4,7 +4,7 @@ using UnityEngine;
 
 public unsafe class fire_crackers : MonoBehaviour
 {
-    public float period, range;
+    public float period, range, stamina_cost;
     public int num = 0, final_num;
     public bool* p_newinput;
     public bool attacking, new_input, init_new_attack=true;

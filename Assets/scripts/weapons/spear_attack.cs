@@ -5,7 +5,7 @@ using UnityEngine;
 public unsafe class spear_attack : MonoBehaviour
 {
     public bool init_attack, new_input, attacking;
-    public float thrust_vel, thrust_period, range, parriable_window;
+    public float thrust_vel, thrust_period, range, parriable_window, stamina_cost;
     public bool* p_newinput;
     public Vector3 init_loc;
     SpriteRenderer sprite;

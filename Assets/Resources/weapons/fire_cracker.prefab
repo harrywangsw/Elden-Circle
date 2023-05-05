@@ -49,6 +49,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   period: 0.1
   range: 0.8
+  stamina_cost: 10
   num: 0
   final_num: 8
   attacking: 0
@@ -71,9 +72,7 @@ MonoBehaviour:
   slash: 0
   strike: 0
   pierce: 20
-  fire: 30
   magic: 0
-  lightning: 0
 --- !u!212 &1245795144259552199
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -141,9 +140,9 @@ PolygonCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.49241814, y: 0.5259068}
-    oldSize: {x: 8.96, y: 4.72}
+    border: {x: 3.8899999, y: 1.895, z: 4.015, w: 1.655}
+    pivot: {x: 0.4930971, y: 0.52290004}
+    oldSize: {x: 1.05, y: 1.155}
     newSize: {x: 17.92, y: 9.44}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

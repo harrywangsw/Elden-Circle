@@ -123,6 +123,7 @@ MonoBehaviour:
   thrust_period: 0.2
   range: 4
   parriable_window: 1
+  stamina_cost: 10
   init_loc: {x: 0.6, y: 0.6, z: 0}
 --- !u!68 &7532111565779867917
 EdgeCollider2D:

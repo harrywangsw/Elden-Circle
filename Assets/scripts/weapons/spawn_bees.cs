@@ -5,7 +5,7 @@ using UnityEngine;
 public unsafe class spawn_bees : MonoBehaviour
 {
     public bool init_attack, new_input, attacking;
-    public float bee_speed, range, parriable_window, init_angle_range;
+    public float bee_speed, range, parriable_window, init_angle_range, stamina_cost;
     public int max_num;
     public bool* p_newinput;
     public Vector3 init_loc;

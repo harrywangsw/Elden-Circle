@@ -48,6 +48,7 @@ public static class statics
     }
 
     public static float calc_damage(stats s, damage_manager damages) {
+        //Debug.Log((damages.slash/s.slash_def + damages.strike/s.strike_def +damages.pierce/s.pierce_def +damages.magic/s.mag_def).ToString());
         return damages.slash/s.slash_def + damages.strike/s.strike_def +damages.pierce/s.pierce_def +damages.magic/s.mag_def;
     }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 public unsafe class glint_stone : MonoBehaviour
 {
     public bool new_input, attacking;
-    public float range;
+    public float range, stamina_cost;
     public bool* p_newinput;
     public Vector3 init_loc;
 

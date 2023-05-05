@@ -5,7 +5,7 @@ using UnityEngine;
 public unsafe class lightning_strike : MonoBehaviour
 {
     
-    public float period, range, new_branch_prob;
+    public float period, range, new_branch_prob, stamina_cost;
     public int max_count;
     public bool* p_newinput;
     public bool attacking, new_input, init_new_attack=true;

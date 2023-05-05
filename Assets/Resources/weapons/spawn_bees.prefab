@@ -51,6 +51,7 @@ MonoBehaviour:
   range: 8
   parriable_window: 0
   init_angle_range: 20
+  stamina_cost: 50
   max_num: 10
   init_loc: {x: 0, y: 0, z: 0}
   bee: {fileID: 7975697581773898508, guid: ea2a807a348a8424b90c35a7afb9dd84, type: 3}

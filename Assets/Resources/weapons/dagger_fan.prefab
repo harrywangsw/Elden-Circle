@@ -102,6 +102,7 @@ MonoBehaviour:
   num: 6
   period: 0.8
   range: 20
+  stamina_cost: 10
   new_input: 0
   attacking: 0
   clone: 0
@@ -144,7 +145,7 @@ PolygonCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.784, y: 2.256}
+    oldSize: {x: 0.724, y: 1.496}
     newSize: {x: 6.96, y: 5.64}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

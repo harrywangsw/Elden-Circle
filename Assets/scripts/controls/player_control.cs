@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 
 public unsafe class player_control : MonoBehaviour
 {
-    public float walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
+    public float dash_stamina, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
     public bool locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
     public stats player_stat;
@@ -45,6 +45,7 @@ public unsafe class player_control : MonoBehaviour
     public void update_stats(){
         health = player_stat.health;
         speed = player_stat.spd;
+        stamina = player_stat.stamina;
     }
 
     public void update_weapon(GameObject new_rweapon, GameObject new_lweapon)
@@ -73,6 +74,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
                 range = rweapon.GetComponent<spear_attack>().range;
                 init_loc = rweapon.GetComponent<spear_attack>().init_loc;
+                stamina_cost = rweapon.GetComponent<spear_attack>().stamina_cost;
             }
             else if (rweapon.GetComponent<fire_crackers>()!=null)
             {
@@ -81,6 +83,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<fire_crackers>().p_newinput = p_attack_order; }
                 range = rweapon.GetComponent<fire_crackers>().range;
                 init_loc = rweapon.GetComponent<fire_crackers>().init_loc;
+                stamina_cost = rweapon.GetComponent<fire_crackers>().stamina_cost;
             }
             else if (rweapon.GetComponent<dagger_fan>()!=null)
             {
@@ -89,6 +92,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<dagger_fan>().p_newinput = p_attack_order; }
                 range = rweapon.GetComponent<dagger_fan>().range;
                 init_loc = rweapon.GetComponent<dagger_fan>().init_loc;
+                stamina_cost = rweapon.GetComponent<dagger_fan>().stamina_cost;
             }
             else if (rweapon.GetComponent<parry_shield>()!=null)
             {
@@ -97,6 +101,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<parry_shield>().p_newinput = p_attack_order; }
                 range = rweapon.GetComponent<parry_shield>().range;
                 init_loc = rweapon.GetComponent<parry_shield>().init_loc;
+                stamina_cost = rweapon.GetComponent<parry_shield>().stamina_cost;
             }
             else if (rweapon.GetComponent<lightning_strike>()!=null)
             {
@@ -105,6 +110,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<lightning_strike>().p_newinput = p_attack_order; }
                 range = rweapon.GetComponent<lightning_strike>().range;
                 init_loc = rweapon.GetComponent<lightning_strike>().init_loc;
+                stamina_cost = rweapon.GetComponent<lightning_strike>().stamina_cost;
             }
             else if (rweapon.GetComponent<glint_stone>()!=null)
             {
@@ -113,6 +119,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<glint_stone>().p_newinput = p_attack_order; }
                 range = rweapon.GetComponent<glint_stone>().range;
                 init_loc = rweapon.GetComponent<glint_stone>().init_loc;
+                stamina_cost = rweapon.GetComponent<glint_stone>().stamina_cost;
             }
         }
         rweapon.transform.localPosition = init_loc;
@@ -185,14 +192,20 @@ public unsafe class player_control : MonoBehaviour
         if(menu.GetComponent<RectTransform>().localScale == Vector3.one){
             return;
         }
-        if (Input.GetMouseButtonDown(1)) {new_input = true;}
-        else new_input = false;
-        if (Input.GetMouseButtonDown(0)) new_input_l = true;
-        else new_input_l = false;
-        if (Input.GetKeyDown("space")&&!dashing) dash_command = true;
         if(Input.GetKeyDown(KeyCode.LeftAlt)) lock_on();
         if(locked_on) switch_target();
         Exp.GetComponent<TMPro.TextMeshProUGUI>().text = player_stat.exp.ToString();
+
+        if(stamina<0f){stamina=0f;}
+        if(stamina<player_stat.stamina) stamina+=stamina_increment;
+        if (Input.GetMouseButtonDown(1)&&stamina>=stamina_cost) {stamina-=stamina_cost; new_input = true;}
+        else new_input = false;
+        if (Input.GetMouseButtonDown(0)) new_input_l = true;
+        else new_input_l = false;
+        if (Input.GetKeyDown("space")&&!dashing&&stamina>dash_stamina) {
+            stamina-=dash_stamina;
+            dash_command = true;
+        }
     }
 
 

@@ -163,6 +163,8 @@ public unsafe class enemy_control : MonoBehaviour
     {
         if(c.collider.gameObject==rweapon) return;
         if(dead) return;
+        if (hit_by.Contains(c.gameObject)) return;
+        else hit_by.Add(c.gameObject);
         StartCoroutine(statics.hit_effect(c.GetContact(0).point, gameObject));
         //Debug.Log(c.gameObject.tag);
         if(c.collider.gameObject.tag=="poise_breaker"&&attacking&&Math.Abs(Time.time-triggertime)>parriable_window){

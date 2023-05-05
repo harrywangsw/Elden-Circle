@@ -47,6 +47,7 @@ MonoBehaviour:
   new_input: 0
   attacking: 0
   range: 18
+  stamina_cost: 8
   init_loc: {x: 0, y: 1.38, z: 0}
   stone: {fileID: 2647071205232384841, guid: b3cacc0f48ffdbe4b9d43588778fed9b, type: 3}
   user: {fileID: 0}

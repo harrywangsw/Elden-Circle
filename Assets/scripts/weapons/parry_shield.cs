@@ -6,7 +6,7 @@ public unsafe class parry_shield : MonoBehaviour
 {
     public bool* p_newinput;
     public bool attacking, new_input;
-    public float period, range;
+    public float period, range, stamina_cost;
     public Vector3 init_loc;
     CircleCollider2D col;
     SpriteRenderer sprite;

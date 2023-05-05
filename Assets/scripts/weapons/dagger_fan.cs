@@ -6,7 +6,7 @@ public unsafe class dagger_fan : MonoBehaviour
 {
     GameObject dagger, user;
     public int num;
-    public float period, range;
+    public float period, range, stamina_cost;
     bool all_ready = false;
     public bool new_input, attacking = false, clone = false;
     public bool* p_newinput;
