@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 
 public unsafe class player_control : MonoBehaviour
 {
-    public float walkAcceleration, item_speed, range, death_period, health, lock_dura, lock_angle;
+    public float walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
     public bool locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
     public stats player_stat;
@@ -107,7 +107,16 @@ public unsafe class player_control : MonoBehaviour
                 range = rweapon.GetComponent<lightning_strike>().range;
                 init_loc = rweapon.GetComponent<lightning_strike>().init_loc;
             }
+            else if (rweapon.GetComponent<glint_stone>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &rweapon.GetComponent<glint_stone>().attacking) { pattacking = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<glint_stone>().p_newinput = p_attack_order; }
+                range = rweapon.GetComponent<glint_stone>().range;
+                init_loc = rweapon.GetComponent<glint_stone>().init_loc;
+            }
         }
+        rweapon.transform.localPosition = init_loc;
 
         if(new_lweapon!=null){
             lweapon = GameObject.Instantiate(new_lweapon, transform, false);
@@ -118,7 +127,7 @@ public unsafe class player_control : MonoBehaviour
                 //get adress of attacking from right-hand weapon and save the adress in pattacking
                 fixed (bool* pattack_fixed = &lweapon.GetComponent<spear_attack>().attacking) { pattacking_l = pattack_fixed; }
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
-                range = lweapon.GetComponent<spear_attack>().range;
+                l_range = lweapon.GetComponent<spear_attack>().range;
                 init_loc = lweapon.GetComponent<spear_attack>().init_loc;
             }
             else if (lweapon.GetComponent<fire_crackers>()!=null)
@@ -126,7 +135,7 @@ public unsafe class player_control : MonoBehaviour
                 //get adress of attacking from right-hand weapon and save the adress in pattacking
                 fixed (bool* pattack_fixed = &lweapon.GetComponent<fire_crackers>().attacking) { pattacking_l = pattack_fixed; }
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<fire_crackers>().p_newinput = p_attack_order; }
-                range = lweapon.GetComponent<fire_crackers>().range;
+                l_range = lweapon.GetComponent<fire_crackers>().range;
                 init_loc = lweapon.GetComponent<fire_crackers>().init_loc;
             }
             else if (lweapon.GetComponent<dagger_fan>()!=null)
@@ -134,7 +143,7 @@ public unsafe class player_control : MonoBehaviour
                 //get adress of attacking from right-hand weapon and save the adress in pattacking
                 fixed (bool* pattack_fixed = &lweapon.GetComponent<dagger_fan>().attacking) { pattacking_l = pattack_fixed; }
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<dagger_fan>().p_newinput = p_attack_order; }
-                range = lweapon.GetComponent<dagger_fan>().range;
+                l_range = lweapon.GetComponent<dagger_fan>().range;
                 init_loc = lweapon.GetComponent<dagger_fan>().init_loc;
             }
             else if (lweapon.GetComponent<parry_shield>()!=null)
@@ -142,7 +151,7 @@ public unsafe class player_control : MonoBehaviour
                 //get adress of attacking from right-hand weapon and save the adress in pattacking
                 fixed (bool* pattack_fixed = &lweapon.GetComponent<parry_shield>().attacking) { pattacking_l = pattack_fixed; }
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<parry_shield>().p_newinput = p_attack_order; }
-                range = lweapon.GetComponent<parry_shield>().range;
+                l_range = lweapon.GetComponent<parry_shield>().range;
                 init_loc = lweapon.GetComponent<parry_shield>().init_loc;
             }
             else if (lweapon.GetComponent<lightning_strike>()!=null)
@@ -150,9 +159,10 @@ public unsafe class player_control : MonoBehaviour
                 //get adress of attacking from right-hand weapon and save the adress in pattacking
                 fixed (bool* pattack_fixed = &lweapon.GetComponent<lightning_strike>().attacking) { pattacking_l = pattack_fixed; }
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<lightning_strike>().p_newinput = p_attack_order; }
-                range = lweapon.GetComponent<lightning_strike>().range;
+                l_range = lweapon.GetComponent<lightning_strike>().range;
                 init_loc = lweapon.GetComponent<lightning_strike>().init_loc;
             }
+            lweapon.transform.localPosition = init_loc;
         }
     }
     
@@ -239,7 +249,14 @@ public unsafe class player_control : MonoBehaviour
             return;
         }
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction = (Vector2)((worldMousePos - transform.position));
+        Vector2 direction;
+        
+        if(locked_enemy!=null){
+            direction = locked_enemy.transform.position-transform.position;
+        }
+        else{
+            direction = (Vector2)((worldMousePos - transform.position));
+        }
         direction.Normalize();
         transform.eulerAngles = new Vector3(0f,0f,Vector2.SignedAngle(Vector2.up, direction));
         previous_angle = transform.eulerAngles;
@@ -290,6 +307,7 @@ public unsafe class player_control : MonoBehaviour
         if(locked_on){
             Destroy(marker);
             locked_on = false;
+            locked_enemy = null;
             return;
         }
         

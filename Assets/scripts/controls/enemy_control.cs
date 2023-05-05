@@ -8,34 +8,35 @@ using Random=UnityEngine.Random;
 //[RequireComponent(typeof(BoxCollider2D))]
 public unsafe class enemy_control : MonoBehaviour
 {
-    public float current_health, walkAcceleration, dash_modifier, dash_dura, rweapon_range, poise_broken_period;
+    public float current_health, walkAcceleration, dash_modifier, rweapon_range, poise_broken_period, dodge_angle;
     float speed, triggertime, parriable_window;
     public int exp;
     bool trigger_time_not_set;
-    public bool dead, new_input, attacking, movable, dashing, dash_command, stray, sight_lost = true, chasing, poise_broken, visible;
+    public bool dead, new_input, attacking, movable, dashing, stray, sight_lost = true, chasing, poise_broken, visible;
     public bool* pattacking;
     public stats enemy_stat;
     Vector2 velocity = new Vector2();
     damage_manager damages;
-    GameObject greybar, player, broken_word, generic_item;
+    GameObject greybar, broken_word, generic_item;
     public Vector3 prev_player_pos;
-    public GameObject rweapon, target;
+    public GameObject rweapon, target, player;
+    player_control playerc;
     Rigidbody2D body;
     SpriteRenderer sprite;
     public List<GameObject> hit_by;
     public List<string> spawnable_item;
     public List<float> spawn_chance;
-    UnityEngine.AI.NavMeshAgent agent;
+    public UnityEngine.AI.NavMeshAgent agent;
     void Start()
     {
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.updateRotation = false;
 		agent.updateUpAxis = false;
-        // agent.SetDestination(target.transform.position);
         prev_player_pos = new Vector3();
         generic_item = Resources.Load<GameObject>("prefab/spawned_item");
         sprite = gameObject.GetComponent<SpriteRenderer>();
         player=GameObject.Find("player");
+        playerc = player.GetComponent<player_control>();
         hit_by = new List<GameObject>();
         body = gameObject.GetComponent<Rigidbody2D>();
         broken_word = Resources.Load<GameObject>("prefab/broken_word");
@@ -72,7 +73,9 @@ public unsafe class enemy_control : MonoBehaviour
         if((agent.destination-transform.position).magnitude<=0.1f){
             chasing = false;
         }
-        if ((player.transform.position - transform.position).magnitude<=rweapon_range) new_input = true;
+        if ((player.transform.position - transform.position).magnitude<=rweapon_range&&!sight_lost&&!dashing) {
+            new_input = true;
+        }
         else new_input = false;
     }
 
@@ -87,14 +90,9 @@ public unsafe class enemy_control : MonoBehaviour
         float stray_angle = 0f;
         face_player();
         //code for dodging
-        // if((player.transform.position - transform.position).magnitude<=rweapon_range){
-        //     if(Random.value<0.5f){
-        //         stray_angle = 90f;
-        //     }
-        //     else{
-        //         stray_angle = -90f;
-        //     }
-        // }
+        if((playerc.new_input&&playerc.range>=(transform.position-player.transform.position).magnitude)||(playerc.new_input_l&&playerc.l_range>=(transform.position-player.transform.position).magnitude)){
+            StartCoroutine(dodge());
+        }
         RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, player.transform.position);
 
         if(Array.FindIndex(objs, obj => obj.collider.name == "Grid")>=0)
@@ -123,12 +121,24 @@ public unsafe class enemy_control : MonoBehaviour
         velocity.x = Mathf.MoveTowards(velocity.x, agent.speed * moveInput.x, walkAcceleration * Time.fixedDeltaTime);
         velocity.y = Mathf.MoveTowards(velocity.y, agent.speed * moveInput.y, walkAcceleration * Time.fixedDeltaTime);
         //velocity = Quaternion.AngleAxis(-transform.eulerAngles.z, Vector3.forward) * velocity;
-        if(dash_command&&!dashing){
-            dash_command = false;
-            StartCoroutine(dash());
-        }
         body.velocity = -velocity;
         //transform.Translate(velocity * Time.deltaTime);
+    }
+
+    IEnumerator dodge(){
+        Debug.Log("doge");
+        agent.isStopped = true;
+        agent.ResetPath();
+        chasing = false;
+        float time = 0f;
+        StartCoroutine(dash());
+        while(time<enemy_stat.dash_dura*3f){
+            float rand_angle = Random.Range(0, 2)==0 ? Random.Range(dodge_angle+10f, dodge_angle-10f):Random.Range(-dodge_angle+10f, -dodge_angle-10f);
+            move((Quaternion.Euler(0f, 0f, rand_angle)*(transform.position-player.transform.position)));
+            yield return new WaitForSeconds(Time.deltaTime);
+            time+=Time.deltaTime;
+        }
+        chasing = true;
     }
 
     IEnumerator dash()
@@ -136,9 +146,9 @@ public unsafe class enemy_control : MonoBehaviour
         dashing = true;
         //Debug.Log("dash");
         sprite.color =  Color.grey;
-        yield return new WaitForSeconds(dash_dura);
+        yield return new WaitForSeconds(enemy_stat.dash_dura);
         sprite.color =  Color.black;
-        yield return new WaitForSeconds(dash_dura*4f);
+        yield return new WaitForSeconds(enemy_stat.dash_dura*3f);
         dashing = false;
     }
 
