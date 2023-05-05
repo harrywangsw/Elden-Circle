@@ -43,13 +43,23 @@ public unsafe class glint_stone : MonoBehaviour
         Rigidbody2D body;
         body = s.GetComponent<Rigidbody2D>();
         StartCoroutine(check_for_new_attack(body));
-        body.velocity = user.transform.rotation*Vector2.up*speed;
+        Vector3 heading = user.transform.rotation*Vector3.up*speed;
+        body.AddForce((Vector2) heading*speed, ForceMode2D.Impulse);
         if(current_target==null) yield break;
-        while((body.position-(Vector2)user.transform.position).sqrMagnitude<(body.position-(Vector2)current_target.transform.position).sqrMagnitude){
+        while((body.position-(Vector2)user.transform.position).sqrMagnitude<((Vector2)user.transform.position-(Vector2)current_target.transform.position).sqrMagnitude){
             if(body==null) break;
-            body.AddForce(((Vector2)target.transform.position-body.position).normalized*curve);
             s.transform.eulerAngles = new Vector3(0f, 0f, Vector2.SignedAngle(Vector2.up, body.velocity));
-            yield return new WaitForSeconds(Time.deltaTime);
+            float angle_between = Vector2.SignedAngle(body.velocity, target.transform.position-user.transform.position);
+            Vector2 force = new Vector2(body.velocity.y, -body.velocity.x).normalized;
+            force*=curve;
+            Debug.Log(angle_between);
+            if(Mathf.Abs(angle_between)>1f){
+                Debug.Log(force);
+                if(angle_between>0) body.AddForce(-force, ForceMode2D.Impulse);
+                else body.AddForce(force, ForceMode2D.Impulse);
+            }
+            yield return new WaitForSeconds(Time.fixedDeltaTime);
+            if(body==null) break;
         }
     }
 

@@ -12,7 +12,8 @@ GameObject:
   - component: {fileID: 1118088348509089845}
   - component: {fileID: 4685781341386540771}
   - component: {fileID: 4370679048650191015}
-  - component: {fileID: 1639102651189700552}
+  - component: {fileID: 7532111565779867917}
+  - component: {fileID: 109120930539183418}
   m_Layer: 0
   m_Name: spear
   m_TagString: harmful
@@ -102,9 +103,7 @@ MonoBehaviour:
   slash: 12
   strike: 2
   pierce: 88
-  fire: 0
   magic: 0
-  lightning: 0
 --- !u!114 &4370679048650191015
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -125,8 +124,8 @@ MonoBehaviour:
   range: 4
   parriable_window: 1
   init_loc: {x: 0.6, y: 0.6, z: 0}
---- !u!61 &1639102651189700552
-BoxCollider2D:
+--- !u!68 &7532111565779867917
+EdgeCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -138,16 +137,36 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.12855986, y: 0.97490364}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.44237548, y: 0.5017778}
-    oldSize: {x: 3.7021277, y: 3}
-    newSize: {x: 6.96, y: 5.64}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 0.46219856, y: 0.69287}
+  m_Offset: {x: 0, y: 0}
   m_EdgeRadius: 0
+  m_Points:
+  - {x: 0.07428992, y: 0.809636}
+  - {x: -0.095118254, y: 0.6574905}
+  - {x: 0.13217187, y: 1.3277628}
+  - {x: 0.3532552, y: 0.6552658}
+  - {x: 0.183492, y: 0.8023116}
+  m_AdjacentStartPoint: {x: 0, y: 0}
+  m_AdjacentEndPoint: {x: 0, y: 0}
+  m_UseAdjacentStartPoint: 0
+  m_UseAdjacentEndPoint: 0
+--- !u!50 &109120930539183418
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6991883489652790954}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 1000000
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4

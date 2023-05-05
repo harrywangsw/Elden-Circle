@@ -5,9 +5,10 @@ using UnityEngine;
 public class health_bar : MonoBehaviour
 {
     GameObject p;
-    float max_p_health;
-    public float p_health;
+    public float max_p_health, max_e_health;
+    public float p_health, e_health;
     player_control control;
+    public GameObject enemy_health_bar;
     void Start()
     {
         p = GameObject.Find("player");
@@ -20,5 +21,14 @@ public class health_bar : MonoBehaviour
         p_health = control.health;
         max_p_health = control.player_stat.health;
         transform.localScale = new Vector3(p_health/max_p_health, 1, 1);
+        if(control.locked_enemy==null) {
+            enemy_health_bar.transform.parent.localScale = Vector3.zero;
+            return;
+        }
+        enemy_health_bar.transform.parent.localScale = Vector3.one;
+        max_e_health = control.locked_enemy.GetComponent<enemy_control>().enemy_stat.health;
+        e_health = control.locked_enemy.GetComponent<enemy_control>().current_health;
+        enemy_health_bar.transform.localScale = new Vector3(e_health/max_e_health, 1, 1);
+
     }
 }

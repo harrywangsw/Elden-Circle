@@ -90,7 +90,11 @@ public unsafe class enemy_control : MonoBehaviour
         float stray_angle = 0f;
         face_player();
         //code for dodging
-        if((playerc.new_input&&playerc.range>=(transform.position-player.transform.position).magnitude)||(playerc.new_input_l&&playerc.l_range>=(transform.position-player.transform.position).magnitude)){
+        // if((playerc.new_input&&playerc.range>=(transform.position-player.transform.position).magnitude)||(playerc.new_input_l&&playerc.l_range>=(transform.position-player.transform.position).magnitude)){
+        //     Debug.Log("dodge");
+        //     StartCoroutine(dodge());
+        // }
+        if(playerc.attacking&&!dashing&&playerc.locked_enemy==gameObject){
             StartCoroutine(dodge());
         }
         RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, player.transform.position);
@@ -115,7 +119,7 @@ public unsafe class enemy_control : MonoBehaviour
     void move(Vector3 moveInput)
     {
         walkAcceleration = agent.speed*10f;
-        Debug.DrawRay(transform.position, -moveInput, Color.green);
+        //Debug.DrawRay(transform.position, -moveInput, Color.green);
         moveInput.Normalize();
 
         velocity.x = Mathf.MoveTowards(velocity.x, agent.speed * moveInput.x, walkAcceleration * Time.fixedDeltaTime);
@@ -126,14 +130,14 @@ public unsafe class enemy_control : MonoBehaviour
     }
 
     IEnumerator dodge(){
-        Debug.Log("doge");
+        //Debug.Log("doge");
         agent.isStopped = true;
         agent.ResetPath();
         chasing = false;
         float time = 0f;
         StartCoroutine(dash());
-        while(time<enemy_stat.dash_dura*3f){
-            float rand_angle = Random.Range(0, 2)==0 ? Random.Range(dodge_angle+10f, dodge_angle-10f):Random.Range(-dodge_angle+10f, -dodge_angle-10f);
+        float rand_angle = Random.Range(0, 2)==0 ? Random.Range(dodge_angle+10f, dodge_angle-10f):Random.Range(-dodge_angle+10f, -dodge_angle-10f);
+        while(time<enemy_stat.dash_dura){
             move((Quaternion.Euler(0f, 0f, rand_angle)*(transform.position-player.transform.position)));
             yield return new WaitForSeconds(Time.deltaTime);
             time+=Time.deltaTime;
@@ -145,10 +149,7 @@ public unsafe class enemy_control : MonoBehaviour
     {
         dashing = true;
         //Debug.Log("dash");
-        sprite.color =  Color.grey;
         yield return new WaitForSeconds(enemy_stat.dash_dura);
-        sprite.color =  Color.black;
-        yield return new WaitForSeconds(enemy_stat.dash_dura*3f);
         dashing = false;
     }
 
@@ -160,16 +161,15 @@ public unsafe class enemy_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
+        if(c.collider.gameObject==rweapon) return;
         if(dead) return;
+        StartCoroutine(statics.hit_effect(c.GetContact(0).point, gameObject));
         //Debug.Log(c.gameObject.tag);
         if(c.collider.gameObject.tag=="poise_breaker"&&attacking&&Math.Abs(Time.time-triggertime)>parriable_window){
             StartCoroutine(break_poise());
         }
-        if (hit_by.Contains(c.gameObject)) return;
-        else hit_by.Add(c.gameObject);
         if (c.gameObject.GetComponent<damage_manager>()!=null)
         {
-            if(dashing) return;
             body.velocity = Vector3.zero;
             damages = c.gameObject.GetComponent<damage_manager>();           
             current_health -= statics.calc_damage(enemy_stat, damages);

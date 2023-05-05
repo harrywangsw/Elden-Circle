@@ -15,7 +15,7 @@ public unsafe class player_control : MonoBehaviour
     public bool* pattacking, pattacking_l;
     damage_manager damages;
     public Vector2 velocity = new Vector2();
-    public Vector3 previous_pos = new Vector3(), previous_angle = new Vector3();
+    public Vector3 previous_angle = new Vector3();
     Vector3 init_loc = new Vector3();
     public GameObject locked_enemy, marker, rweapon, overlay, death_screen, menu, inventory_content, lweapon, Exp, lock_on_marker;
     public SpriteRenderer player_sprite;
@@ -29,7 +29,6 @@ public unsafe class player_control : MonoBehaviour
         foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("enemy")){
             enemies.Add(enemy.GetComponent<SpriteRenderer>());
         }
-        player_stat = new stats();
         inventory_content = GameObject.Find("inventory_content");
         if(rweapon!=null){
             update_weapon(rweapon, null);
@@ -201,7 +200,7 @@ public unsafe class player_control : MonoBehaviour
     {
         if (c.collider.gameObject.GetComponent<damage_manager>()!=null)
         {      
-            if(dashing) return;
+            if(player_sprite.color==Color.grey) return;
             health -= statics.calc_damage(player_stat, c.collider.gameObject.GetComponent<damage_manager>());
             StartCoroutine(statics.animate_hurt(player_sprite));
             if (health < 0f) StartCoroutine(death());
@@ -222,8 +221,6 @@ public unsafe class player_control : MonoBehaviour
 
     void FixedUpdate()
     {
-        previous_pos = transform.position;
-        Debug.DrawRay(transform.position, transform.rotation*Vector3.up*30f, Color.green);
         move();
     }
 
@@ -244,18 +241,19 @@ public unsafe class player_control : MonoBehaviour
         //transform.Translate(velocity * Time.fixedDeltaTime);
         Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
 
-        if(attacking) {
-            transform.eulerAngles = previous_angle;
-            return;
-        }
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction;
         
         if(locked_enemy!=null){
             direction = locked_enemy.transform.position-transform.position;
+            previous_angle = new Vector3(0f,0f,Vector2.SignedAngle(Vector2.up, direction));
         }
         else{
             direction = (Vector2)((worldMousePos - transform.position));
+        }
+        if(attacking) {
+            transform.eulerAngles = previous_angle;
+            return;
         }
         direction.Normalize();
         transform.eulerAngles = new Vector3(0f,0f,Vector2.SignedAngle(Vector2.up, direction));
@@ -272,7 +270,7 @@ public unsafe class player_control : MonoBehaviour
     IEnumerator dash()
     {
         dashing = true;
-        player_sprite.color = new Color(0f, 0f, 0f, 0.5f);
+        player_sprite.color = Color.grey;
         yield return new WaitForSeconds(player_stat.dash_dura);
         player_sprite.color = Color.black;
         yield return new WaitForSeconds(player_stat.dash_dura*3f);
