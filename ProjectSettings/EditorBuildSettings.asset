@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/start.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/lodge_of_voyagers.unity
+    guid: e215ecf1cc68c7d48afc4a20d09ebc98
   m_configObjects: {}

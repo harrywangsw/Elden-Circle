@@ -36,7 +36,7 @@ public unsafe class spear_attack : MonoBehaviour
     {
         if(player!=null) target = player.locked_enemy;
         else if(enemy!=null) target = enemy.player;
-        Debug.DrawRay(transform.position, target.transform.position-transform.position, Color.green);
+        //Debug.DrawRay(transform.position, target.transform.position-transform.position, Color.green);
         new_input = *p_newinput;
         thrust_vel = range/thrust_period;
         if (new_input&&!attacking) StartCoroutine(thrust());

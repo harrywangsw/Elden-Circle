@@ -19,16 +19,18 @@ public class inventory_manager : MonoBehaviour
         up = GameObject.Find("up");
         right = GameObject.Find("right");
         left = GameObject.Find("left");
-        refresh_inv_menu();
+        last_slot = transform.GetChild(0).GetChild(0).gameObject;
     }
 
     public void refresh_inv_menu(){
-        last_slot = transform.GetChild(0).GetChild(0).gameObject;
+        //Debug.Log(p.player_stat.inv.inv.Count.ToString());
         for (i = 0; i<p.player_stat.inv.inv.Count; i++)
         {
-            if(p.player_stat.inv.inv[i].Item2==0) continue;
-            GameObject it = Resources.Load<GameObject>("prefab/UI_items/"+p.player_stat.inv.inv[i].Item1);
-            add_item(it, p.player_stat.inv.inv[i].Item2);
+            Debug.Log("S"+i.ToString());
+            if(p.player_stat.inv.inv[i].num_left==0) continue;
+            GameObject it = Resources.Load<GameObject>("prefab/UI_items/"+p.player_stat.inv.inv[i].item_name);
+            Debug.Log(it.name);
+            add_item(it, p.player_stat.inv.inv[i].num_left);
 
             //quickslot_up/down/left/right_indexes are the indexes of inv that represent the items in each respective quickslot
             //u/d/l/r_gameobjects are the gameobject for each item
@@ -43,7 +45,7 @@ public class inventory_manager : MonoBehaviour
             }
 
             if(r_gameobjects.Count>0){
-            switchr();
+                switchr();
             }
             if(l_gameobjects.Count>0){
                 switchl();
@@ -94,12 +96,12 @@ public class inventory_manager : MonoBehaviour
 
         if(!p.attacking&&!p.dashing&&Input.GetKeyDown("e")&&u_gameobjects.Count>0){
             p.use_item(u_gameobjects[current_itemu].name);
-            int ind = p.player_stat.inv.inv.FindIndex(obj=>obj.Item1==u_gameobjects[current_itemu].name);
-            p.player_stat.inv.inv[ind] = Tuple.Create(p.player_stat.inv.inv[ind].Item1, p.player_stat.inv.inv[ind].Item2-1, p.player_stat.inv.inv[ind].Item3);
-            int num_left = p.player_stat.inv.inv[ind].Item2;
+            int ind = p.player_stat.inv.inv.FindIndex(obj=>obj.item_name==u_gameobjects[current_itemu].name);
+            p.player_stat.inv.inv[ind] = new item(p.player_stat.inv.inv[ind].item_name, p.player_stat.inv.inv[ind].num_left-1, p.player_stat.inv.inv[ind].item_type);
+            int num_left = p.player_stat.inv.inv[ind].num_left;
             u_gameobjects[current_itemu].transform.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = num_left.ToString();
             up.transform.GetChild(0).GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = num_left.ToString();
-            if(p.player_stat.inv.inv[ind].Item2==0) {
+            if(p.player_stat.inv.inv[ind].num_left==0) {
                 p.player_stat.inv.inv.RemoveAt(ind);
                 Destroy(u_gameobjects[current_itemu]);
                 u_gameobjects.RemoveAt(current_itemu);
@@ -111,7 +113,7 @@ public class inventory_manager : MonoBehaviour
         // if(u_gameobjects.Count>0){
         //     Transform slot = up.transform;
         //     item = GameObject.Instantiate(u_gameobjects[player_stat.inv.quickslot_up], slot);
-        //     item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_stat.inv.inv[player_stat.inv.quickslot_up_indexes[player_stat.inv.quickslot_up]].Item2.ToString();
+        //     item.transform.GetChild(0).GetComponent<TMPro.TextMeshProUGUI>().text = player_stat.inv.inv[player_stat.inv.quickslot_up_indexes[player_stat.inv.quickslot_up]].num_left.ToString();
         // }
         // if(l_gameobjects.Count>0){
         //     Transform slot = GameObject.Find("left").transform;
@@ -131,7 +133,6 @@ public class inventory_manager : MonoBehaviour
 
     //add an item into the inventory menu and hope that it has already been added to player_stat.inv
     public void add_item(GameObject item, int num){
-        p.player_stat.inv.inv.Add(Tuple.Create(item.name, 1, statics.item_types[item.name]));
         Transform tran = last_slot.transform;
         tran.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = num.ToString();
         GameObject item_inserted = GameObject.Instantiate(item, tran);

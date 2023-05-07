@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
- using UnityEngine.SceneManagement;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class main_menu : MonoBehaviour
@@ -20,7 +20,7 @@ public class main_menu : MonoBehaviour
         //string path = "P:/GitHub/saves"+"/";
         string path = save_load.save_path;
         foreach (string file in System.IO.Directory.GetFiles(path)){
-            Debug.Log(file);
+            //Debug.Log(file);
             if(file.Split(".")[1]=="wor"){
                 worlds.Add(save_load.Loadworld(file));
             }
@@ -34,7 +34,7 @@ public class main_menu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(loaded.ToString());
+        //Debug.Log(loaded.ToString());
         if(Input.anyKey){
             if(title){
                 buttons.SetActive(true);
@@ -51,30 +51,12 @@ public class main_menu : MonoBehaviour
         }
     }
 
-    public IEnumerator LoadYourAsyncScene(int index){
-        Debug.Log(index.ToString());
-        if(worlds[index].world_name==""){
-            worlds[index].world_name = "start";
-        }
-        asyncLoad = SceneManager.LoadSceneAsync(worlds[index].world_name);
-        // Wait until the asynchronous scene fully loads
-        while (!asyncLoad.isDone)
-        {
-            yield return null;
+    public void LoadYourAsyncScene(int index){
+        if(worlds[index].current_world==""){
+            worlds[index].current_world = "start";
         }
         saves.SetActive(false);
-
-        //Debug.Log(GameObject.Find("player").transform.position.z);
-        player_control p = GameObject.Find("player").GetComponent<player_control>();
-        p.transform.position = new Vector2(worlds[index].player_pos_x, worlds[index].player_pos_y);
-        Debug.Log(stat[index].inv.inv[0].Item1);
-        p.player_stat = stat[index];
-        p.update_stats();
-        GameObject.Find("inventory_content").GetComponent<inventory_manager>().refresh_inv_menu();
-        Debug.Log("finished loading scene?");
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName(worlds[index].world_name));
-        asyncLoad.allowSceneActivation = true;
-        Destroy(gameObject);
+        StartCoroutine(statics.load_new_world(worlds[index].current_world, worlds[index], stat[index], gameObject));
     }
 
     public void new_player(){
@@ -89,7 +71,9 @@ public class main_menu : MonoBehaviour
 
     public void start_new(string name){
         stat[worlds.Count-1].name = name;
-        StartCoroutine(LoadYourAsyncScene(worlds.Count-1));
+        save_load.SavePlayer(stat[stat.Count-1]);
+        save_load.Saveworld(worlds[worlds.Count-1], name);
+        LoadYourAsyncScene(worlds.Count-1);
     }
 
     public void show_saves(){
@@ -99,10 +83,9 @@ public class main_menu : MonoBehaviour
         saves.SetActive(true);
         for(i=0; i<worlds.Count; i++){
             int tmp = i;
-            Debug.Log(worlds[i].world_name);
             saves.transform.GetChild(i).gameObject.name = i.ToString();
             saves.transform.GetChild(i).GetChild(0).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = stat[i].name;
-            saves.transform.GetChild(i).gameObject.GetComponent<Button>().onClick.AddListener(delegate{StartCoroutine(LoadYourAsyncScene(tmp));});
+            saves.transform.GetChild(i).gameObject.GetComponent<Button>().onClick.AddListener(delegate{LoadYourAsyncScene(tmp);});
         }
     }
 

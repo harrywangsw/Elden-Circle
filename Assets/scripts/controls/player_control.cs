@@ -9,7 +9,7 @@ public unsafe class player_control : MonoBehaviour
 {
     public float dash_stamina, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
-    public bool locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
+    public bool restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
     public stats player_stat;
     public world_details current_world;
     public bool* pattacking, pattacking_l;
@@ -29,7 +29,11 @@ public unsafe class player_control : MonoBehaviour
         foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("enemy")){
             enemies.Add(enemy.GetComponent<SpriteRenderer>());
         }
-        inventory_content = GameObject.Find("inventory_content");
+        if(menu==null){
+            inventory_content = GameObject.Find("inventory_content");
+            menu = GameObject.Find("item_menu");
+            Exp = GameObject.Find("Exp");
+        }
         if(rweapon!=null){
             update_weapon(rweapon, null);
             gameObject.GetComponent<damage_manager>().enabled = false;
@@ -197,17 +201,27 @@ public unsafe class player_control : MonoBehaviour
         Exp.GetComponent<TMPro.TextMeshProUGUI>().text = player_stat.exp.ToString();
 
         if(stamina<0f){stamina=0f;}
-        if(stamina<player_stat.stamina) stamina+=stamina_increment;
-        if (Input.GetMouseButtonDown(1)&&stamina>=stamina_cost) {stamina-=stamina_cost; new_input = true;}
+        if(stamina<player_stat.stamina&&restore_stamina) stamina+=stamina_increment;
+        if (Input.GetMouseButtonDown(1)&&stamina>=stamina_cost) {
+            stamina-=stamina_cost; 
+            new_input = true;
+            StartCoroutine(stamina_delay());
+        }
         else new_input = false;
         if (Input.GetMouseButtonDown(0)) new_input_l = true;
         else new_input_l = false;
         if (Input.GetKeyDown("space")&&!dashing&&stamina>dash_stamina) {
+            StartCoroutine(stamina_delay());
             stamina-=dash_stamina;
             dash_command = true;
         }
     }
-
+    
+    IEnumerator stamina_delay(){
+        restore_stamina = false;
+        yield return new WaitForSeconds(0.5f);
+        restore_stamina = true;
+    }
 
     void OnCollisionEnter2D(Collision2D c)
     {

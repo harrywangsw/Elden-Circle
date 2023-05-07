@@ -12,6 +12,7 @@ TagManager:
   - poise_breaker
   - weapon
   - enemy
+  - door
   layers:
   - Default
   - TransparentFX

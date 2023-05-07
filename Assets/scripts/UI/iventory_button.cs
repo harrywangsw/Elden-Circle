@@ -45,7 +45,7 @@ public class iventory_button : MonoBehaviour
     void Update()
     {
         if(!wait_for_input) return;
-        if(Input.GetKeyDown(KeyCode.LeftShift)&&player.player_stat.inv.inv[item_index].Item3=="weapon"){
+        if(Input.GetKeyDown(KeyCode.LeftShift)&&player.player_stat.inv.inv[item_index].item_type=="weapon"){
             //Debug.Log("addpls");
             if(!in_rquick_slot){
                 player.player_stat.inv.quickslot_right_indexes.Add(item_index);
@@ -60,7 +60,7 @@ public class iventory_button : MonoBehaviour
                 inv.r_gameobjects.Remove(gameObject);
             }
         }
-        if(Input.GetKeyDown(KeyCode.LeftControl)&&player.player_stat.inv.inv[item_index].Item3=="weapon"){
+        if(Input.GetKeyDown(KeyCode.LeftControl)&&player.player_stat.inv.inv[item_index].item_type=="weapon"){
             if(!in_lquick_slot){
                 player.player_stat.inv.quickslot_left_indexes.Add(item_index);
                 in_rquick_slot = false;
@@ -75,7 +75,7 @@ public class iventory_button : MonoBehaviour
                 inv.l_gameobjects.Remove(gameObject);
             }
         }
-        if(Input.GetKeyDown("e")&&player.player_stat.inv.inv[item_index].Item3=="item"){
+        if(Input.GetKeyDown("e")&&player.player_stat.inv.inv[item_index].item_type=="item"){
             if(!in_uquick_slot){
                 player.player_stat.inv.quickslot_up_indexes.Add(item_index);
                 inv.u_gameobjects.Add(gameObject);

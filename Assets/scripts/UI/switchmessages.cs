@@ -24,13 +24,14 @@ public class switchmessages : MonoBehaviour
     void Update()
     {
         if(switch_guide.activeSelf){
-            s_background.color = Color.white;
+            s_background.color = new Color(1f, 1f, 1f, 0.5f);
         }
         else{
             s_background.color = new Color(1f, 1f, 1f, 0f);
         }
         if(message_screen.GetComponent<TMPro.TextMeshProUGUI>().text!=""){
-            m_background.color = Color.white;
+            //m_background.color = Color.white;
+            m_background.color = new Color(1f, 1f, 1f, 0.5f);
         }
         else{
             m_background.color = new Color(1f, 1f, 1f, 0f);

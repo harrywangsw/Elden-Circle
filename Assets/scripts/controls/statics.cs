@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using Random=UnityEngine.Random;
+using UnityEngine.SceneManagement;
 
 public static class statics
 {
@@ -19,6 +20,16 @@ public static class statics
         {"spawn_bees", "weapon"}
     };
 
+    public static Dictionary<string, int> world_index = new Dictionary<string, int>(){
+        {"start", 0},
+	    {"lodge_of_voyagers", 1},
+    };
+
+    public static Dictionary<string, List<string>> npc_lines = new Dictionary<string, List<string>>(){
+        {"Thales", npc_dialogues.thales},
+        {"Hali", npc_dialogues.hali},
+    };
+
 
     public static IEnumerator animate_hurt(SpriteRenderer damaged_sprite)
     {
@@ -27,24 +38,51 @@ public static class statics
         damaged_sprite.color = Color.black;
     }
     public static int search_for_item(inventory inv, string item){
-        //Debug.Log(item+" "+inv.inv.FindIndex(obj => obj.Item1 == item));
-        return inv.inv.FindIndex(obj => obj.Item1 == item);
+        //Debug.Log(item+" "+inv.inv.FindIndex(obj => obj.item_name == item));
+        return inv.inv.FindIndex(obj => obj.item_name == item);
     }
 
     public static void apply_world_details(world_details w){
         int i;
+        int world_num = statics.world_index[w.current_world];
+        //Debug.Log(w.opened_doors.Count);
         GameObject p = GameObject.Find("player");
         p.GetComponent<Transform>().position = new Vector2(w.player_pos_x, w.player_pos_y);
         GameObject[] doors = GameObject.FindGameObjectsWithTag("door");
         for(i=0; i<doors.Length; i++){
             doors[i].GetComponent<doors>().num = i;
             bool closed = doors[i].GetComponent<Collider2D>().enabled;
-            if(i>=w.opened_doors.Count) w.opened_doors.Add(!closed);
+            if(i>=w.opened_doors[world_num].Count) w.opened_doors[world_num].Add(!closed);
             //if door is closed but saved world detail say it's open, then open it
-            if(closed&&w.opened_doors[i]){
+            if(closed&&w.opened_doors[world_num][i]){
                 doors[i].GetComponent<Collider2D>().enabled = false;
             }
         }
+    }
+
+    public static IEnumerator load_new_world(string world_name, world_details world, stats player_stat, GameObject loader_object, GameObject cloned_player = null){
+        Debug.Log(player_stat.inv.inv.Count.ToString());
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(world_name);
+
+        // Wait until the asynchronous scene fully loads
+        while (!asyncLoad.isDone)
+        {
+            yield return null;
+        }
+
+        GameObject player = GameObject.Find("player");
+        if(player==null&&cloned_player!=null) GameObject.Instantiate(cloned_player, Vector3.zero, Quaternion.identity);
+        player_control p = GameObject.Find("player").GetComponent<player_control>();
+        p.player_stat = player_stat;
+        p.update_stats();
+        GameObject inventory_content =  GameObject.Find("inventory_content");
+        //Debug.Log(inventory_content.name);
+        inventory_content.GetComponent<inventory_manager>().refresh_inv_menu();
+        apply_world_details(world);
+        Debug.Log("finished loading scene?");
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName(world_name));
+        asyncLoad.allowSceneActivation = true;
+        UnityEngine.Object.Destroy(loader_object);
     }
 
     public static float calc_damage(stats s, damage_manager damages) {
@@ -60,18 +98,23 @@ public static class statics
     }
 
     static public IEnumerator hit_effect(Vector3 pos, GameObject hitted_object){
+        foreach (Transform child in hitted_object.transform){
+            if(child.gameObject.name=="hit_effect") yield break;
+        }
         GameObject hit_image = Resources.Load<GameObject>("prefab/hit_effect");
         float rand_angle = Random.Range(90f+hit_effect_angle_range, 90f-hit_effect_angle_range);
         GameObject h1 = GameObject.Instantiate(hit_image, pos, Quaternion.Euler(0f, 0f, rand_angle));
         GameObject h2 = GameObject.Instantiate(hit_image, pos, Quaternion.Euler(0f, 0f, -rand_angle));
+        h1.name = "hit_effect";
+        h2.name = "hit_effect";
         h1.transform.parent = hitted_object.transform;
         h2.transform.parent = hitted_object.transform;
         float time = 0f;
         while(time<hit_effect_period){
-            h1.transform.position+=new Vector3(0f, Time.deltaTime*range/hit_effect_period, 0f);
+            //h1.transform.localPosition+=new Vector3(0f, Time.deltaTime*range/hit_effect_period, 0f);
             h1.transform.localScale-=Vector3.one*Time.deltaTime/hit_effect_period;
 
-            h2.transform.position+=new Vector3(0f, Time.deltaTime*range/hit_effect_period, 0f);
+            //h2.transform.localPosition+=new Vector3(0f, Time.deltaTime*range/hit_effect_period, 0f);
             h2.transform.localScale-=Vector3.one*Time.deltaTime/hit_effect_period;
             yield return new WaitForSeconds(Time.deltaTime);
             time+=Time.deltaTime;
