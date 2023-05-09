@@ -14,6 +14,8 @@ public class world_details
     public string current_world;
     public List<string> guild_teleports;
 
+    public Dictionary<string, int> npc_index;
+
     public world_details(){
         player_pos_x = 0f;
         player_pos_y = 0f;
@@ -24,5 +26,10 @@ public class world_details
         }
         guild_teleports = new List<string>();
         current_world = "start";
+
+        npc_index = new Dictionary<string, int>(){
+            {"Thales", 0},
+            {"Hali", 0},
+        };
     }
 }

@@ -9,7 +9,7 @@ public unsafe class player_control : MonoBehaviour
 {
     public float dash_stamina, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
-    public bool restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
+    public bool in_conversation, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
     public stats player_stat;
     public world_details current_world;
     public bool* pattacking, pattacking_l;
@@ -17,11 +17,12 @@ public unsafe class player_control : MonoBehaviour
     public Vector2 velocity = new Vector2();
     public Vector3 previous_angle = new Vector3();
     Vector3 init_loc = new Vector3();
-    public GameObject locked_enemy, marker, rweapon, overlay, death_screen, menu, inventory_content, lweapon, Exp, lock_on_marker;
+    public GameObject npc_marker, locked_npc, n_marker, locked_enemy, marker, rweapon, overlay, death_screen, menu, inventory_content, lweapon, Exp, lock_on_marker;
     public SpriteRenderer player_sprite;
     List<SpriteRenderer> enemies = new List<SpriteRenderer>();
     string type;
     Rigidbody2D body;
+    public List<GameObject> near_by_npcs = new List<GameObject>();
     List<GameObject> u_gameobjects = new List<GameObject>(), l_gameobjects = new List<GameObject>(), r_gameobjects = new List<GameObject>();
 
     void Start()
@@ -41,6 +42,7 @@ public unsafe class player_control : MonoBehaviour
         }
         player_sprite = gameObject.GetComponent<SpriteRenderer>();
         body = gameObject.GetComponent<Rigidbody2D>();
+        n_marker = Resources.Load<GameObject>("prefab/npc_lock_marker");
         //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<CircleCollider2D>(), true);
         //GameObject.Find("ground").GetComponent<TilemapCollider2D>().enabled = false;
         update_stats();
@@ -179,6 +181,10 @@ public unsafe class player_control : MonoBehaviour
 
     void Update()
     {
+        if(in_conversation){
+            speed = 0f;
+            return;
+        }
         if(!ramming) {
             if(pattacking!=null) attacking = *pattacking;
             if(pattacking_l!=null&&!attacking) attacking = *pattacking_l;
@@ -215,11 +221,12 @@ public unsafe class player_control : MonoBehaviour
             stamina-=dash_stamina;
             dash_command = true;
         }
+        look_at_npc();
     }
     
     IEnumerator stamina_delay(){
         restore_stamina = false;
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.8f);
         restore_stamina = true;
     }
 
@@ -343,10 +350,30 @@ public unsafe class player_control : MonoBehaviour
                 locked_enemy = enemy_sprite.gameObject;
                 Destroy(marker);
                 marker = GameObject.Instantiate(lock_on_marker, enemy_sprite.gameObject.transform, false);
-                StartCoroutine(lock_anim());
+                StartCoroutine(lock_anim(marker, locked_enemy));
                 locked_on = true;
                 return;
             }     
+        }
+    }
+
+    void look_at_npc(){
+        foreach(GameObject npc in near_by_npcs){
+            if(npc==null) {
+                near_by_npcs.Remove(npc);
+                continue;
+            }
+            if(npc == locked_npc) continue;
+            //use dot product=cos(a) to determine which enemy has the least angulare seperation from the direction
+            //the player's facing
+            float dot1 = Vector3.Dot(npc.transform.position, transform.rotation*Vector3.up);
+            float dot2 = Vector3.Dot(transform.rotation*Vector3.up, locked_npc.transform.position);
+            if(dot1>dot2){
+                locked_npc = npc;
+                Destroy(npc_marker);
+                npc_marker = GameObject.Instantiate(n_marker, npc.transform, false);
+                StartCoroutine(lock_anim(npc_marker, locked_npc));
+            }
         }
     }
 
@@ -366,23 +393,23 @@ public unsafe class player_control : MonoBehaviour
                 locked_enemy = enemy_sprite.gameObject;
                 Destroy(marker);
                 marker = GameObject.Instantiate(lock_on_marker, enemy_sprite.gameObject.transform, false);
-                StartCoroutine(lock_anim());
+                StartCoroutine(lock_anim(marker, locked_enemy));
             }
         }
     }
 
-    IEnumerator lock_anim(){
-        float size = locked_enemy.GetComponent<SpriteRenderer>().bounds.extents.magnitude;
+    IEnumerator lock_anim(GameObject m, GameObject locked){
+        float size = locked.GetComponent<SpriteRenderer>().bounds.extents.magnitude;
         //Debug.Log(size.ToString());
-        marker.transform.localScale = 2f*size*Vector3.one;
+        m.transform.localScale = 2f*size*Vector3.one;
         float time = 0f;
         while(time<lock_dura){
-            //Quaternion.RotateTowards(marker.transform.rotation, Quaternion.Euler(0f, 0f, 90f), Time.deltaTime*90f/lock_dura);
-            if(marker==null) break;
-            marker.transform.localScale-=Vector3.one*(Time.deltaTime*size/lock_dura);
+            //Quaternion.RotateTowards(m.transform.rotation, Quaternion.Euler(0f, 0f, 90f), Time.deltaTime*90f/lock_dura);
+            if(m==null) break;
+            m.transform.localScale-=Vector3.one*(Time.deltaTime*size/lock_dura);
             yield return new WaitForSeconds(Time.deltaTime);
             time+=Time.deltaTime;
         }
-        marker.transform.localScale = size*Vector3.one;
+        m.transform.localScale = size*Vector3.one;
     }
 }

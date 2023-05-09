@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5947763857748752507}
   - component: {fileID: -7303791767732442488}
   m_Layer: 0
-  m_Name: Thales
+  m_Name: Thales 1
   m_TagString: npc
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

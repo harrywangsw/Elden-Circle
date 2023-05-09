@@ -13,6 +13,7 @@ TagManager:
   - weapon
   - enemy
   - door
+  - npc
   layers:
   - Default
   - TransparentFX
