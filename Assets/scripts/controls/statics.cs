@@ -17,7 +17,8 @@ public static class statics
         {"dagger_fan", "weapon"},
         {"parry_shield", "weapon"},
         {"lightning_strike", "weapon"},
-        {"spawn_bees", "weapon"}
+        {"spawn_bees", "weapon"},
+        {"glintstone", "weapon"}
     };
 
     public static Dictionary<string, int> world_index = new Dictionary<string, int>(){

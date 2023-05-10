@@ -45,7 +45,7 @@ public class npc_control : MonoBehaviour
                 message_screen.transform.localScale = Vector3.zero;
                 switch_message.transform.localScale = Vector3.zero;
                 dialogue_screen.transform.parent.localScale = Vector3.one;
-                p.in_conversation = true;
+                p.stop = true;
                 in_conversation = true;
                 start_new_lines();
             }
@@ -70,7 +70,7 @@ public class npc_control : MonoBehaviour
             message_screen.transform.localScale = Vector3.one;
             switch_message.transform.localScale = Vector3.one;
             dialogue_screen.transform.parent.localScale = Vector3.zero;
-            p.in_conversation = false;
+            p.stop = false;
             in_conversation = false;
             //switch to the buffer dialogue if we're not on the buffer dialogue right now
             if(index%2==0) p.current_world.npc_index[npc_name]+=1;

@@ -39,7 +39,8 @@ public unsafe class glint_stone : MonoBehaviour
         attacking = true;
         GameObject s = GameObject.Instantiate(stone, gameObject.transform, false);
         s.transform.parent = null;
-        statics.apply_stats(s.GetComponent<damage_manager>(), player.player_stat);
+        if(player!=null) statics.apply_stats(s.GetComponent<damage_manager>(), player.player_stat);
+        else if(enemy!=null) statics.apply_stats(s.GetComponent<damage_manager>(), enemy.enemy_stat);
         Rigidbody2D body;
         body = s.GetComponent<Rigidbody2D>();
         StartCoroutine(check_for_new_attack(body));
@@ -52,7 +53,7 @@ public unsafe class glint_stone : MonoBehaviour
             float angle_between = Vector2.SignedAngle(body.velocity, target.transform.position-user.transform.position);
             Vector2 force = new Vector2(body.velocity.y, -body.velocity.x).normalized;
             force*=curve;
-            Debug.Log(angle_between);
+            //Debug.Log(angle_between);
             if(Mathf.Abs(angle_between)>1f){
                 Debug.Log(force);
                 if(angle_between>0) body.AddForce(-force, ForceMode2D.Impulse);
@@ -79,7 +80,6 @@ public unsafe class glint_stone : MonoBehaviour
         float time = 0f;
         while(time<0.5f*range/speed){
             if(body==null){
-                attacking = false;
                 yield break;
             }
             yield return new WaitForSeconds(Time.deltaTime);

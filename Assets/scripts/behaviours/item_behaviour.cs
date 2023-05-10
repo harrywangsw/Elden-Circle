@@ -47,6 +47,7 @@ public class item_behaviour : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to pick up item"&&entered){
                 int i;
+                //if the player already has the item in inventory, add one to the item's count
                 for(i=0; i<plac.player_stat.inv.inv.Count; i++){
                     //Debug.Log(plac.player_stat.inv.inv[i].item_name);
                     if(plac.player_stat.inv.inv[i].item_name==gameObject.name){
@@ -55,6 +56,7 @@ public class item_behaviour : MonoBehaviour
                         Destroy(gameObject);
                     }
                 }
+                plac.player_stat.inv.inv.Add(new item(gameObject.name, 0, statics.item_types[gameObject.name]));
                 inv_manager.add_item(Resources.Load<GameObject>("prefab/UI_items/"+gameObject.name), 1);
                 if(ind>=0) message_screen.GetComponent<switchmessages>().messages.RemoveAt(ind);
                 Destroy(gameObject);

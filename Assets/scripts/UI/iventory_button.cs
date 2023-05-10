@@ -45,6 +45,7 @@ public class iventory_button : MonoBehaviour
     void Update()
     {
         if(!wait_for_input) return;
+        //if(item!=null) item_index = statics.search_for_item(player.player_stat.inv, item.name);
         if(Input.GetKeyDown(KeyCode.LeftShift)&&player.player_stat.inv.inv[item_index].item_type=="weapon"){
             //Debug.Log("addpls");
             if(!in_rquick_slot){

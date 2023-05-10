@@ -185,7 +185,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 0.0001
   m_LinearDrag: 0
   m_AngularDrag: 1000000
   m_GravityScale: 0
@@ -206,6 +206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e1a9c894331c92499bce28be4768320, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stun_lock_period: 0.5
   dash_stamina: 20
   stamina_cost: 0
   stamina_increment: 0.5
@@ -219,6 +220,7 @@ MonoBehaviour:
   lock_dura: 0.2
   lock_angle: 20
   speed: 0
+  stop: 0
   restore_stamina: 1
   locked_on: 0
   new_input: 0
@@ -248,19 +250,23 @@ MonoBehaviour:
     level: 1
     name: Hiboy
     inv:
+      inv: []
       quickslot_up_indexes: 
       quickslot_left_indexes: 
       quickslot_right_indexes: 
   current_world:
     player_pos_x: 0
     player_pos_y: 0
-    opened_doors: 
-    world_name: 
+    current_world: start
+    guild_teleports: []
   velocity: {x: 0, y: 0}
   previous_angle: {x: 0, y: 0, z: 0}
+  npc_marker: {fileID: 0}
+  locked_npc: {fileID: 0}
+  n_marker: {fileID: 0}
   locked_enemy: {fileID: 0}
   marker: {fileID: 0}
-  rweapon: {fileID: 1495373251946413818, guid: 2188b7a7bd9469b4d827fc937096a7c8, type: 3}
+  rweapon: {fileID: 1245795144259552193, guid: c907ce156f91b9b4daa5e045bf258d48, type: 3}
   overlay: {fileID: 0}
   death_screen: {fileID: 0}
   menu: {fileID: 0}
@@ -270,6 +276,7 @@ MonoBehaviour:
   lock_on_marker: {fileID: 3130184260024326521, guid: 96138267aef0e164491638dfe20d5165,
     type: 3}
   player_sprite: {fileID: 0}
+  near_by_npcs: []
 --- !u!114 &3269226321231946713
 MonoBehaviour:
   m_ObjectHideFlags: 0

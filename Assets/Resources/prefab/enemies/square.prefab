@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3092593548950902434}
   - component: {fileID: 3092593548950902435}
   - component: {fileID: 3092593548950902432}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: square
   m_TagString: enemy
   m_Icon: {fileID: 0}
@@ -122,19 +122,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a0d1e169502c8745906e981492d2e86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  attack_seperation: 0
+  stamina_cost: 0
   current_health: 0
   walkAcceleration: 8888
   dash_modifier: 188
-  dash_dura: 0
-  rweapon_range: 0
+  range: 0
   poise_broken_period: 3.2
+  dodge_angle: 0
   exp: 0
+  start_new_attack: 1
   dead: 0
   new_input: 0
   attacking: 0
   movable: 0
   dashing: 0
-  dash_command: 0
   stray: 0
   sight_lost: 0
   chasing: 1
@@ -159,17 +161,20 @@ MonoBehaviour:
     level: 0
     name: 
     inv:
+      inv: []
       quickslot_up_indexes: 
       quickslot_left_indexes: 
       quickslot_right_indexes: 
   prev_player_pos: {x: 0, y: 0, z: 0}
   rweapon: {fileID: 6991883489652790954, guid: c7e87c296ab62354ca558905937bc384, type: 3}
   target: {fileID: 0}
+  player: {fileID: 0}
   hit_by: []
   spawnable_item:
   - health_potion
   spawn_chance:
   - 1
+  agent: {fileID: 0}
 --- !u!61 &3092593548950902435
 BoxCollider2D:
   m_ObjectHideFlags: 0

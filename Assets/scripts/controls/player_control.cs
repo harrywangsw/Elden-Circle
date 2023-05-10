@@ -7,9 +7,10 @@ using UnityEngine.Tilemaps;
 
 public unsafe class player_control : MonoBehaviour
 {
-    public float dash_stamina, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
+    [SerializeField] private FieldOfView fieldofview;
+    public float stun_lock_period, dash_stamina, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
-    public bool in_conversation, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
+    public bool stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
     public stats player_stat;
     public world_details current_world;
     public bool* pattacking, pattacking_l;
@@ -35,8 +36,8 @@ public unsafe class player_control : MonoBehaviour
             menu = GameObject.Find("item_menu");
             Exp = GameObject.Find("Exp");
         }
+        update_weapon(rweapon, lweapon);
         if(rweapon!=null){
-            update_weapon(rweapon, null);
             gameObject.GetComponent<damage_manager>().enabled = false;
             ramming = false;
         }
@@ -181,10 +182,12 @@ public unsafe class player_control : MonoBehaviour
 
     void Update()
     {
-        if(in_conversation){
+        if(stop){
             speed = 0f;
             return;
         }
+        fieldofview.SetAimDirection(transform.rotation.eulerAngles.z);
+        //fieldofview.SetOrigin(transform.position);
         if(!ramming) {
             if(pattacking!=null) attacking = *pattacking;
             if(pattacking_l!=null&&!attacking) attacking = *pattacking_l;
@@ -237,8 +240,15 @@ public unsafe class player_control : MonoBehaviour
             if(player_sprite.color==Color.grey) return;
             health -= statics.calc_damage(player_stat, c.collider.gameObject.GetComponent<damage_manager>());
             StartCoroutine(statics.animate_hurt(player_sprite));
+            StartCoroutine(hurt());
             if (health < 0f) StartCoroutine(death());
         }
+    }
+
+    IEnumerator hurt(){
+        stop = true;
+        yield return new WaitForSeconds(stun_lock_period);
+        stop = false;
     }
 
     IEnumerator death(){
@@ -323,7 +333,7 @@ public unsafe class player_control : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime*8f);
             time+=Time.deltaTime*8f;
         }
-        player_stat.health+=player_stat.health_up_amount;
+        health+=player_stat.health_up_amount;
         while(time<1f/player_stat.item_speed){
             player_sprite.color = Color.green;
             yield return new WaitForSeconds(Time.deltaTime*8f);

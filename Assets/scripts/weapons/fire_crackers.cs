@@ -4,7 +4,7 @@ using UnityEngine;
 
 public unsafe class fire_crackers : MonoBehaviour
 {
-    public float period, range, stamina_cost;
+    public float period, range, spacing, stamina_cost;
     public int num = 0, final_num;
     public bool* p_newinput;
     public bool attacking, new_input, init_new_attack=true;
@@ -34,7 +34,7 @@ public unsafe class fire_crackers : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime);
         }
         //spawn another one to the left and track how many has been spawned
-        Vector3 new_pos = new Vector3(Random.Range(0f, range*2f), Random.Range(-range/2f, range/2f), 0f);
+        Vector3 new_pos = new Vector3(Random.Range(0f, spacing*2f), Random.Range(-spacing/2f, spacing/2f), 0f);
         new_pos=Quaternion.Euler(0f, 0f, transform.eulerAngles.z)*-new_pos;
         GameObject another = GameObject.Instantiate(gameObject, transform.position+new_pos, transform.rotation);
         another.transform.localScale = Vector3.one*original_size;

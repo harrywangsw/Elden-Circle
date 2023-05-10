@@ -49,9 +49,11 @@ public unsafe class spear_attack : MonoBehaviour
         //Debug.Log("wtf"+body.velocity.y.ToString());
         //body.velocity = thrust_vel*Vector2.up;
         Vector3 thrust_vector;
-        
-        transform.localRotation = Quaternion.LookRotation(target.transform.position-transform.position);
-        thrust_vector = target.transform.position-transform.position;
+        if(target==null) thrust_vector = Vector3.up;
+        else{
+            transform.localRotation = Quaternion.LookRotation(target.transform.position-transform.position);
+            thrust_vector = target.transform.position-transform.position;
+        }
         thrust_vector.Normalize();
         float time  = 0f;
         while(time<thrust_period/2f){

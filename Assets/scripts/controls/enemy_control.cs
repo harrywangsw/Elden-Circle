@@ -8,14 +8,15 @@ using Random=UnityEngine.Random;
 //[RequireComponent(typeof(BoxCollider2D))]
 public unsafe class enemy_control : MonoBehaviour
 {
-    public float current_health, walkAcceleration, dash_modifier, rweapon_range, poise_broken_period, dodge_angle;
+    public float attack_seperation, stamina_cost, current_health, walkAcceleration, dash_modifier, range, poise_broken_period, dodge_angle;
     float speed, triggertime, parriable_window;
     public int exp;
     bool trigger_time_not_set;
-    public bool dead, new_input, attacking, movable, dashing, stray, sight_lost = true, chasing, poise_broken, visible;
+    public bool start_new_attack = true, dead, new_input, attacking, movable, dashing, stray, sight_lost = true, chasing, poise_broken, visible;
     public bool* pattacking;
     public stats enemy_stat;
     Vector2 velocity = new Vector2();
+    Vector3 init_loc = new Vector3();
     damage_manager damages;
     GameObject greybar, broken_word, generic_item;
     public Vector3 prev_player_pos;
@@ -64,19 +65,42 @@ public unsafe class enemy_control : MonoBehaviour
             return;
         }
 
+        RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, player.transform.position);
+
+        if(Array.FindIndex(objs, obj => obj.collider.name == "Grid")>=0)
+        {
+            //Debug.Log(prev_player_pos);
+            //only set prev_player_pos once when sight has just been lost
+            if(!sight_lost) {
+                prev_player_pos = player.transform.position;
+            }
+            sight_lost = true;
+        }
+        else {
+            sight_lost = false;
+        }
         if(chasing) follow_player();
         else patrol();
         if((player.transform.position - transform.position).magnitude>=40f){
             sight_lost = true;
             chasing = false;
         }
-        if((agent.destination-transform.position).magnitude<=0.1f){
+        if((agent.destination-transform.position).magnitude<=0.1f&&sight_lost){
             chasing = false;
         }
-        if ((player.transform.position - transform.position).magnitude<=rweapon_range&&!sight_lost&&!dashing) {
-            new_input = true;
+        //wait a bit before doing another attack to catch up to player and give the player a bit to react
+        if ((player.transform.position - transform.position).magnitude<=range&&!sight_lost&&!dashing&&start_new_attack) {
+            StartCoroutine(attack());
         }
         else new_input = false;
+    }
+
+    public IEnumerator attack(){
+        new_input = true;
+        start_new_attack = false;
+        agent.SetDestination(transform.position);
+        yield return new WaitForSeconds(attack_seperation);
+        start_new_attack = true;
     }
 
     public void patrol(){
@@ -86,33 +110,12 @@ public unsafe class enemy_control : MonoBehaviour
     }
 
     public void follow_player(){
-        if(!sight_lost) chasing = true;
         float stray_angle = 0f;
         face_player();
-        //code for dodging
-        // if((playerc.new_input&&playerc.range>=(transform.position-player.transform.position).magnitude)||(playerc.new_input_l&&playerc.l_range>=(transform.position-player.transform.position).magnitude)){
-        //     Debug.Log("dodge");
-        //     StartCoroutine(dodge());
-        // }
+        if(sight_lost) agent.SetDestination(prev_player_pos);
+        else agent.SetDestination(player.transform.position);
         if(playerc.attacking&&!dashing&&playerc.locked_enemy==gameObject){
             StartCoroutine(dodge());
-        }
-        RaycastHit2D[] objs = Physics2D.LinecastAll(transform.position, player.transform.position);
-
-        if(Array.FindIndex(objs, obj => obj.collider.name == "Grid")>=0)
-        {
-            //Debug.Log(prev_player_pos);
-            //only set prev_player_pos once when sight has just been lost
-            if(!sight_lost) {
-                prev_player_pos = player.transform.position;
-                sight_lost = true;
-            }
-            agent.SetDestination(prev_player_pos);
-            //move(transform.position-prev_player_pos);
-        }
-        else {
-            sight_lost = false;
-            agent.SetDestination(player.transform.position);
         }
     }
 
@@ -249,36 +252,56 @@ public unsafe class enemy_control : MonoBehaviour
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<spear_attack>().attacking) { pattacking = pattack_fixed; }
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
-            parriable_window = rweapon.GetComponent<spear_attack>().parriable_window;
-            rweapon_range = rweapon.GetComponent<spear_attack>().range;
+            range = rweapon.GetComponent<spear_attack>().range;
+            init_loc = rweapon.GetComponent<spear_attack>().init_loc;
+            stamina_cost = rweapon.GetComponent<spear_attack>().stamina_cost;
         }
         else if (rweapon.GetComponent<fire_crackers>()!=null)
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<fire_crackers>().attacking) { pattacking = pattack_fixed; }
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<fire_crackers>().p_newinput = p_attack_order; }
-            
+            range = rweapon.GetComponent<fire_crackers>().range;
+            init_loc = rweapon.GetComponent<fire_crackers>().init_loc;
+            stamina_cost = rweapon.GetComponent<fire_crackers>().stamina_cost;
         }
         else if (rweapon.GetComponent<dagger_fan>()!=null)
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<dagger_fan>().attacking) { pattacking = pattack_fixed; }
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<dagger_fan>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<dagger_fan>().range;
+            init_loc = rweapon.GetComponent<dagger_fan>().init_loc;
+            stamina_cost = rweapon.GetComponent<dagger_fan>().stamina_cost;
         }
         else if (rweapon.GetComponent<parry_shield>()!=null)
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
             fixed (bool* pattack_fixed = &rweapon.GetComponent<parry_shield>().attacking) { pattacking = pattack_fixed; }
             fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<parry_shield>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<parry_shield>().range;
+            init_loc = rweapon.GetComponent<parry_shield>().init_loc;
+            stamina_cost = rweapon.GetComponent<parry_shield>().stamina_cost;
         }
-        else if (rweapon.GetComponent<spawn_bees>()!=null)
+        else if (rweapon.GetComponent<lightning_strike>()!=null)
         {
             //get adress of attacking from right-hand weapon and save the adress in pattacking
-            fixed (bool* pattack_fixed = &rweapon.GetComponent<spawn_bees>().attacking) { pattacking = pattack_fixed; }
-            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spawn_bees>().p_newinput = p_attack_order; }
-            rweapon_range = rweapon.GetComponent<spawn_bees>().range;
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<lightning_strike>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<lightning_strike>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<lightning_strike>().range;
+            init_loc = rweapon.GetComponent<lightning_strike>().init_loc;
+            stamina_cost = rweapon.GetComponent<lightning_strike>().stamina_cost;
         }
-        agent.stoppingDistance = rweapon_range;
+        else if (rweapon.GetComponent<glint_stone>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<glint_stone>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<glint_stone>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<glint_stone>().range;
+            init_loc = rweapon.GetComponent<glint_stone>().init_loc;
+            stamina_cost = rweapon.GetComponent<glint_stone>().stamina_cost;
+        }
+        rweapon.transform.localPosition = init_loc*GetComponent<SpriteRenderer>().bounds.extents.magnitude;;
     }
 
     void OnBecameVisible()
