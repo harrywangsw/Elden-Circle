@@ -7,10 +7,9 @@ using UnityEngine.Tilemaps;
 
 public unsafe class player_control : MonoBehaviour
 {
-    [SerializeField] private FieldOfView fieldofview;
     public float stun_lock_period, dash_stamina, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
-    public bool stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
+    public bool attack_interrupted, stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
     public stats player_stat;
     public world_details current_world;
     public bool* pattacking, pattacking_l;
@@ -128,6 +127,16 @@ public unsafe class player_control : MonoBehaviour
                 init_loc = rweapon.GetComponent<glint_stone>().init_loc;
                 stamina_cost = rweapon.GetComponent<glint_stone>().stamina_cost;
             }
+
+            else if (rweapon.GetComponent<mine>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &rweapon.GetComponent<mine>().attacking) { pattacking = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<mine>().p_newinput = p_attack_order; }
+                range = rweapon.GetComponent<mine>().range;
+                init_loc = rweapon.GetComponent<mine>().init_loc;
+                stamina_cost = rweapon.GetComponent<mine>().stamina_cost;
+            }
         }
         rweapon.transform.localPosition = init_loc;
 
@@ -175,6 +184,15 @@ public unsafe class player_control : MonoBehaviour
                 l_range = lweapon.GetComponent<lightning_strike>().range;
                 init_loc = lweapon.GetComponent<lightning_strike>().init_loc;
             }
+
+            else if (lweapon.GetComponent<mine>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &lweapon.GetComponent<mine>().attacking) { pattacking_l = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<mine>().p_newinput = p_attack_order; }
+                l_range = lweapon.GetComponent<mine>().range;
+                init_loc = lweapon.GetComponent<mine>().init_loc;
+            }
             lweapon.transform.localPosition = init_loc;
         }
     }
@@ -186,8 +204,6 @@ public unsafe class player_control : MonoBehaviour
             speed = 0f;
             return;
         }
-        fieldofview.SetAimDirection(transform.rotation.eulerAngles.z);
-        //fieldofview.SetOrigin(transform.position);
         if(!ramming) {
             if(pattacking!=null) attacking = *pattacking;
             if(pattacking_l!=null&&!attacking) attacking = *pattacking_l;
@@ -237,6 +253,7 @@ public unsafe class player_control : MonoBehaviour
     {
         if (c.collider.gameObject.GetComponent<damage_manager>()!=null)
         {      
+            attack_interrupted = true;
             if(player_sprite.color==Color.grey) return;
             health -= statics.calc_damage(player_stat, c.collider.gameObject.GetComponent<damage_manager>());
             StartCoroutine(statics.animate_hurt(player_sprite));
@@ -249,6 +266,7 @@ public unsafe class player_control : MonoBehaviour
         stop = true;
         yield return new WaitForSeconds(stun_lock_period);
         stop = false;
+        attack_interrupted = false;
     }
 
     IEnumerator death(){

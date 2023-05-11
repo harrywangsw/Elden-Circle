@@ -98,7 +98,7 @@ public static class statics
         base_damage.pierce*=modifers.peirce_dmg;
     }
 
-    static public IEnumerator hit_effect(Vector3 pos, GameObject hitted_object){
+    public static IEnumerator hit_effect(Vector3 pos, GameObject hitted_object){
         foreach (Transform child in hitted_object.transform){
             if(child.gameObject.name=="hit_effect") yield break;
         }

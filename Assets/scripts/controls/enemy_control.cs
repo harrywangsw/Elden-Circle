@@ -46,7 +46,7 @@ public unsafe class enemy_control : MonoBehaviour
         //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<Collider2D>(), false);
     }
 
-    void FixedUpdate()
+    void Update()
     {
         attacking = *pattacking;
         //tracking the time when attack started to determine if enemy can be parried right now
@@ -76,8 +76,9 @@ public unsafe class enemy_control : MonoBehaviour
             }
             sight_lost = true;
         }
-        else {
+        else{
             sight_lost = false;
+            chasing = true;
         }
         if(chasing) follow_player();
         else patrol();
