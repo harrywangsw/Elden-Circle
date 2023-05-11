@@ -52,8 +52,7 @@ public unsafe class spawn_bees : MonoBehaviour
         for(int i=0; i<num; i++){
             GameObject b = GameObject.Instantiate(bee, user.transform, false);
             Physics2D.IgnoreCollision(b.GetComponent<Collider2D>(), userc, true);
-            if(player_stat!=null) statics.apply_stats(b.GetComponent<damage_manager>(), player_stat);
-            else if(enemy_stat!=null) statics.apply_stats(b.GetComponent<damage_manager>(), enemy_stat);
+            statics.apply_stats(GetComponent<damage_manager>(), b.GetComponent<damage_manager>(), new stats());
             Vector3 heading = transform.rotation*Vector3.up;
             b.GetComponent<Rigidbody2D>().velocity = Quaternion.Euler(0f, 0f, Random.Range(180f-init_angle_range, 180f+init_angle_range))*heading*bee_speed;
             agent = b.GetComponent<UnityEngine.AI.NavMeshAgent>();

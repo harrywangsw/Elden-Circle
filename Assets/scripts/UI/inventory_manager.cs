@@ -138,6 +138,7 @@ public class inventory_manager : MonoBehaviour
         GameObject item_inserted = GameObject.Instantiate(item, tran);
         item_inserted.name = item_inserted.name.Replace("(Clone)", "");
         tran.gameObject.name = item_inserted.name;
+        tran.gameObject.GetComponent<iventory_button>().enabled = true;
         tran.gameObject.GetComponent<iventory_button>().item = item_inserted;
         tran.gameObject.GetComponent<iventory_button>().item_index = statics.search_for_item(p.player_stat.inv, item_inserted.name);
         if(tran.GetSiblingIndex()+1< tran.parent.childCount) last_slot = tran.parent.GetChild(tran.GetSiblingIndex() + 1).gameObject;

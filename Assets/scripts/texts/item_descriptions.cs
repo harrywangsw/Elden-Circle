@@ -8,11 +8,12 @@ public static class item_descriptions
         {"fire_cracker", @"spawns a series of exploding stars that propagates 
         horizontally in front of the player."},
 	    {"health_potion", "item"},
-	    {"spear", @"The simplist of the weapons"},
+	    {"spear", @"The simplest of the weapons"},
         {"dagger_fan", "weapon"},
         {"parry_shield", "weapon"},
         {"lightning_strike", @"Forks in random direction"},
         {"spawn_bees", "weapon"},
-        {"glintstone", "weapon"}
+        {"glintstone", "weapon"},
+        {"mine", "weapon"}
     };
 }

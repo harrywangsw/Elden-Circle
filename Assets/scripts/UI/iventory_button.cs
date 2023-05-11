@@ -7,14 +7,19 @@ using TMPro;
 
 public class iventory_button : MonoBehaviour
 {
+
     Button b;
     player_control player;
     bool wait_for_input, in_uquick_slot, in_lquick_slot, in_rquick_slot;
     public int item_index;
-    public GameObject marker, item;
+    public GameObject marker, item, item_description;
+    TMPro.TextMeshProUGUI description_text, UI_control;
     inventory_manager inv;
     void Start()
     {
+        UI_control = GameObject.Find("UI_control").GetComponent<TMPro.TextMeshProUGUI>();
+        item_description = GameObject.Find("item_description");
+        description_text = item_description.GetComponent<TMPro.TextMeshProUGUI>();
         b = gameObject.GetComponent<Button>();
         player = GameObject.Find("player").GetComponent<player_control>();
         player.player_stat.inv = player.player_stat.inv;
@@ -45,6 +50,12 @@ public class iventory_button : MonoBehaviour
     void Update()
     {
         if(!wait_for_input) return;
+        if(player.player_stat.inv.inv[item_index].item_type=="weapon"){
+            UI_control.text = "LeftShift/LeftCtrl to insert item into right/left quickslot.";
+        }
+        else if(player.player_stat.inv.inv[item_index].item_type=="item"){
+            UI_control.text = "e to insert item into upper quickslot.";
+        }
         //if(item!=null) item_index = statics.search_for_item(player.player_stat.inv, item.name);
         if(Input.GetKeyDown(KeyCode.LeftShift)&&player.player_stat.inv.inv[item_index].item_type=="weapon"){
             //Debug.Log("addpls");
@@ -103,8 +114,20 @@ public class iventory_button : MonoBehaviour
 
     public void get_input(){
         //Debug.Log("Sda");
+        string text = "<b>"+gameObject.name.Replace('_', ' ')+"</b>\n\n"+item_descriptions.des[gameObject.name]+"\n";
+        if(player.player_stat.inv.inv[item_index].item_type=="weapon"){
+            damage_manager d = Resources.Load<GameObject>("weapons/"+gameObject.name).GetComponent<damage_manager>();
+            statics.apply_stats(d, d, player.player_stat);
+            text+=@"
+slash damage: "+d.slash.ToString()+@"
+strike damage: "+d.strike.ToString()+@"
+pierce damage: "+d.pierce.ToString()+@"
+magic damage: "+d.magic.ToString();
+        }
+        description_text.text = text;
         wait_for_input = true;
         marker.SetActive(true);
+
     }
 
     public void ignore_input(){

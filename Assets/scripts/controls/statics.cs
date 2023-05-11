@@ -18,7 +18,8 @@ public static class statics
         {"parry_shield", "weapon"},
         {"lightning_strike", "weapon"},
         {"spawn_bees", "weapon"},
-        {"glintstone", "weapon"}
+        {"glintstone", "weapon"},
+        {"mine", "weapon"}
     };
 
     public static Dictionary<string, int> world_index = new Dictionary<string, int>(){
@@ -91,11 +92,12 @@ public static class statics
         return damages.slash/s.slash_def + damages.strike/s.strike_def +damages.pierce/s.pierce_def +damages.magic/s.mag_def;
     }
 
-    public static void apply_stats(damage_manager base_damage, stats modifers){
-        base_damage.magic*=modifers.mag_dmg;
-        base_damage.slash*=modifers.slash_dmg;
-        base_damage.strike*=modifers.strike_dmg;
-        base_damage.pierce*=modifers.peirce_dmg;
+    // used to apply damage from stats and apply damage from a weapon to the things it spawns
+    public static void apply_stats(damage_manager base_damage, damage_manager damage_to_be_changed, stats modifers){
+        damage_to_be_changed.magic = base_damage.magic*modifers.mag_dmg;
+        damage_to_be_changed.slash = base_damage.slash*modifers.slash_dmg;
+        damage_to_be_changed.strike = base_damage.strike*modifers.strike_dmg;
+        damage_to_be_changed.pierce = base_damage.pierce*modifers.peirce_dmg;
     }
 
     public static IEnumerator hit_effect(Vector3 pos, GameObject hitted_object){

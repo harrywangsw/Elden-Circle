@@ -458,7 +458,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7337705365648983098}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e18e6e0d584b61041afb3ca5f8544e19, type: 3}
   m_Name: 
@@ -466,6 +466,7 @@ MonoBehaviour:
   item_index: 0
   marker: {fileID: 1982675091640372190}
   item: {fileID: 0}
+  item_description: {fileID: 0}
 --- !u!114 &1163893366
 MonoBehaviour:
   m_ObjectHideFlags: 0

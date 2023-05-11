@@ -302,7 +302,8 @@ public unsafe class enemy_control : MonoBehaviour
             init_loc = rweapon.GetComponent<glint_stone>().init_loc;
             stamina_cost = rweapon.GetComponent<glint_stone>().stamina_cost;
         }
-        rweapon.transform.localPosition = init_loc*GetComponent<SpriteRenderer>().bounds.extents.magnitude;;
+        rweapon.transform.localPosition = init_loc*GetComponent<SpriteRenderer>().bounds.extents.magnitude;
+        statics.apply_stats(rweapon.GetComponent<damage_manager>(), rweapon.GetComponent<damage_manager>(), enemy_stat);
     }
 
     void OnBecameVisible()

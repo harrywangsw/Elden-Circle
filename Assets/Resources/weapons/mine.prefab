@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7655600116373296677}
   - component: {fileID: 4211433747785963892}
+  - component: {fileID: 1544414321946087944}
   m_Layer: 0
   m_Name: mine
   m_TagString: Untagged
@@ -53,3 +54,19 @@ MonoBehaviour:
   period: 5
   mines: {fileID: 955922389627862547, guid: 6c050491117ea7d4d85c3a3ec0312b56, type: 3}
   user: {fileID: 0}
+--- !u!114 &1544414321946087944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1495373251946413818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0351c898d346b34ebf2a16de154ed24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slash: 0
+  strike: 0
+  pierce: 100
+  magic: 0

@@ -38,9 +38,8 @@ public unsafe class glint_stone : MonoBehaviour
     IEnumerator fire(GameObject current_target){
         attacking = true;
         GameObject s = GameObject.Instantiate(stone, gameObject.transform, false);
+        statics.apply_stats(GetComponent<damage_manager>(), s.GetComponent<damage_manager>(), new stats());
         s.transform.parent = null;
-        if(player!=null) statics.apply_stats(s.GetComponent<damage_manager>(), player.player_stat);
-        else if(enemy!=null) statics.apply_stats(s.GetComponent<damage_manager>(), enemy.enemy_stat);
         Rigidbody2D body;
         body = s.GetComponent<Rigidbody2D>();
         StartCoroutine(check_for_new_attack(body));

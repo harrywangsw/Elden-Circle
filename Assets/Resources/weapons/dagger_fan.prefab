@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4429066965996979605}
   - component: {fileID: 7143697092929835653}
   - component: {fileID: 7642130161620681770}
+  - component: {fileID: 6648930855036742211}
   m_Layer: 0
   m_Name: dagger_fan
   m_TagString: Untagged
@@ -222,3 +223,19 @@ PolygonCollider2D:
       - {x: -0.080000006, y: -0.67600006}
       - {x: -0.076000005, y: -0.61200005}
       - {x: -0.072000004, y: -0.508}
+--- !u!114 &6648930855036742211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 450404184206558630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0351c898d346b34ebf2a16de154ed24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slash: 0
+  strike: 0
+  pierce: 12
+  magic: 0

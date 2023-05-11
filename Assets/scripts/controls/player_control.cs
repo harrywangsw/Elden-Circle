@@ -137,8 +137,9 @@ public unsafe class player_control : MonoBehaviour
                 init_loc = rweapon.GetComponent<mine>().init_loc;
                 stamina_cost = rweapon.GetComponent<mine>().stamina_cost;
             }
+            rweapon.transform.localPosition = init_loc;
+            statics.apply_stats(rweapon.GetComponent<damage_manager>(), rweapon.GetComponent<damage_manager>(), player_stat);
         }
-        rweapon.transform.localPosition = init_loc;
 
         if(new_lweapon!=null){
             lweapon = GameObject.Instantiate(new_lweapon, transform, false);
@@ -194,6 +195,7 @@ public unsafe class player_control : MonoBehaviour
                 init_loc = lweapon.GetComponent<mine>().init_loc;
             }
             lweapon.transform.localPosition = init_loc;
+            statics.apply_stats(lweapon.GetComponent<damage_manager>(), lweapon.GetComponent<damage_manager>(), player_stat);
         }
     }
     
