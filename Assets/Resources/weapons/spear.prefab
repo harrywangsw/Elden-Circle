@@ -29,7 +29,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6991883489652790954}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.58, y: 0.51, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -121,10 +121,10 @@ MonoBehaviour:
   attacking: 0
   thrust_vel: 10
   thrust_period: 0.2
-  range: 4
+  range: 5
   parriable_window: 1
   stamina_cost: 10
-  init_loc: {x: 0.6, y: 0.6, z: 0}
+  init_loc: {x: 0, y: 0, z: 0}
 --- !u!68 &7532111565779867917
 EdgeCollider2D:
   m_ObjectHideFlags: 0
@@ -141,11 +141,11 @@ EdgeCollider2D:
   m_Offset: {x: 0, y: 0}
   m_EdgeRadius: 0
   m_Points:
-  - {x: 0.07428992, y: 0.809636}
-  - {x: -0.095118254, y: 0.6574905}
-  - {x: 0.13217187, y: 1.3277628}
-  - {x: 0.3532552, y: 0.6552658}
-  - {x: 0.183492, y: 0.8023116}
+  - {x: -0.042150505, y: 1.5172969}
+  - {x: -0.22444625, y: 1.3557264}
+  - {x: 0.0087355375, y: 2.0330117}
+  - {x: 0.23707138, y: 1.3675177}
+  - {x: 0.055707157, y: 1.5229656}
   m_AdjacentStartPoint: {x: 0, y: 0}
   m_AdjacentEndPoint: {x: 0, y: 0}
   m_UseAdjacentStartPoint: 0
@@ -158,14 +158,14 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6991883489652790954}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 1000000
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1

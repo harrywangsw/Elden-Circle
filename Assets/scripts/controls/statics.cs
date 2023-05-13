@@ -44,47 +44,53 @@ public static class statics
         return inv.inv.FindIndex(obj => obj.item_name == item);
     }
 
-    public static void apply_world_details(world_details w){
+    public static void apply_world_details(){
         int i;
-        int world_num = statics.world_index[w.current_world];
-        //Debug.Log(w.opened_doors.Count);
         GameObject p = GameObject.Find("player");
-        p.GetComponent<Transform>().position = new Vector2(w.player_pos_x, w.player_pos_y);
+        player_control pc = p.GetComponent<player_control>();
+        Debug.Log(pc.current_world.player_pos_x.ToString());
+        p.GetComponent<Transform>().position = new Vector2(pc.current_world.player_pos_x, pc.current_world.player_pos_y);
         GameObject[] doors = GameObject.FindGameObjectsWithTag("door");
+        int world_num = statics.world_index[pc.current_world.current_world];
         for(i=0; i<doors.Length; i++){
             doors[i].GetComponent<doors>().num = i;
             bool closed = doors[i].GetComponent<Collider2D>().enabled;
-            if(i>=w.opened_doors[world_num].Count) w.opened_doors[world_num].Add(!closed);
+            if(i>=pc.current_world.opened_doors[world_num].Count) {
+                //Debug.Log("world num: "+world_num.ToString()+" num: "+doors[i].GetComponent<doors>().num.ToString());
+                pc.current_world.opened_doors[world_num].Add(!closed);
+            }
             //if door is closed but saved world detail say it's open, then open it
-            if(closed&&w.opened_doors[world_num][i]){
-                doors[i].GetComponent<Collider2D>().enabled = false;
+            if(closed&&pc.current_world.opened_doors[world_num][i]){
+                doors[i].SetActive(false);
             }
         }
     }
 
-    public static IEnumerator load_new_world(string world_name, world_details world, stats player_stat, GameObject loader_object, GameObject cloned_player = null){
-        Debug.Log(player_stat.inv.inv.Count.ToString());
+    //cloned player is there just in case I forgot to put a player object in the scene
+    public static IEnumerator load_new_world(string world_name, world_details world, stats player_stat, GameObject loader_object = null, GameObject cloned_player = null){
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(world_name);
-
         // Wait until the asynchronous scene fully loads
         while (!asyncLoad.isDone)
         {
-            yield return null;
+            yield return new WaitForSeconds(Time.deltaTime);
         }
-
+        Debug.Log(player_stat.inv.inv.Count.ToString());
         GameObject player = GameObject.Find("player");
         if(player==null&&cloned_player!=null) GameObject.Instantiate(cloned_player, Vector3.zero, Quaternion.identity);
         player_control p = GameObject.Find("player").GetComponent<player_control>();
         p.player_stat = player_stat;
+        p.unaltered_player_stat = player_stat;
         p.update_stats();
         GameObject inventory_content =  GameObject.Find("inventory_content");
         //Debug.Log(inventory_content.name);
         inventory_content.GetComponent<inventory_manager>().refresh_inv_menu();
-        apply_world_details(world);
+        p.current_world = world;
         Debug.Log("finished loading scene?");
+        Debug.Log("loader: "+loader_object.name);
+        if(loader_object!=null) UnityEngine.Object.Destroy(loader_object);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(world_name));
         asyncLoad.allowSceneActivation = true;
-        UnityEngine.Object.Destroy(loader_object);
+        apply_world_details();
     }
 
     public static float calc_damage(stats s, damage_manager damages) {

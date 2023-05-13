@@ -1,23 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 using System;
 using UnityEngine.Tilemaps;
+using UnityEngine.SceneManagement;
 
 public unsafe class player_control : MonoBehaviour
 {
     public float stun_lock_period, dash_stamina, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
     public bool attack_interrupted, stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
-    public stats player_stat;
+    public stats player_stat, unaltered_player_stat;
     public world_details current_world;
     public bool* pattacking, pattacking_l;
     damage_manager damages;
     public Vector2 velocity = new Vector2();
     public Vector3 previous_angle = new Vector3();
     Vector3 init_loc = new Vector3();
-    public GameObject npc_marker, locked_npc, n_marker, locked_enemy, marker, rweapon, overlay, death_screen, menu, inventory_content, lweapon, Exp, lock_on_marker;
+    public GameObject npc_marker, locked_npc, n_marker, locked_enemy, marker, rweapon, overlay, death_screen, menu, inventory_content, lweapon, lock_on_marker;
+    TMPro.TextMeshProUGUI Exp;
     public SpriteRenderer player_sprite;
     List<SpriteRenderer> enemies = new List<SpriteRenderer>();
     string type;
@@ -30,11 +33,9 @@ public unsafe class player_control : MonoBehaviour
         foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("enemy")){
             enemies.Add(enemy.GetComponent<SpriteRenderer>());
         }
-        if(menu==null){
-            inventory_content = GameObject.Find("inventory_content");
-            menu = GameObject.Find("item_menu");
-            Exp = GameObject.Find("Exp");
-        }
+        inventory_content = GameObject.Find("inventory_content");
+        menu = GameObject.Find("item_menu");
+        Exp = GameObject.Find("Exp").GetComponent<TMPro.TextMeshProUGUI>();
         update_weapon(rweapon, lweapon);
         if(rweapon!=null){
             gameObject.GetComponent<damage_manager>().enabled = false;
@@ -46,6 +47,7 @@ public unsafe class player_control : MonoBehaviour
         //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<CircleCollider2D>(), true);
         //GameObject.Find("ground").GetComponent<TilemapCollider2D>().enabled = false;
         update_stats();
+        DontDestroyOnLoad(gameObject);
     }
 
     public void update_stats(){
@@ -71,6 +73,7 @@ public unsafe class player_control : MonoBehaviour
 
         if(new_rweapon!=null){
             rweapon = GameObject.Instantiate(new_rweapon, transform, false);
+            Physics2D.IgnoreCollision(rweapon.GetComponent<Collider2D>(), GetComponent<Collider2D>(), true);
             ramming = false;
             //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
             if (rweapon.GetComponent<spear_attack>()!=null)
@@ -202,19 +205,12 @@ public unsafe class player_control : MonoBehaviour
 
     void Update()
     {
+        //current_world = new world_details();
+        //Debug.Log(GameObject.Find("Door(1)").GetComponent<damage_manager>().slash.ToString());
         if(stop){
             speed = 0f;
             return;
         }
-        if(!ramming) {
-            if(pattacking!=null) attacking = *pattacking;
-            if(pattacking_l!=null&&!attacking) attacking = *pattacking_l;
-        }
-        else attacking = dashing;
-        if(attacking||using_item) speed = player_stat.spd/8f;
-        else if(dashing) speed = player_stat.spd*2f;
-        else speed = player_stat.spd;
-
         if(Input.GetKeyDown("escape")){
             //Debug.Log("wtf");
             if(menu.GetComponent<RectTransform>().localScale==Vector3.one) menu.GetComponent<RectTransform>().localScale= Vector3.zero;
@@ -223,9 +219,18 @@ public unsafe class player_control : MonoBehaviour
         if(menu.GetComponent<RectTransform>().localScale == Vector3.one){
             return;
         }
+        if(!ramming) {
+            if(pattacking!=null) attacking = *pattacking;
+            if(pattacking_l!=null&&!attacking) attacking = *pattacking_l;
+        }
+        else attacking = dashing;
+        if(attacking||using_item) speed = player_stat.spd/18f;
+        else if(dashing) speed = player_stat.spd*2f;
+        else speed = player_stat.spd;
+
         if(Input.GetKeyDown(KeyCode.LeftAlt)) lock_on();
         if(locked_on) switch_target();
-        Exp.GetComponent<TMPro.TextMeshProUGUI>().text = player_stat.exp.ToString();
+        Exp.text = player_stat.exp.ToString();
 
         if(stamina<0f){stamina=0f;}
         if(stamina<player_stat.stamina&&restore_stamina) stamina+=stamina_increment;
@@ -253,11 +258,12 @@ public unsafe class player_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
-        if (c.collider.gameObject.GetComponent<damage_manager>()!=null)
+        if (c.otherCollider.gameObject.GetComponent<damage_manager>()!=null/*&&c.otherCollider.gameObject.transform.parent.gameObject!=gameObject*/);
         {      
+            Debug.Log("wtf: "+c.otherCollider.gameObject.name);
             attack_interrupted = true;
             if(player_sprite.color==Color.grey) return;
-            health -= statics.calc_damage(player_stat, c.collider.gameObject.GetComponent<damage_manager>());
+            health -= statics.calc_damage(player_stat, c.otherCollider.gameObject.GetComponent<damage_manager>());
             StartCoroutine(statics.animate_hurt(player_sprite));
             StartCoroutine(hurt());
             if (health < 0f) StartCoroutine(death());
@@ -272,14 +278,21 @@ public unsafe class player_control : MonoBehaviour
     }
 
     IEnumerator death(){
+        GetComponent<Collider2D>().enabled = false;
+        player_stat.exp = 0;
         overlay.SetActive(false);
         menu.SetActive(false);
         death_screen.SetActive(true);
-        while(player_sprite.color.a>0f){
-            player_sprite.color = new Color(0f, 0f, 0f, player_sprite.color.a-Time.deltaTime/death_period);
+        Image death_background = death_screen.transform.GetChild(0).gameObject.GetComponent<Image>();
+        while(death_background.color.a<1f){
+            death_background.color += new Color(0f, 0f, 0f, Time.deltaTime/death_period);
             yield return new WaitForSeconds(Time.deltaTime);
         }
-        player_sprite.sprite = null;
+        health = unaltered_player_stat.health;
+        //save so that the player can't revert their death
+        save_load.SavePlayer(player_stat);
+        save_load.Saveworld(current_world, player_stat.name);
+        yield return StartCoroutine(statics.load_new_world(SceneManager.GetActiveScene().name, current_world, player_stat));
     }
 
 
@@ -290,7 +303,7 @@ public unsafe class player_control : MonoBehaviour
 
     void move()
     {
-        walkAcceleration = speed*10f;
+        walkAcceleration = speed*100f;
         transform.rotation = Quaternion.identity;
         Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         //moveInput = statics.rotate(moveInput, transform.eulerAngles.z);
@@ -408,6 +421,10 @@ public unsafe class player_control : MonoBehaviour
     }
 
     void switch_target(){
+        if(locked_enemy==null) {
+            locked_on = false;
+            return;
+        }
         foreach(SpriteRenderer enemy_sprite in enemies){
             if(enemy_sprite==null) {
                 enemies.Remove(enemy_sprite);

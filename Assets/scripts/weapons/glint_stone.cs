@@ -79,7 +79,7 @@ public unsafe class glint_stone : MonoBehaviour
         float time = 0f;
         while(time<0.5f*range/speed){
             if(body==null){
-                yield break;
+                break;
             }
             yield return new WaitForSeconds(Time.deltaTime);
             time+=Time.deltaTime;

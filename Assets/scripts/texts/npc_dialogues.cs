@@ -37,4 +37,65 @@ Press escape; I have laid out the basic tools you’ll need to interact with thi
         //2
         "Welcome, traveller. To the lodge of voyagers. "
     };
+
+    public static List<string> Huygens = new List<string>(){
+        @"S-Stop right there! There are fifty million prashuels of Seffle particles in this room.
+Anything with enough power to kill me will trigger them and blow this world away.
+Now why don't we have some tea?
+My sincerest apologies. They have to be cold.
+Oh, another apology for my poor manners. My name is Huygens. I am an explosive expert.
+You are a voyager. Am I correct?
+Your mere presence here speaks volume to your capabilities.
+I have something to ask of you.
+A madman roams in the north.
+He is in possession of a deadly weapon.
+The precautions I installed are meant to deter him.
+I want you to kill him. Only then will I rest in peace.
+If you succeed, I will teach you what I know of the explosive arts.
+So, we have a deal? Good.
+Take this. I'm sure it will be effective against him.
+        ",
+        @"
+        Fifty million...Oh it's you again.
+        ",
+        @"S-Stop right there! There are fifty million prashuels of Seffle particles in this room.
+Anything with enough power to kill me will trigger them and blow this world away.
+Now why don't we have some tea?
+My sincerest apologies. They have to be cold.
+Oh, another apology for my poor manners. My name is Huygens. I am an explosive expert.
+You are a voyager. Am I correct?
+Your mere presence here speaks volume to your capabilities.
+I have something to ask of you.
+A madman roams in the north.
+He is in possession of a deadly weapon.
+The precautions I installed are meant to deter him.
+I want you to kill him. Only then will I rest in peace.
+Truely? He is dead? 
+What is that... He kept that?...
+Get out.",
+        @"FIFTY MILLION... OUT!",
+        @"
+Ahh... I can see the light of triumpth radiating from you. 
+Here, the knowledge I promised.
+Now, farewell...Wait.
+What is that... He kept that?...
+Please, leave me.
+        ",
+        "Please...",
+        "No...No... He is a monster. All of those people... 'For entertainment', he said... Tha why you left, isn't it?",
+        "No...No... He is a monster. All of those people... 'For entertainment', he said... Tha why you left, isn't it?"
+    };
+
+    public static List<string> Kirchhoff = new List<string>(){
+        @"
+Hey traveller.
+Disturbance in the air? You say?
+Ha! If you are a master of the longitudinal waves, you will be able to perceive the intricate patterns in these so-called “disturbances in the air”.
+I believe this instrument is more suited to someone of your caliber. 
+        ",
+        @"
+My name is Kirchhoff. Until next time, traveller.
+        ",
+    };
+
 }

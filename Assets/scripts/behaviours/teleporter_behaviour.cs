@@ -32,7 +32,7 @@ public class teleporter_behaviour : MonoBehaviour
     }
 
     void OnCollisionEnter2D(Collision2D c){
-        if(c.gameObject.name=="player"){
+        if(c.collider.gameObject.name=="player"){
             GameObject player = GameObject.Find("player");
             StartCoroutine(statics.load_new_world(destination, c.gameObject.GetComponent<player_control>().current_world, c.gameObject.GetComponent<player_control>().player_stat, gameObject, player));
         }

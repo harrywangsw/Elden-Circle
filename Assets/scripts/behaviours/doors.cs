@@ -8,13 +8,14 @@ public class doors : MonoBehaviour
     public int num;
     public bool open_right;
     public bool open_left;
+    public bool breakable;
     public float triggerdist, period;
     GameObject player;
     GameObject message_screen;
 
     void Start()
     {
-        player = GameObject.FindWithTag("Player");
+        player = GameObject.Find("player");
         message_screen = GameObject.Find("message_screen");
     }
 
@@ -61,6 +62,15 @@ public class doors : MonoBehaviour
         }
         gameObject.GetComponent<Collider2D>().enabled = false;
         gameObject.GetComponent<SpriteRenderer>().enabled = false;
-        player.GetComponent<player_control>().current_world.opened_doors[statics.world_index[SceneManager.GetActiveScene().name]][num] = false;
+        Debug.Log(statics.world_index[SceneManager.GetActiveScene().name].ToString()+" Doors: "+player.GetComponent<player_control>().current_world.opened_doors.Count.ToString());
+        Debug.Log(num.ToString()+" D: "+player.GetComponent<player_control>().current_world.opened_doors[statics.world_index[SceneManager.GetActiveScene().name]].Count.ToString());
+        player.GetComponent<player_control>().current_world.opened_doors[statics.world_index[SceneManager.GetActiveScene().name]][num] = true;
+        gameObject.SetActive(false);
+    }
+
+    void OnCollisionEnter2D(Collision2D c){
+        if(c.collider.gameObject.GetComponent<damage_manager>()!=null&&breakable){
+            StartCoroutine(open());
+        }
     }
 }

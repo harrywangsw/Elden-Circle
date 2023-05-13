@@ -73,4 +73,8 @@ public unsafe class fire_crackers : MonoBehaviour
             }
         }
     }
+
+    void OnCollisionEnter2D(){
+        GetComponent<Collider2D>().enabled = false;
+    }
 }

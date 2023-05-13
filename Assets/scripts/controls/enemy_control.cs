@@ -30,6 +30,7 @@ public unsafe class enemy_control : MonoBehaviour
     public UnityEngine.AI.NavMeshAgent agent;
     void Start()
     {
+        prev_player_pos = transform.position;
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.updateRotation = false;
 		agent.updateUpAxis = false;
@@ -165,16 +166,16 @@ public unsafe class enemy_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
-        if(c.collider.gameObject==rweapon) return;
+        if(c.otherCollider.gameObject==rweapon) return;
         if(dead) return;
-        if (hit_by.Contains(c.gameObject)) return;
-        else hit_by.Add(c.gameObject);
+        if (hit_by.Contains(c.otherCollider.gameObject)) return;
+        else hit_by.Add(c.otherCollider.gameObject);
         StartCoroutine(statics.hit_effect(c.GetContact(0).point, gameObject));
         //Debug.Log(c.gameObject.tag);
-        if(c.collider.gameObject.tag=="poise_breaker"&&attacking&&Math.Abs(Time.time-triggertime)>parriable_window){
+        if(c.otherCollider.gameObject.tag=="poise_breaker"&&attacking&&Math.Abs(Time.time-triggertime)>parriable_window){
             StartCoroutine(break_poise());
         }
-        if (c.gameObject.GetComponent<damage_manager>()!=null)
+        if (c.otherCollider.gameObject.GetComponent<damage_manager>()!=null&&c.otherCollider.gameObject.transform.parent.gameObject!=gameObject)
         {
             body.velocity = Vector3.zero;
             damages = c.gameObject.GetComponent<damage_manager>();           
@@ -241,7 +242,7 @@ public unsafe class enemy_control : MonoBehaviour
 
     void OnCollisionExit2D(Collision2D c)
     {
-        if (hit_by.Contains(c.gameObject)) hit_by.Remove(c.gameObject);
+        if (hit_by.Contains(c.otherCollider.gameObject)) hit_by.Remove(c.otherCollider.gameObject);
     }
 
     public void update_weapon()

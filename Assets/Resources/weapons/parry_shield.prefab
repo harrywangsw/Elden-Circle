@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2985841850152933645}
   - component: {fileID: 2475922912512002730}
   - component: {fileID: 1152520558228772176}
+  - component: {fileID: -2927435670021342366}
   m_Layer: 0
   m_Name: parry_shield
   m_TagString: Untagged
@@ -120,3 +121,19 @@ MonoBehaviour:
   range: 0
   stamina_cost: 2
   init_loc: {x: 0, y: 0, z: -1}
+--- !u!114 &-2927435670021342366
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1983353603521155892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0351c898d346b34ebf2a16de154ed24, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  slash: 0
+  strike: 0
+  pierce: 0
+  magic: 0

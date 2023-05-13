@@ -22,7 +22,7 @@ public unsafe class spear_attack : MonoBehaviour
         body = GetComponent<Rigidbody2D>();
         c.enabled = false;
         sprite.enabled = false;
-         user = transform.parent.gameObject;
+        user = transform.parent.gameObject;
         Physics2D.IgnoreCollision(user.GetComponent<Collider2D>(), GetComponent<Collider2D>(), true);
         if(user.GetComponent<player_control>()!=null){
             player = user.GetComponent<player_control>();
@@ -43,36 +43,34 @@ public unsafe class spear_attack : MonoBehaviour
     }
 
     IEnumerator thrust(){
+        transform.localPosition = init_loc;
+        transform.parent = null;
         attacking = true;
         c.enabled = true;
         sprite.enabled = true;
         //Debug.Log("wtf"+body.velocity.y.ToString());
-        //body.velocity = thrust_vel*Vector2.up;
-        Vector3 thrust_vector;
-        if(target==null) thrust_vector = Vector3.up;
-        else{
-            transform.localRotation = Quaternion.LookRotation(target.transform.position-transform.position);
-            thrust_vector = target.transform.position-transform.position;
-        }
-        thrust_vector.Normalize();
-        float time  = 0f;
-        while(time<thrust_period/2f){
-            transform.position+=thrust_vector*thrust_vel*Time.deltaTime;
-            yield return new WaitForSeconds(Time.deltaTime);
-            time+=Time.deltaTime;
-        }
+        body.velocity = user.transform.rotation*(Vector2.up)*thrust_vel;
+        // Vector3 thrust_vector = Vector3.up;
+        // float time  = 0f;
+        // while(time<thrust_period/2f){
+        //     transform.localPosition+=thrust_vector*thrust_vel*Time.deltaTime;
+        //     yield return new WaitForSeconds(Time.deltaTime);
+        //     time+=Time.deltaTime;
+        // }
         yield return new WaitForSeconds(thrust_period/2f);
-        //body.velocity = -thrust_vel*Vector2.up;
-        while(time>thrust_period/2f&&time<thrust_period){
-            transform.position-=thrust_vector*thrust_vel*Time.deltaTime;
-            yield return new WaitForSeconds(Time.deltaTime);
-            time+=Time.deltaTime;
-        }
-
+        body.velocity = user.transform.rotation*(-Vector2.up)*thrust_vel;
+        // while(time>thrust_period/2f&&time<thrust_period){
+        //     transform.localPosition-=thrust_vector*thrust_vel*Time.deltaTime;
+        //     yield return new WaitForSeconds(Time.deltaTime);
+        //     time+=Time.deltaTime;
+        // }
+        yield return new WaitForSeconds(thrust_period);
+        body.velocity = Vector3.zero;
         transform.localPosition = init_loc;
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.2f);
         attacking = false;
         c.enabled = false;
         sprite.enabled = false;
+        transform.parent = user.transform;
     }
 }

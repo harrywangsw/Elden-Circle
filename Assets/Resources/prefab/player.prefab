@@ -215,11 +215,12 @@ MonoBehaviour:
   item_speed: 1
   range: 0
   l_range: 0
-  death_period: 0
+  death_period: 5
   health: 0
   lock_dura: 0.2
   lock_angle: 20
   speed: 0
+  attack_interrupted: 0
   stop: 0
   restore_stamina: 1
   locked_on: 0
@@ -266,13 +267,12 @@ MonoBehaviour:
   n_marker: {fileID: 0}
   locked_enemy: {fileID: 0}
   marker: {fileID: 0}
-  rweapon: {fileID: 1245795144259552193, guid: c907ce156f91b9b4daa5e045bf258d48, type: 3}
+  rweapon: {fileID: 6991883489652790954, guid: c7e87c296ab62354ca558905937bc384, type: 3}
   overlay: {fileID: 0}
   death_screen: {fileID: 0}
   menu: {fileID: 0}
   inventory_content: {fileID: 0}
   lweapon: {fileID: 0}
-  Exp: {fileID: 0}
   lock_on_marker: {fileID: 3130184260024326521, guid: 96138267aef0e164491638dfe20d5165,
     type: 3}
   player_sprite: {fileID: 0}
