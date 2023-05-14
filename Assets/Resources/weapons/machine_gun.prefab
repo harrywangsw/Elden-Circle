@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1495373251946413818
+--- !u!1 &5947375600691683875
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,23 +8,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7655600116373296677}
-  - component: {fileID: 4211433747785963892}
-  - component: {fileID: 1544414321946087944}
+  - component: {fileID: 2902478105846595430}
+  - component: {fileID: 3141670477617469190}
+  - component: {fileID: 46958957536664064}
   m_Layer: 0
-  m_Name: mine
+  m_Name: machine_gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &7655600116373296677
+--- !u!4 &2902478105846595430
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1495373251946413818}
+  m_GameObject: {fileID: 5947375600691683875}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -33,34 +33,41 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4211433747785963892
+--- !u!114 &3141670477617469190
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1495373251946413818}
+  m_GameObject: {fileID: 5947375600691683875}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e9def36373236c4d8f035838e1c2c4c, type: 3}
+  m_Script: {fileID: 11500000, guid: c3d8cc28cc8e6dc4aaab5f4c8c8dbd8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   new_input: 0
   attacking: 0
   attack_interrupted: 0
   range: 0
-  stamina_cost: 50
-  init_loc: {x: 0, y: 1, z: 0}
-  period: 5
-  mines: {fileID: 955922389627862547, guid: 6c050491117ea7d4d85c3a3ec0312b56, type: 3}
+  stamina_cost: 5
+  init_loc: {x: 0, y: 4, z: 0}
   user: {fileID: 0}
---- !u!114 &1544414321946087944
+  expand_period: 2
+  bullet_fire_duration: 0.2
+  vel: 8
+  gun_barrel: {fileID: 9035412602133995340, guid: 9348f8ea6d3890f46bf57f4232335a24,
+    type: 3}
+  gun_tripod: {fileID: 8434495334368408831, guid: 95c109151f9ba1341b0f6f1fb2d2a8fe,
+    type: 3}
+  bullet: {fileID: 7572325680458869399, guid: e59fc0dc33287224ab7341798c8af2d0, type: 3}
+  used_by_enemy: 0
+--- !u!114 &46958957536664064
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1495373251946413818}
+  m_GameObject: {fileID: 5947375600691683875}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e0351c898d346b34ebf2a16de154ed24, type: 3}
@@ -68,5 +75,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slash: 0
   strike: 0
-  pierce: 100
+  pierce: 10
   magic: 0

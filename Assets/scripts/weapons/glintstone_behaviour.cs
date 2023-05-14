@@ -18,9 +18,4 @@ public class glintstone_behaviour : MonoBehaviour
     void OnCollisionEnter2D(){
         Destroy(gameObject);
     }
-
-    IEnumerator wait_destroy(){
-        yield return new WaitForSeconds(2f*Time.deltaTime);
-        Destroy(gameObject);
-    }
 }

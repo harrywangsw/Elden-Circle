@@ -72,5 +72,10 @@ public unsafe class spear_attack : MonoBehaviour
         c.enabled = false;
         sprite.enabled = false;
         transform.parent = user.transform;
+        transform.localRotation = Quaternion.identity;
+    }
+
+    void OnCollisionEnter2D(){
+        c.enabled = false;
     }
 }

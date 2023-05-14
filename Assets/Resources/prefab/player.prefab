@@ -229,7 +229,7 @@ MonoBehaviour:
   attacking: 0
   movable: 0
   dashing: 0
-  dash_command: 0
+  start_new_dash: 1
   using_item: 0
   ramming: 1
   player_stat:
@@ -255,6 +255,29 @@ MonoBehaviour:
       quickslot_up_indexes: 
       quickslot_left_indexes: 
       quickslot_right_indexes: 
+  unaltered_player_stat:
+    slash_def: 1
+    strike_def: 1
+    pierce_def: 1
+    mag_def: 1
+    health: 888
+    dash_dura: 0.2
+    item_speed: 1
+    health_up_amount: 100
+    slash_dmg: 1
+    strike_dmg: 1
+    peirce_dmg: 1
+    mag_dmg: 1
+    stamina: 100
+    spd: 10
+    exp: 0
+    level: 1
+    name: 
+    inv:
+      inv: []
+      quickslot_up_indexes: 
+      quickslot_left_indexes: 
+      quickslot_right_indexes: 
   current_world:
     player_pos_x: 0
     player_pos_y: 0
@@ -267,7 +290,7 @@ MonoBehaviour:
   n_marker: {fileID: 0}
   locked_enemy: {fileID: 0}
   marker: {fileID: 0}
-  rweapon: {fileID: 6991883489652790954, guid: c7e87c296ab62354ca558905937bc384, type: 3}
+  rweapon: {fileID: 1495373251946413818, guid: 05f0b0050d6ed324bb56f29ba21fcf45, type: 3}
   overlay: {fileID: 0}
   death_screen: {fileID: 0}
   menu: {fileID: 0}

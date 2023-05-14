@@ -39,7 +39,7 @@ Press escape; I have laid out the basic tools you’ll need to interact with thi
     };
 
     public static List<string> Huygens = new List<string>(){
-        @"S-Stop right there! There are fifty million prashuels of Seffle particles in this room.
+        @"force_player_into_conversationS-Stop right there! There are fifty million prashuels of Seffle particles in this room.
 Anything with enough power to kill me will trigger them and blow this world away.
 Now why don't we have some tea?
 My sincerest apologies. They have to be cold.
@@ -53,11 +53,8 @@ The precautions I installed are meant to deter him.
 I want you to kill him. Only then will I rest in peace.
 If you succeed, I will teach you what I know of the explosive arts.
 So, we have a deal? Good.
-Take this. I'm sure it will be effective against him.
-        ",
-        @"
-        Fifty million...Oh it's you again.
-        ",
+Take this. I'm sure it will be effective against him.",
+        @"Fifty million...Oh it's you again.",
         @"S-Stop right there! There are fifty million prashuels of Seffle particles in this room.
 Anything with enough power to kill me will trigger them and blow this world away.
 Now why don't we have some tea?
@@ -96,6 +93,20 @@ I believe this instrument is more suited to someone of your caliber.
         @"
 My name is Kirchhoff. Until next time, traveller.
         ",
+        @"
+You want to know how to get from the dominant
+        "
     };
+
+    public static List<string> patches = new List<string>(){
+        @"OOOh, a traveler.
+My name is patches. 
+You can always count on me to fix whatever issues you encounter in your travels.
+My fees are reasonable and my services are effective.
+When you crash, remember to get Patches.
+        ",
+        "When you crash, remember to get Patches."
+    };
+
 
 }

@@ -25,11 +25,15 @@ public static class statics
     public static Dictionary<string, int> world_index = new Dictionary<string, int>(){
         {"start", 0},
 	    {"lodge_of_voyagers", 1},
+        {"tight_corridors", 2},
+	    {"the_grand_staff", 3}
     };
 
     public static Dictionary<string, List<string>> npc_lines = new Dictionary<string, List<string>>(){
         {"Thales", npc_dialogues.thales},
         {"Hali", npc_dialogues.hali},
+        {"Huygens", npc_dialogues.Huygens},
+        {"Kirchhoff", npc_dialogues.Kirchhoff}
     };
 
 
@@ -94,6 +98,7 @@ public static class statics
     }
 
     public static float calc_damage(stats s, damage_manager damages) {
+        if(!damages) return 0f;
         //Debug.Log((damages.slash/s.slash_def + damages.strike/s.strike_def +damages.pierce/s.pierce_def +damages.magic/s.mag_def).ToString());
         return damages.slash/s.slash_def + damages.strike/s.strike_def +damages.pierce/s.pierce_def +damages.magic/s.mag_def;
     }
@@ -130,5 +135,16 @@ public static class statics
         }
         UnityEngine.Object.Destroy(h1);
         UnityEngine.Object.Destroy(h2);
+    }
+    
+    public static IEnumerator expand(Transform object_to_expand, float expand_period, Vector3 end_size){
+        float time = 0f;
+        Vector3 init_size = object_to_expand.localScale;
+        while(time<expand_period){
+            object_to_expand.localScale+=(end_size-init_size)*Time.deltaTime/expand_period;
+            yield return new WaitForSeconds(Time.deltaTime);
+            time+=Time.deltaTime;
+        }
+        object_to_expand.localScale = end_size;
     }
 }

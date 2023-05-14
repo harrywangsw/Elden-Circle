@@ -11,7 +11,7 @@ public unsafe class player_control : MonoBehaviour
 {
     public float stun_lock_period, dash_stamina, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
-    public bool attack_interrupted, stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, dash_command, using_item, ramming = true;
+    public bool attack_interrupted, stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, start_new_dash = true, using_item, ramming = true;
     public stats player_stat, unaltered_player_stat;
     public world_details current_world;
     public bool* pattacking, pattacking_l;
@@ -38,7 +38,7 @@ public unsafe class player_control : MonoBehaviour
         Exp = GameObject.Find("Exp").GetComponent<TMPro.TextMeshProUGUI>();
         update_weapon(rweapon, lweapon);
         if(rweapon!=null){
-            gameObject.GetComponent<damage_manager>().enabled = false;
+            Destroy(gameObject.GetComponent<damage_manager>());
             ramming = false;
         }
         player_sprite = gameObject.GetComponent<SpriteRenderer>();
@@ -73,7 +73,6 @@ public unsafe class player_control : MonoBehaviour
 
         if(new_rweapon!=null){
             rweapon = GameObject.Instantiate(new_rweapon, transform, false);
-            Physics2D.IgnoreCollision(rweapon.GetComponent<Collider2D>(), GetComponent<Collider2D>(), true);
             ramming = false;
             //get the pointers of variables in weapon that must be controled by the player at the start, so we don't have to do these if statements every frame
             if (rweapon.GetComponent<spear_attack>()!=null)
@@ -140,6 +139,16 @@ public unsafe class player_control : MonoBehaviour
                 init_loc = rweapon.GetComponent<mine>().init_loc;
                 stamina_cost = rweapon.GetComponent<mine>().stamina_cost;
             }
+
+            else if (rweapon.GetComponent<machine_gun>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &rweapon.GetComponent<machine_gun>().attacking) { pattacking = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<machine_gun>().p_newinput = p_attack_order; }
+                range = rweapon.GetComponent<machine_gun>().range;
+                init_loc = rweapon.GetComponent<machine_gun>().init_loc;
+                stamina_cost = rweapon.GetComponent<machine_gun>().stamina_cost;
+            }
             rweapon.transform.localPosition = init_loc;
             statics.apply_stats(rweapon.GetComponent<damage_manager>(), rweapon.GetComponent<damage_manager>(), player_stat);
         }
@@ -197,6 +206,15 @@ public unsafe class player_control : MonoBehaviour
                 l_range = lweapon.GetComponent<mine>().range;
                 init_loc = lweapon.GetComponent<mine>().init_loc;
             }
+
+            else if (lweapon.GetComponent<machine_gun>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &lweapon.GetComponent<machine_gun>().attacking) { pattacking_l = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<machine_gun>().p_newinput = p_attack_order; }
+                l_range = lweapon.GetComponent<machine_gun>().range;
+                init_loc = lweapon.GetComponent<machine_gun>().init_loc;
+            }
             lweapon.transform.localPosition = init_loc;
             statics.apply_stats(lweapon.GetComponent<damage_manager>(), lweapon.GetComponent<damage_manager>(), player_stat);
         }
@@ -208,7 +226,7 @@ public unsafe class player_control : MonoBehaviour
         //current_world = new world_details();
         //Debug.Log(GameObject.Find("Door(1)").GetComponent<damage_manager>().slash.ToString());
         if(stop){
-            speed = 0f;
+            body.velocity = Vector2.zero;
             return;
         }
         if(Input.GetKeyDown("escape")){
@@ -225,7 +243,6 @@ public unsafe class player_control : MonoBehaviour
         }
         else attacking = dashing;
         if(attacking||using_item) speed = player_stat.spd/18f;
-        else if(dashing) speed = player_stat.spd*2f;
         else speed = player_stat.spd;
 
         if(Input.GetKeyDown(KeyCode.LeftAlt)) lock_on();
@@ -242,10 +259,11 @@ public unsafe class player_control : MonoBehaviour
         else new_input = false;
         if (Input.GetMouseButtonDown(0)) new_input_l = true;
         else new_input_l = false;
-        if (Input.GetKeyDown("space")&&!dashing&&stamina>dash_stamina) {
+        if (Input.GetKeyDown("space")&&start_new_dash&&stamina>dash_stamina) {
             StartCoroutine(stamina_delay());
+            StartCoroutine(dash());
             stamina-=dash_stamina;
-            dash_command = true;
+            start_new_dash = false;
         }
         look_at_npc();
     }
@@ -258,16 +276,14 @@ public unsafe class player_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
-        if (c.otherCollider.gameObject.GetComponent<damage_manager>()!=null/*&&c.otherCollider.gameObject.transform.parent.gameObject!=gameObject*/);
-        {      
-            Debug.Log("wtf: "+c.otherCollider.gameObject.name);
-            attack_interrupted = true;
-            if(player_sprite.color==Color.grey) return;
-            health -= statics.calc_damage(player_stat, c.otherCollider.gameObject.GetComponent<damage_manager>());
-            StartCoroutine(statics.animate_hurt(player_sprite));
-            StartCoroutine(hurt());
-            if (health < 0f) StartCoroutine(death());
-        }
+        damage_manager d = c.collider.gameObject.GetComponent<damage_manager>();
+        if(!d) return;   
+        attack_interrupted = true;
+        if(player_sprite.color==Color.grey) return;
+        health -= statics.calc_damage(player_stat, d);
+        StartCoroutine(statics.animate_hurt(player_sprite));
+        StartCoroutine(hurt());
+        if (health < 0f) StartCoroutine(death());
     }
 
     IEnumerator hurt(){
@@ -277,7 +293,7 @@ public unsafe class player_control : MonoBehaviour
         attack_interrupted = false;
     }
 
-    IEnumerator death(){
+    public IEnumerator death(){
         GetComponent<Collider2D>().enabled = false;
         player_stat.exp = 0;
         overlay.SetActive(false);
@@ -298,25 +314,21 @@ public unsafe class player_control : MonoBehaviour
 
     void FixedUpdate()
     {
-        move();
+        if(!dashing&&!stop) move();
+        Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
     }
 
     void move()
     {
-        walkAcceleration = speed*100f;
+        walkAcceleration = speed*10f;
         transform.rotation = Quaternion.identity;
         Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         //moveInput = statics.rotate(moveInput, transform.eulerAngles.z);
         velocity.x = Mathf.MoveTowards(velocity.x, speed * moveInput.x, walkAcceleration * Time.fixedDeltaTime);
         velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInput.y, walkAcceleration * Time.fixedDeltaTime);
         //velocity = Quaternion.AngleAxis(-transform.eulerAngles.z, Vector3.forward) * velocity;
-        if(dash_command&&!dashing){
-            dash_command = false;
-            StartCoroutine(dash());
-        }
         body.velocity = velocity;
         //transform.Translate(velocity * Time.fixedDeltaTime);
-        Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
 
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 direction;
@@ -348,10 +360,13 @@ public unsafe class player_control : MonoBehaviour
     {
         dashing = true;
         player_sprite.color = Color.grey;
+        body.velocity*=2f;
         yield return new WaitForSeconds(player_stat.dash_dura);
         player_sprite.color = Color.black;
-        yield return new WaitForSeconds(player_stat.dash_dura*3f);
+        body.velocity/=2f;
         dashing = false;
+        yield return new WaitForSeconds(player_stat.dash_dura*3f);
+        start_new_dash = true;
     }
 
     IEnumerator health_potion(){

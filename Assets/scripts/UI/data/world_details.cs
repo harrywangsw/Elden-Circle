@@ -30,6 +30,8 @@ public class world_details
         npc_index = new Dictionary<string, int>(){
             {"Thales", 0},
             {"Hali", 0},
+            {"Huygens", 0},
+            {"Patches", 0},
         };
     }
 }

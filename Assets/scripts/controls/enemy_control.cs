@@ -37,6 +37,7 @@ public unsafe class enemy_control : MonoBehaviour
         prev_player_pos = new Vector3();
         generic_item = Resources.Load<GameObject>("prefab/spawned_item");
         sprite = gameObject.GetComponent<SpriteRenderer>();
+        agent.stoppingDistance = sprite.bounds.extents.magnitude;
         player=GameObject.Find("player");
         playerc = player.GetComponent<player_control>();
         hit_by = new List<GameObject>();
@@ -91,7 +92,7 @@ public unsafe class enemy_control : MonoBehaviour
             chasing = false;
         }
         //wait a bit before doing another attack to catch up to player and give the player a bit to react
-        if ((player.transform.position - transform.position).magnitude<=range&&!sight_lost&&!dashing&&start_new_attack) {
+        if ((player.transform.position - transform.position).magnitude<=range&&!sight_lost&&!dashing&&start_new_attack&&!attacking) {
             StartCoroutine(attack());
         }
         else new_input = false;
@@ -101,7 +102,7 @@ public unsafe class enemy_control : MonoBehaviour
         new_input = true;
         start_new_attack = false;
         agent.SetDestination(transform.position);
-        yield return new WaitForSeconds(attack_seperation);
+        yield return new WaitForSeconds(Random.Range(attack_seperation, attack_seperation*2f));
         start_new_attack = true;
     }
 
@@ -166,24 +167,23 @@ public unsafe class enemy_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
-        if(c.otherCollider.gameObject==rweapon) return;
+        if(c.collider.gameObject==rweapon) return;
         if(dead) return;
-        if (hit_by.Contains(c.otherCollider.gameObject)) return;
-        else hit_by.Add(c.otherCollider.gameObject);
+        if (hit_by.Contains(c.collider.gameObject)) return;
+        else hit_by.Add(c.collider.gameObject);
         StartCoroutine(statics.hit_effect(c.GetContact(0).point, gameObject));
         //Debug.Log(c.gameObject.tag);
-        if(c.otherCollider.gameObject.tag=="poise_breaker"&&attacking&&Math.Abs(Time.time-triggertime)>parriable_window){
+        if(c.collider.gameObject.tag=="poise_breaker"&&attacking&&Math.Abs(Time.time-triggertime)>parriable_window){
             StartCoroutine(break_poise());
         }
-        if (c.otherCollider.gameObject.GetComponent<damage_manager>()!=null&&c.otherCollider.gameObject.transform.parent.gameObject!=gameObject)
-        {
-            body.velocity = Vector3.zero;
-            damages = c.gameObject.GetComponent<damage_manager>();           
-            current_health -= statics.calc_damage(enemy_stat, damages);
-            StartCoroutine(statics.animate_hurt(sprite));
-            if (current_health < 0f) {
-                death();
-            }
+        damage_manager d = c.collider.gameObject.GetComponent<damage_manager>();
+        if(!d) return;   
+        body.velocity = Vector3.zero;
+        damages = c.gameObject.GetComponent<damage_manager>();           
+        current_health -= statics.calc_damage(enemy_stat, damages);
+        StartCoroutine(statics.animate_hurt(sprite));
+        if (current_health < 0f) {
+            death();
         }
     }
 
@@ -242,7 +242,7 @@ public unsafe class enemy_control : MonoBehaviour
 
     void OnCollisionExit2D(Collision2D c)
     {
-        if (hit_by.Contains(c.otherCollider.gameObject)) hit_by.Remove(c.otherCollider.gameObject);
+        if (hit_by.Contains(c.collider.gameObject)) hit_by.Remove(c.collider.gameObject);
     }
 
     public void update_weapon()
