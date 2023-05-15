@@ -16,6 +16,9 @@ public class make_new_player : MonoBehaviour
         p = GameObject.Find("player").GetComponent<player_control>();
         transform.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Level: "+p.unaltered_player_stat.level.ToString();
         transform.GetChild(2).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Exp: "+p.unaltered_player_stat.exp.ToString();
+        //it's ok to addlisteners for level down here because they'll get canceled later
+        //add the stats to the textmeshproguis
+        level_down();
     }
 
     public void on_edit(int up_down){

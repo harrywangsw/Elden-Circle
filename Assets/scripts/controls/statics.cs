@@ -33,7 +33,9 @@ public static class statics
         {"Thales", npc_dialogues.thales},
         {"Hali", npc_dialogues.hali},
         {"Huygens", npc_dialogues.Huygens},
-        {"Kirchhoff", npc_dialogues.Kirchhoff}
+        {"Kirchhoff", npc_dialogues.Kirchhoff},
+        {"patches", npc_dialogues.patches},
+        {"magic mirror", npc_dialogues.magic_mirror}
     };
 
 
@@ -90,7 +92,6 @@ public static class statics
         inventory_content.GetComponent<inventory_manager>().refresh_inv_menu();
         p.current_world = world;
         Debug.Log("finished loading scene?");
-        Debug.Log("loader: "+loader_object.name);
         if(loader_object!=null) UnityEngine.Object.Destroy(loader_object);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(world_name));
         asyncLoad.allowSceneActivation = true;
@@ -146,5 +147,18 @@ public static class statics
             time+=Time.deltaTime;
         }
         object_to_expand.localScale = end_size;
+    }
+
+    public class circle
+    {
+        float x, y, r;
+         
+        public circle(float X, float Y, float R){
+            x = X;
+            y = Y;
+            r = R;
+        }
+
+
     }
 }

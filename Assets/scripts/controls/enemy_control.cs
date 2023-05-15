@@ -73,7 +73,7 @@ public unsafe class enemy_control : MonoBehaviour
         {
             //Debug.Log(prev_player_pos);
             //only set prev_player_pos once when sight has just been lost
-            if(!sight_lost) {
+            if(!sight_lost&&chasing) {
                 prev_player_pos = player.transform.position;
             }
             sight_lost = true;
@@ -87,6 +87,7 @@ public unsafe class enemy_control : MonoBehaviour
         if((player.transform.position - transform.position).magnitude>=40f){
             sight_lost = true;
             chasing = false;
+            agent.SetDestination(transform.position);
         }
         if((agent.destination-transform.position).magnitude<=0.1f&&sight_lost){
             chasing = false;

@@ -32,6 +32,7 @@ public class world_details
             {"Hali", 0},
             {"Huygens", 0},
             {"Patches", 0},
+            {"magic mirror", 0}
         };
     }
 }

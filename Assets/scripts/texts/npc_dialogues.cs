@@ -108,5 +108,10 @@ When you crash, remember to get Patches.
         "When you crash, remember to get Patches."
     };
 
-
+        public static List<string> magic_mirror = new List<string>(){
+                @"Greetings, traveller.
+I shall let you pass. If you can name the most beautiful women in the world.
+[player_input]",
+                @"You may enter."
+        };
 }

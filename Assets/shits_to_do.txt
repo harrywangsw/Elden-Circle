@@ -1,1 +1,1 @@
-fix the add dublicate item issue
+limit the use of mines(make it an item?)

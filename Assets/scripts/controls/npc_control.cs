@@ -2,21 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class npc_control : MonoBehaviour
 {
     public float trigger_dist = 0f;
-    public bool in_conversation, force_talk;
+    public bool in_conversation, force_talk, wait_for_input, look_at_player = true;
     GameObject message_screen, switch_message, player, dialogue_screen;
+    public GameObject player_input_box;
     switchmessages message_controller;
     player_control p;
     List<string> dialogues;
-    TMPro.TextMeshProUGUI dialogue_text_bar, npc_name_bar;
+    public TMPro.TextMeshProUGUI dialogue_text_bar, npc_name_bar;
     string[] lines;
     //-1 cause the same button press that triggers the conversation also changes current_line by one
     public int current_line = -1, index = 0;
+    public string player_input;
     void Start()
     {
+        player_input_box = GameObject.Find("player_input_box");
         dialogue_screen = GameObject.Find("dialogue_screen");
         message_screen = GameObject.Find("message_screen");
         message_controller = message_screen.GetComponent<switchmessages>();
@@ -32,9 +36,10 @@ public class npc_control : MonoBehaviour
 
     void Update()
     {
-        if(lines[current_line].IndexOf("force_player_into_conversation")>=0){
+        if(wait_for_input) return;
+        if(lines[0].IndexOf("force_player_into_conversation")>=0){
             force_talk = true;
-            lines[current_line] = lines[current_line].Remove(0, 30);
+            lines[0] = lines[0].Remove(0, 30);
         }
         //place this in front so that the enter that triggers in_conversation doesn't add one to current_line
         if(in_conversation){
@@ -52,7 +57,7 @@ public class npc_control : MonoBehaviour
                 in_conversation = true;
                 start_new_lines();
             }
-            face_player();
+            if(look_at_player) face_player();
             if(p.near_by_npcs.IndexOf(gameObject)<0) p.near_by_npcs.Add(gameObject);
             if(p.locked_npc==null) p.locked_npc = gameObject;
             if(ind<0){
@@ -86,8 +91,9 @@ public class npc_control : MonoBehaviour
     void converse(){
         npc_name_bar.text = gameObject.name+":";
         if(Input.GetKeyDown(KeyCode.Return)) current_line+=1;
+    
         //if npc has finished a set of dialogues, stop the conversation and prevent it from starting again in this frame
-        if(current_line==lines.Length){
+        if(current_line>=lines.Length){
             message_screen.transform.parent.localScale = Vector3.one;
             switch_message.transform.parent.localScale = Vector3.one;
             dialogue_screen.transform.parent.localScale = Vector3.zero;
@@ -99,6 +105,13 @@ public class npc_control : MonoBehaviour
             start_new_lines();
             return;
         }
+        if(lines[current_line]=="[player_input]"){
+            wait_for_input = true;
+            in_conversation = false;
+            current_line+=1;
+            get_input();
+            return;
+        }
         dialogue_text_bar.text = lines[current_line];
     }
 
@@ -107,5 +120,10 @@ public class npc_control : MonoBehaviour
         //get the current list of strings that the npc should say, which is stored in world details.
         index = p.current_world.npc_index[gameObject.name];
         lines = statics.npc_lines[gameObject.name][index].Split("\n");
+    }
+
+    void get_input(){
+        player_input_box.transform.localScale = Vector3.one;
+        player_input_box.GetComponent<TMP_InputField>().onEndEdit.AddListener(delegate{player_input = player_input_box.GetComponent<TMP_InputField>().text;});
     }
 }

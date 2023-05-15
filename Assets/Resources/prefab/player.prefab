@@ -290,7 +290,7 @@ MonoBehaviour:
   n_marker: {fileID: 0}
   locked_enemy: {fileID: 0}
   marker: {fileID: 0}
-  rweapon: {fileID: 1495373251946413818, guid: 05f0b0050d6ed324bb56f29ba21fcf45, type: 3}
+  rweapon: {fileID: 1983353603521155892, guid: 0cfd7ebf0328742478e54fec7d89ce3f, type: 3}
   overlay: {fileID: 0}
   death_screen: {fileID: 0}
   menu: {fileID: 0}

@@ -12,6 +12,7 @@ public class item_behaviour : MonoBehaviour
     SpriteRenderer sprite;
     inventory_manager inv_manager;
     player_control plac;
+    switchmessages swi;
     void Start()
     {
         sprite = GetComponent<SpriteRenderer>();
@@ -20,11 +21,12 @@ public class item_behaviour : MonoBehaviour
         StartCoroutine(flash());
         inv_manager = GameObject.Find("inventory_content").GetComponent<inventory_manager>();
         plac = player.GetComponent<player_control>();
+        swi = message_screen.GetComponent<switchmessages>();
     }
 
     void Update()
     {
-        int ind = message_screen.GetComponent<switchmessages>().messages.IndexOf("press enter to pick up item");
+        int ind = swi.messages.IndexOf("press enter to pick up item");
         if((player.transform.position-transform.position).magnitude<=trigger_dist){
             // Debug.Log("vector3 angle: "+Vector3.Angle(transform.up, (player.transform.position-transform.position)).ToString());
             // Debug.Log(player.transform.rotation.eulerAngles.z);
@@ -33,14 +35,14 @@ public class item_behaviour : MonoBehaviour
 
             if(ind<0&&!entered){
                 entered = true;
-                message_screen.GetComponent<switchmessages>().messages.Add("press enter to pick up item");
-                message_screen.GetComponent<switchmessages>().current = message_screen.GetComponent<switchmessages>().messages.Count-1;
+                swi.messages.Add("press enter to pick up item");
+                swi.current = swi.messages.Count-1;
             }
         }
         else{
             if(ind>=0&&entered) {
-                message_screen.GetComponent<switchmessages>().messages.RemoveAt(ind);
-                message_screen.GetComponent<switchmessages>().current = message_screen.GetComponent<switchmessages>().messages.Count-1;
+                swi.messages.RemoveAt(ind);
+                swi.current = swi.messages.Count-1;
             }
             entered = false;
         }
@@ -52,13 +54,14 @@ public class item_behaviour : MonoBehaviour
                     //Debug.Log(plac.player_stat.inv.inv[i].item_name);
                     if(plac.player_stat.inv.inv[i].item_name==gameObject.name){
                         plac.player_stat.inv.inv[i] = new item(gameObject.name, plac.player_stat.inv.inv[i].num_left+1, statics.item_types[gameObject.name]);
-                        if(ind>=0) message_screen.GetComponent<switchmessages>().messages.RemoveAt(ind);
+                        if(swi.messages.IndexOf("press enter to pick up item")>=0) swi.messages.RemoveAt(ind);
                         Destroy(gameObject);
+                        return;
                     }
                 }
-                plac.player_stat.inv.inv.Add(new item(gameObject.name, 0, statics.item_types[gameObject.name]));
+                plac.player_stat.inv.inv.Add(new item(gameObject.name, 1, statics.item_types[gameObject.name]));
                 inv_manager.add_item(Resources.Load<GameObject>("prefab/UI_items/"+gameObject.name), 1);
-                if(ind>=0) message_screen.GetComponent<switchmessages>().messages.RemoveAt(ind);
+                if(swi.messages.IndexOf("press enter to pick up item")>=0) swi.messages.RemoveAt(ind);
                 Destroy(gameObject);
         }
     }

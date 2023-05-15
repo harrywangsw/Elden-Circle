@@ -36,6 +36,8 @@ public unsafe class player_control : MonoBehaviour
         inventory_content = GameObject.Find("inventory_content");
         menu = GameObject.Find("item_menu");
         Exp = GameObject.Find("Exp").GetComponent<TMPro.TextMeshProUGUI>();
+        overlay = GameObject.Find("overlay");
+        death_screen = GameObject.Find("death_screen");
         update_weapon(rweapon, lweapon);
         if(rweapon!=null){
             Destroy(gameObject.GetComponent<damage_manager>());
@@ -224,7 +226,7 @@ public unsafe class player_control : MonoBehaviour
     void Update()
     {
         //current_world = new world_details();
-        //Debug.Log(GameObject.Find("Door(1)").GetComponent<damage_manager>().slash.ToString());
+        // Debug.Log(player_stat.inv.inv[0].num_left.ToString()+" "+player_stat.inv.inv[1].num_left.ToString());
         if(stop){
             body.velocity = Vector2.zero;
             return;
@@ -298,12 +300,13 @@ public unsafe class player_control : MonoBehaviour
         player_stat.exp = 0;
         overlay.SetActive(false);
         menu.SetActive(false);
-        death_screen.SetActive(true);
+        death_screen.transform.localScale = Vector3.one;
         Image death_background = death_screen.transform.GetChild(0).gameObject.GetComponent<Image>();
         while(death_background.color.a<1f){
             death_background.color += new Color(0f, 0f, 0f, Time.deltaTime/death_period);
             yield return new WaitForSeconds(Time.deltaTime);
         }
+        yield return new WaitForSeconds(1f);
         health = unaltered_player_stat.health;
         //save so that the player can't revert their death
         save_load.SavePlayer(player_stat);
