@@ -59,6 +59,7 @@ public unsafe class lightning_strike : MonoBehaviour
 
     GameObject spawn_new_piece(float angle, Vector3 new_location){
         GameObject p = GameObject.Instantiate(lightning_piece, new_location, Quaternion.AngleAxis(angle, Vector3.forward));    
+        p.transform.localScale*=transform.parent.localScale.x;
         statics.apply_stats(GetComponent<damage_manager>(), p.GetComponent<damage_manager>(), new stats());
         Physics2D.IgnoreCollision(p.GetComponent<Collider2D>(), userc, true);
         return p;

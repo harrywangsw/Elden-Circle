@@ -11,7 +11,7 @@ public class stats
     public float slash_def, strike_def, pierce_def, mag_def, health, dash_dura, item_speed, health_up_amount;
     public float slash_dmg, strike_dmg, peirce_dmg, mag_dmg, stamina;
     public float spd;
-    public int exp, level;
+    public int exp, level, exp_lost;
     public string name;
     public inventory inv;
     public stats()

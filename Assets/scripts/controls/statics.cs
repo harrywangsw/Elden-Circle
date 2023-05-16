@@ -9,6 +9,7 @@ public static class statics
 {
 
     public static float hit_effect_angle_range = 30f, hit_effect_period = 0.3f, range = 3f;
+    public static float shrink_period = 30f;
 
     public static Dictionary<string, string> item_types = new Dictionary<string, string>(){
         {"fire_cracker", "weapon"},
@@ -19,7 +20,9 @@ public static class statics
         {"lightning_strike", "weapon"},
         {"spawn_bees", "weapon"},
         {"glintstone", "weapon"},
-        {"mine", "weapon"}
+        {"mine", "weapon"},
+        {"machine_gun", "weapon"},
+        {"shrink", "item"}
     };
 
     public static Dictionary<string, int> world_index = new Dictionary<string, int>(){
@@ -54,7 +57,6 @@ public static class statics
         int i;
         GameObject p = GameObject.Find("player");
         player_control pc = p.GetComponent<player_control>();
-        Debug.Log(pc.current_world.player_pos_x.ToString());
         p.GetComponent<Transform>().position = new Vector2(pc.current_world.player_pos_x, pc.current_world.player_pos_y);
         GameObject[] doors = GameObject.FindGameObjectsWithTag("door");
         int world_num = statics.world_index[pc.current_world.current_world];
@@ -72,27 +74,36 @@ public static class statics
         }
     }
 
-    //cloned player is there just in case I forgot to put a player object in the scene
-    public static IEnumerator load_new_world(string world_name, world_details world, stats player_stat, GameObject loader_object = null, GameObject cloned_player = null){
+    public static IEnumerator load_new_world(string world_name, world_details world, stats player_stat, GameObject loader_object = null){
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(world_name);
         // Wait until the asynchronous scene fully loads
         while (!asyncLoad.isDone)
         {
             yield return new WaitForSeconds(Time.deltaTime);
         }
-        Debug.Log(player_stat.inv.inv.Count.ToString());
-        GameObject player = GameObject.Find("player");
-        if(player==null&&cloned_player!=null) GameObject.Instantiate(cloned_player, Vector3.zero, Quaternion.identity);
+        //Debug.Log(player_stat.inv.inv.Count.ToString());
+        // while(true){
+        //     GameObject player = GameObject.Find("player");
+        //     if(player==null&&cloned_player!=null) {
+        //         GameObject.Instantiate(cloned_player, Vector3.zero, Quaternion.identity);
+        //         break;
+        //     }
+        //     if(player!=cloned_player) {
+        //         UnityEngine.Object.Destroy(player);
+        //         break;
+        //     }
+        // }
+        UnityEngine.Object.Destroy(GameObject.Find("old_player"));
+        if(loader_object!=null) UnityEngine.Object.Destroy(loader_object);
         player_control p = GameObject.Find("player").GetComponent<player_control>();
         p.player_stat = player_stat;
-        p.unaltered_player_stat = player_stat;
-        p.update_stats();
+        p.unbuffed_player_stat = player_stat;
+        p.init();
         GameObject inventory_content =  GameObject.Find("inventory_content");
         //Debug.Log(inventory_content.name);
         inventory_content.GetComponent<inventory_manager>().refresh_inv_menu();
         p.current_world = world;
         Debug.Log("finished loading scene?");
-        if(loader_object!=null) UnityEngine.Object.Destroy(loader_object);
         SceneManager.SetActiveScene(SceneManager.GetSceneByName(world_name));
         asyncLoad.allowSceneActivation = true;
         apply_world_details();

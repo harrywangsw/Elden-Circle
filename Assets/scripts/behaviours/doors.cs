@@ -9,47 +9,54 @@ public class doors : MonoBehaviour
     public bool open_right;
     public bool open_left;
     public bool breakable;
-    public float triggerdist, period;
+    public bool entered = false;
+    public float trigger_dist, period;
     GameObject player;
     GameObject message_screen;
+    reactive_messages temporary_messages;
+    switchmessages swi;
 
     void Start()
     {
         player = GameObject.Find("player");
         message_screen = GameObject.Find("message_screen");
+        swi = message_screen.GetComponent<switchmessages>();
+        temporary_messages = GameObject.Find("temporary_messages").GetComponent<reactive_messages>();
     }
 
 
     void Update()
     {
-        if((player.transform.position-transform.position).magnitude<=triggerdist){
-            int ind = message_screen.GetComponent<switchmessages>().messages.IndexOf("press enter to open door");
-            if(ind<0){
-                message_screen.GetComponent<switchmessages>().messages.Add("press enter to open door");
-                message_screen.GetComponent<switchmessages>().current = message_screen.GetComponent<switchmessages>().messages.Count-1;
-            }
-            if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to open door"){
-                if(Vector3.Angle(transform.up, (player.transform.position-transform.position))>0&&open_left){
-                    StartCoroutine(open());
-                }
-                else if(Vector3.Angle(transform.up, (player.transform.position-transform.position))<0&&open_right){
-                    StartCoroutine(open());
-                }
-                else{
-                    ind = message_screen.GetComponent<switchmessages>().messages.IndexOf("this door does not open from this side");
-                    if(ind<0){
-                        message_screen.GetComponent<switchmessages>().messages.Add("this door does not open from this side");
-                        message_screen.GetComponent<switchmessages>().current = message_screen.GetComponent<switchmessages>().messages.Count-1;
-                    }
-                }
+        int ind = swi.messages.IndexOf("press enter to open the door");
+        if((player.transform.position-transform.position).magnitude<=trigger_dist){
+            Debug.Log(ind.ToString());
+            if(ind<0&&!entered){
+                Debug.Log("addded");
+                entered = true;
+                swi.messages.Add("press enter to open the door");
+                swi.current = swi.messages.Count-1;
             }
         }
         else{
-            int ind = message_screen.GetComponent<switchmessages>().messages.IndexOf("press enter to open door");
-            if(ind>=0){
-                message_screen.GetComponent<switchmessages>().messages.RemoveAt(ind);
+            if(ind>=0&&entered) {
+                swi.messages.RemoveAt(ind);
+                swi.current = swi.messages.Count-1;
+            }
+            entered = false;
+        }
+
+        if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to open the door"&&entered){
+            if(Vector3.Angle(transform.up, (player.transform.position-transform.position))>0&&open_left){
+                StartCoroutine(open());
+            }
+            else if(Vector3.Angle(transform.up, (player.transform.position-transform.position))<0&&open_right){
+                StartCoroutine(open());
+            }
+            else{
+                temporary_messages.show_message("This door does not open from this side!");
             }
         }
+
     }
 
     IEnumerator open(){

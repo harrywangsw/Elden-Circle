@@ -221,7 +221,7 @@ public unsafe class enemy_control : MonoBehaviour
     void death(){
         if(dead) return;
         dead = true;
-        player.GetComponent<player_control>().player_stat.exp+=exp;
+        player.GetComponent<player_control>().unbuffed_player_stat.exp+=exp;
         spawn_item();
         Destroy(gameObject);
     }

@@ -50,18 +50,18 @@ public class item_behaviour : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to pick up item"&&entered){
                 int i;
                 //if the player already has the item in inventory, add one to the item's count
-                for(i=0; i<plac.player_stat.inv.inv.Count; i++){
-                    //Debug.Log(plac.player_stat.inv.inv[i].item_name);
-                    if(plac.player_stat.inv.inv[i].item_name==gameObject.name){
-                        plac.player_stat.inv.inv[i] = new item(gameObject.name, plac.player_stat.inv.inv[i].num_left+1, statics.item_types[gameObject.name]);
-                        if(swi.messages.IndexOf("press enter to pick up item")>=0) swi.messages.RemoveAt(ind);
+                for(i=0; i<plac.unbuffed_player_stat.inv.inv.Count; i++){
+                    //Debug.Log(plac.unbuffed_player_stat.inv.inv[i].item_name);
+                    if(plac.unbuffed_player_stat.inv.inv[i].item_name==gameObject.name){
+                        plac.unbuffed_player_stat.inv.inv[i] = new item(gameObject.name, plac.unbuffed_player_stat.inv.inv[i].num_left+1, statics.item_types[gameObject.name]);
+                        if(swi.messages.IndexOf("press enter to pick up item")>=0) swi.messages.RemoveAt(swi.messages.IndexOf("press enter to pick up item"));
                         Destroy(gameObject);
                         return;
                     }
                 }
-                plac.player_stat.inv.inv.Add(new item(gameObject.name, 1, statics.item_types[gameObject.name]));
+                plac.unbuffed_player_stat.inv.inv.Add(new item(gameObject.name, 1, statics.item_types[gameObject.name]));
                 inv_manager.add_item(Resources.Load<GameObject>("prefab/UI_items/"+gameObject.name), 1);
-                if(swi.messages.IndexOf("press enter to pick up item")>=0) swi.messages.RemoveAt(ind);
+                if(swi.messages.IndexOf("press enter to pick up item")>=0) swi.messages.RemoveAt(swi.messages.IndexOf("press enter to pick up item"));
                 Destroy(gameObject);
         }
     }

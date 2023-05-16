@@ -14,6 +14,8 @@ public static class item_descriptions
         {"lightning_strike", @"This attack is similair to a lightning strike"},
         {"spawn_bees", "weapon"},
         {"glintstone", "shoots...something"},
-        {"mine", "deploys a mine that explodes when an enemy steps on it"}
+        {"mine", "deploys a mine that explodes when an enemy steps on it"},
+        {"machine_gun", "Shoots shrapnel at a rapid rate. Takes a long time to deploy."},
+        {"shrink", "shrinks the player character; makes it more nimble"}
     };
 }

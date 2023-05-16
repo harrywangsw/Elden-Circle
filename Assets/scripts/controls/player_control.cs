@@ -12,7 +12,7 @@ public unsafe class player_control : MonoBehaviour
     public float stun_lock_period, dash_stamina, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
     public bool attack_interrupted, stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, start_new_dash = true, using_item, ramming = true;
-    public stats player_stat, unaltered_player_stat;
+    public stats player_stat, unbuffed_player_stat;
     public world_details current_world;
     public bool* pattacking, pattacking_l;
     damage_manager damages;
@@ -27,17 +27,11 @@ public unsafe class player_control : MonoBehaviour
     Rigidbody2D body;
     public List<GameObject> near_by_npcs = new List<GameObject>();
     List<GameObject> u_gameobjects = new List<GameObject>(), l_gameobjects = new List<GameObject>(), r_gameobjects = new List<GameObject>();
+    float orig_cam_size;
 
     void Start()
     {
-        foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("enemy")){
-            enemies.Add(enemy.GetComponent<SpriteRenderer>());
-        }
-        inventory_content = GameObject.Find("inventory_content");
-        menu = GameObject.Find("item_menu");
-        Exp = GameObject.Find("Exp").GetComponent<TMPro.TextMeshProUGUI>();
-        overlay = GameObject.Find("overlay");
-        death_screen = GameObject.Find("death_screen");
+        orig_cam_size = Camera.main.orthographicSize; 
         update_weapon(rweapon, lweapon);
         if(rweapon!=null){
             Destroy(gameObject.GetComponent<damage_manager>());
@@ -48,11 +42,20 @@ public unsafe class player_control : MonoBehaviour
         n_marker = Resources.Load<GameObject>("prefab/npc_lock_marker");
         //Physics2D.IgnoreCollision(GameObject.Find("ground").GetComponent<TilemapCollider2D>(), GetComponent<CircleCollider2D>(), true);
         //GameObject.Find("ground").GetComponent<TilemapCollider2D>().enabled = false;
-        update_stats();
+        init();
         DontDestroyOnLoad(gameObject);
     }
 
-    public void update_stats(){
+    public void init(){
+        foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("enemy")){
+            enemies.Add(enemy.GetComponent<SpriteRenderer>());
+        }
+        inventory_content = GameObject.Find("inventory_content");
+        menu = GameObject.Find("item_menu");
+        Exp = GameObject.Find("Exp").GetComponent<TMPro.TextMeshProUGUI>();
+        overlay = GameObject.Find("overlay");
+        death_screen = GameObject.Find("death_screen");
+
         health = player_stat.health;
         speed = player_stat.spd;
         stamina = player_stat.stamina;
@@ -244,12 +247,12 @@ public unsafe class player_control : MonoBehaviour
             if(pattacking_l!=null&&!attacking) attacking = *pattacking_l;
         }
         else attacking = dashing;
-        if(attacking||using_item) speed = player_stat.spd/18f;
+        if(attacking||using_item) speed = 0f;
         else speed = player_stat.spd;
 
         if(Input.GetKeyDown(KeyCode.LeftAlt)) lock_on();
         if(locked_on) switch_target();
-        Exp.text = player_stat.exp.ToString();
+        Exp.text = unbuffed_player_stat.exp.ToString();
 
         if(stamina<0f){stamina=0f;}
         if(stamina<player_stat.stamina&&restore_stamina) stamina+=stamina_increment;
@@ -297,7 +300,8 @@ public unsafe class player_control : MonoBehaviour
 
     public IEnumerator death(){
         GetComponent<Collider2D>().enabled = false;
-        player_stat.exp = 0;
+        unbuffed_player_stat.exp_lost = unbuffed_player_stat.exp;
+        unbuffed_player_stat.exp = 0;
         overlay.SetActive(false);
         menu.SetActive(false);
         death_screen.transform.localScale = Vector3.one;
@@ -306,12 +310,13 @@ public unsafe class player_control : MonoBehaviour
             death_background.color += new Color(0f, 0f, 0f, Time.deltaTime/death_period);
             yield return new WaitForSeconds(Time.deltaTime);
         }
+        GameObject.Instantiate(Resources.Load<GameObject>("prefab/lost_exp"), transform.position, Quaternion.identity);
         yield return new WaitForSeconds(1f);
-        health = unaltered_player_stat.health;
+        gameObject.name = "old_player";
         //save so that the player can't revert their death
-        save_load.SavePlayer(player_stat);
-        save_load.Saveworld(current_world, player_stat.name);
-        yield return StartCoroutine(statics.load_new_world(SceneManager.GetActiveScene().name, current_world, player_stat));
+        save_load.SavePlayer(unbuffed_player_stat);
+        save_load.Saveworld(current_world, unbuffed_player_stat.name);
+        StartCoroutine(statics.load_new_world(SceneManager.GetActiveScene().name, current_world, unbuffed_player_stat, gameObject));
     }
 
 
@@ -357,6 +362,12 @@ public unsafe class player_control : MonoBehaviour
         if(item_name=="health_potion"){
             StartCoroutine(health_potion());
         }
+        else if(item_name=="shrink"){
+            StartCoroutine(shrink_expand(0.4f));
+        }
+        else if(item_name=="expand"){
+            StartCoroutine(shrink_expand(1f/0.4f));
+        }
     }
 
     IEnumerator dash()
@@ -385,6 +396,7 @@ public unsafe class player_control : MonoBehaviour
             time+=Time.deltaTime*8f;
         }
         health+=player_stat.health_up_amount;
+        if(health>player_stat.health) health=player_stat.health;
         while(time<1f/player_stat.item_speed){
             player_sprite.color = Color.green;
             yield return new WaitForSeconds(Time.deltaTime*8f);
@@ -394,6 +406,31 @@ public unsafe class player_control : MonoBehaviour
             time+=Time.deltaTime*8f;
         }
         using_item = false;
+    }
+
+    //the multiplayer always shrink objects with respect to Vector3.one
+    IEnumerator shrink_expand(float multiplyer){
+        using_item = true;
+        float time = 0f;
+        StartCoroutine(statics.expand(transform, 1f/player_stat.item_speed, Vector3.one*multiplyer));
+        float cam_change_rate = (Camera.main.orthographicSize-orig_cam_size*multiplyer)*player_stat.item_speed;
+        while(time<1f/player_stat.item_speed){
+            Camera.main.orthographicSize-=cam_change_rate*Time.deltaTime;
+            time+=Time.deltaTime;
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+        Camera.main.orthographicSize = multiplyer*orig_cam_size;
+        using_item = false;
+        yield return new WaitForSeconds(statics.shrink_period);
+
+        StartCoroutine(statics.expand(transform, 1f/player_stat.item_speed, Vector3.one));
+        cam_change_rate = (orig_cam_size*multiplyer-Camera.main.orthographicSize)*player_stat.item_speed;
+        while(time<1f/player_stat.item_speed){
+            Camera.main.orthographicSize-=cam_change_rate*Time.deltaTime;
+            time+=Time.deltaTime;
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
+        Camera.main.orthographicSize = orig_cam_size;
     }
 
     public void lock_on(){

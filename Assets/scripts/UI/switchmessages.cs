@@ -38,7 +38,10 @@ public class switchmessages : MonoBehaviour
         }
         if(messages.Count>1) switch_guide.SetActive(true);
         else switch_guide.SetActive(false);
-        if(messages.Count>0) message_screen.GetComponent<TMPro.TextMeshProUGUI>().text = messages[(current)%messages.Count];
+        if(messages.Count>0) {
+            Debug.Log("w");
+            message_screen.GetComponent<TMPro.TextMeshProUGUI>().text = messages[(current)%messages.Count];
+        }
         else message_screen.GetComponent<TMPro.TextMeshProUGUI>().text = "";
         if(Input.GetKeyDown(KeyCode.Y))current+=1;
     }

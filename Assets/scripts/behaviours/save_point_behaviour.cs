@@ -25,8 +25,7 @@ public class save_point_behaviour : MonoBehaviour
                 message_screen.GetComponent<switchmessages>().current = message_screen.GetComponent<switchmessages>().messages.Count-1;
             }
             if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to save"&&!p.dashing){
-                save_load.SavePlayer(p.player_stat);
-                //save_load.SavePlayerItem(p.player_stat.inv, p.player_name);
+                save_load.SavePlayer(p.unbuffed_player_stat);
                 p.current_world.player_pos_x = player.transform.position.x;
                 p.current_world.player_pos_y = player.transform.position.y;
                 save_load.Saveworld(p.current_world, p.player_stat.name);

@@ -206,7 +206,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e1a9c894331c92499bce28be4768320, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stun_lock_period: 0.5
+  stun_lock_period: 0.2
   dash_stamina: 20
   stamina_cost: 0
   stamina_increment: 0.5
@@ -247,20 +247,21 @@ MonoBehaviour:
     mag_dmg: 1
     stamina: 100
     spd: 10
-    exp: 100
+    exp: 0
     level: 1
+    exp_lost: 0
     name: Hiboy
     inv:
       inv: []
       quickslot_up_indexes: 
       quickslot_left_indexes: 
       quickslot_right_indexes: 
-  unaltered_player_stat:
+  unbuffed_player_stat:
     slash_def: 1
     strike_def: 1
     pierce_def: 1
     mag_def: 1
-    health: 888
+    health: 8888
     dash_dura: 0.2
     item_speed: 1
     health_up_amount: 100
@@ -272,7 +273,8 @@ MonoBehaviour:
     spd: 10
     exp: 0
     level: 1
-    name: 
+    exp_lost: 0
+    name: Hiboy
     inv:
       inv: []
       quickslot_up_indexes: 
@@ -290,12 +292,12 @@ MonoBehaviour:
   n_marker: {fileID: 0}
   locked_enemy: {fileID: 0}
   marker: {fileID: 0}
-  rweapon: {fileID: 1983353603521155892, guid: 0cfd7ebf0328742478e54fec7d89ce3f, type: 3}
+  rweapon: {fileID: 5947375600691683875, guid: 890d8a06cac0e4a4f90e4e960dbed157, type: 3}
   overlay: {fileID: 0}
   death_screen: {fileID: 0}
   menu: {fileID: 0}
   inventory_content: {fileID: 0}
-  lweapon: {fileID: 0}
+  lweapon: {fileID: 450404184206558630, guid: 6a565e9ebf002f5468e5dfbb82efa2c7, type: 3}
   lock_on_marker: {fileID: 3130184260024326521, guid: 96138267aef0e164491638dfe20d5165,
     type: 3}
   player_sprite: {fileID: 0}

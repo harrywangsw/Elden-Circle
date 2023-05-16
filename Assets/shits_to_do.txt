@@ -1,1 +1,5 @@
 limit the use of mines(make it an item?)
+doors are broken
+equippting weapons cause traswnform child out of bounds at iventory_button
+create the patches questlinwe
+create the slim opening level to show-off enemy path-finding

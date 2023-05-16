@@ -101,8 +101,8 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 0.0001
-  m_LinearDrag: 0
+  m_Mass: 800
+  m_LinearDrag: 80
   m_AngularDrag: 1000000
   m_GravityScale: 0
   m_Material: {fileID: 0}
@@ -129,7 +129,7 @@ MonoBehaviour:
   dash_modifier: 188
   range: 0
   poise_broken_period: 3.2
-  dodge_angle: 0
+  dodge_angle: 90
   exp: 0
   start_new_attack: 1
   dead: 0
@@ -139,7 +139,7 @@ MonoBehaviour:
   dashing: 0
   stray: 0
   sight_lost: 0
-  chasing: 1
+  chasing: 0
   poise_broken: 0
   visible: 0
   enemy_stat:
@@ -159,6 +159,7 @@ MonoBehaviour:
     spd: 5
     exp: 100
     level: 0
+    exp_lost: 0
     name: 
     inv:
       inv: []
