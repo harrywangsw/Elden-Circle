@@ -49,7 +49,7 @@ public class iventory_button : MonoBehaviour
     
     void Update()
     {
-        transform.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = player.unbuffed_player_stat.inv.inv[item_index].num_left.ToString();
+        if(transform.childCount>1) transform.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = player.unbuffed_player_stat.inv.inv[item_index].num_left.ToString();
         if(!wait_for_input) return;
         if(player.unbuffed_player_stat.inv.inv[item_index].item_type=="weapon"){
             UI_control.text = "LeftShift/LeftCtrl to insert item into right/left quickslot.";

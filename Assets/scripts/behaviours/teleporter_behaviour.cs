@@ -6,6 +6,7 @@ public class teleporter_behaviour : MonoBehaviour
 {
     public float angle, period, eccen, major_axis;
     public string destination;
+    public Vector3 destination_loc = new Vector3();
     public GameObject c1, c2;
     void Start()
     {
@@ -32,6 +33,10 @@ public class teleporter_behaviour : MonoBehaviour
     }
 
     void OnCollisionEnter2D(Collision2D c){
+        if(destination==""){
+            c.collider.gameObject.transform.position = destination_loc;
+            return;
+        }
         if(c.collider.gameObject.name=="player"){
             GameObject player = GameObject.Find("player");
             player.name = "old_player";

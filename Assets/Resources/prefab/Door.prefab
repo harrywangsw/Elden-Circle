@@ -140,5 +140,7 @@ MonoBehaviour:
   num: 0
   open_right: 1
   open_left: 0
-  triggerdist: 4
+  breakable: 0
+  entered: 0
+  trigger_dist: 8
   period: 3

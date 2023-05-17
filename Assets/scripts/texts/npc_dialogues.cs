@@ -94,8 +94,11 @@ I believe this instrument is more suited to someone of your caliber.
 My name is Kirchhoff. Until next time, traveller.
         ",
         @"
-You want to know how to get from the dominant
-        "
+You have danced well, traveler.
+I have heard about this other world, where dancing does not involve finality. 
+Now where is the fun in that? To do something over, and over,
+        ",
+        "and over,"
     };
 
     public static List<string> patches = new List<string>(){

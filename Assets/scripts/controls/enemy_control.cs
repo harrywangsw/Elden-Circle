@@ -8,15 +8,15 @@ using Random=UnityEngine.Random;
 //[RequireComponent(typeof(BoxCollider2D))]
 public unsafe class enemy_control : MonoBehaviour
 {
-    public float attack_seperation, stamina_cost, current_health, walkAcceleration, dash_modifier, range, poise_broken_period, dodge_angle;
+    public float patrol_radius, attack_seperation, stamina_cost, current_health, walkAcceleration, dash_modifier, range, poise_broken_period, dodge_angle;
     float speed, triggertime, parriable_window;
     public int exp;
     bool trigger_time_not_set;
-    public bool start_new_attack = true, dead, new_input, attacking, movable, dashing, stray, sight_lost = true, chasing, poise_broken, visible;
+    public bool patrol_started = false, start_new_attack = true, dead, new_input, attacking, movable, dashing, stray, sight_lost = true, chasing, poise_broken, visible;
     public bool* pattacking;
     public stats enemy_stat;
     Vector2 velocity = new Vector2();
-    Vector3 init_loc = new Vector3();
+    Vector3 init_loc = new Vector3(), enemy_init_loc = new Vector3();
     damage_manager damages;
     GameObject greybar, broken_word, generic_item;
     public Vector3 prev_player_pos;
@@ -30,6 +30,7 @@ public unsafe class enemy_control : MonoBehaviour
     public UnityEngine.AI.NavMeshAgent agent;
     void Start()
     {
+        enemy_init_loc = transform.position;
         prev_player_pos = transform.position;
         agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         agent.updateRotation = false;
@@ -59,7 +60,7 @@ public unsafe class enemy_control : MonoBehaviour
         if(!attacking){
             trigger_time_not_set = true;
         }
-        if(attacking) agent.speed = enemy_stat.spd/8f;
+        if(attacking) agent.speed = 0f;
         if(dashing) agent.speed = enemy_stat.spd*2f;
         else agent.speed = enemy_stat.spd;
         if(poise_broken) {
@@ -84,13 +85,14 @@ public unsafe class enemy_control : MonoBehaviour
         }
         if(chasing) follow_player();
         else patrol();
-        if((player.transform.position - transform.position).magnitude>=40f){
+        if((player.transform.position - transform.position).magnitude>=40f&&chasing){
             sight_lost = true;
             chasing = false;
             agent.SetDestination(transform.position);
         }
         if((agent.destination-transform.position).magnitude<=0.1f&&sight_lost){
             chasing = false;
+            agent.SetDestination(transform.position);
         }
         //wait a bit before doing another attack to catch up to player and give the player a bit to react
         if ((player.transform.position - transform.position).magnitude<=range&&!sight_lost&&!dashing&&start_new_attack&&!attacking) {
@@ -108,9 +110,11 @@ public unsafe class enemy_control : MonoBehaviour
     }
 
     public void patrol(){
-        // body.angularVelocity = 0f;
-        // body.velocity = Vector2.zero;
-        // move(new Vector3(UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f)));
+        if(agent.destination == transform.position) agent.SetDestination(enemy_init_loc);
+        if((transform.position-agent.destination).magnitude<=0.1f){
+            agent.SetDestination(transform.position+new Vector3(Random.Range(patrol_radius, patrol_radius*2f), Random.Range(patrol_radius, 2f*patrol_radius), 0f));
+            //Debug.Log(agent.destination);
+        }
     }
 
     public void follow_player(){
@@ -303,6 +307,24 @@ public unsafe class enemy_control : MonoBehaviour
             range = rweapon.GetComponent<glint_stone>().range;
             init_loc = rweapon.GetComponent<glint_stone>().init_loc;
             stamina_cost = rweapon.GetComponent<glint_stone>().stamina_cost;
+        }
+        else if (rweapon.GetComponent<mine>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<mine>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<mine>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<mine>().range;
+            init_loc = rweapon.GetComponent<mine>().init_loc;
+            stamina_cost = rweapon.GetComponent<mine>().stamina_cost;
+        }
+        else if (rweapon.GetComponent<machine_gun>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<machine_gun>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<machine_gun>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<machine_gun>().range;
+            init_loc = rweapon.GetComponent<machine_gun>().init_loc;
+            stamina_cost = rweapon.GetComponent<machine_gun>().stamina_cost;
         }
         rweapon.transform.localPosition = init_loc*GetComponent<SpriteRenderer>().bounds.extents.magnitude;
         statics.apply_stats(rweapon.GetComponent<damage_manager>(), rweapon.GetComponent<damage_manager>(), enemy_stat);
