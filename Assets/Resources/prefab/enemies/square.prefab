@@ -122,6 +122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a0d1e169502c8745906e981492d2e86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  patrol_radius: 8
   attack_seperation: 0.8
   stamina_cost: 0
   current_health: 0
@@ -131,6 +132,7 @@ MonoBehaviour:
   poise_broken_period: 3.2
   dodge_angle: 90
   exp: 0
+  patrol_started: 0
   start_new_attack: 1
   dead: 0
   new_input: 0

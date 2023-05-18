@@ -169,7 +169,5 @@ public static class statics
             y = Y;
             r = R;
         }
-
-
     }
 }

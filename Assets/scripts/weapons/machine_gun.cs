@@ -44,7 +44,7 @@ public unsafe class machine_gun : MonoBehaviour
     IEnumerator spawn_gun(){
         attacking = true;
         float time = 0f;
-        barrel = GameObject.Instantiate(gun_barrel, transform.position, Quaternion.identity);
+        barrel = GameObject.Instantiate(gun_barrel, transform.position, player.gameObject.transform.rotation);
         barrel.transform.localScale = new Vector3(1f, 0f, 1f);
         yield return statics.expand(barrel.transform, expand_period/2f, Vector3.one);
         GameObject tripod = GameObject.Instantiate(gun_tripod, transform.position, Quaternion.identity);

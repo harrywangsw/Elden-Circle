@@ -1,4 +1,3 @@
 limit the use of mines(make it an item?)
-create the patches questlinwe
-create the slim opening level to show-off enemy path-finding
 npc marker doesn't always show up
+make enemy patrol back and forth from two points as opposed to random each time

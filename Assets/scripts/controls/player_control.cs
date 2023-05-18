@@ -374,10 +374,10 @@ public unsafe class player_control : MonoBehaviour
     {
         dashing = true;
         player_sprite.color = Color.grey;
-        body.velocity*=4f;
+        body.AddForce(body.velocity/88f);
         yield return new WaitForSeconds(player_stat.dash_dura);
         player_sprite.color = Color.black;
-        body.velocity/=4f;
+        body.AddForce(-body.velocity/88f);
         dashing = false;
         yield return new WaitForSeconds(player_stat.dash_dura*3f);
         start_new_dash = true;

@@ -112,8 +112,13 @@ public unsafe class enemy_control : MonoBehaviour
     public void patrol(){
         if(agent.destination == transform.position) agent.SetDestination(enemy_init_loc);
         if((transform.position-agent.destination).magnitude<=0.1f){
-            agent.SetDestination(transform.position+new Vector3(Random.Range(patrol_radius, patrol_radius*2f), Random.Range(patrol_radius, 2f*patrol_radius), 0f));
-            //Debug.Log(agent.destination);
+            float new_des_x = Random.Range(0, 2)==0 ? Random.Range(patrol_radius, patrol_radius*2f):Random.Range(-patrol_radius, -patrol_radius*2f);
+            float new_des_y = Random.Range(0, 2)==0 ? Random.Range(patrol_radius, patrol_radius*2f):Random.Range(-patrol_radius, -patrol_radius*2f);
+            Vector3 new_des = transform.position+new Vector3(new_des_x, new_des_y, 0f);
+            while(!agent.CalculatePath(new_des, new UnityEngine.AI.NavMeshPath())){
+                new_des = transform.position+new Vector3(Random.Range(patrol_radius, patrol_radius*2f), Random.Range(patrol_radius, 2f*patrol_radius), 0f);
+            }
+            agent.SetDestination(new_des);
         }
     }
 

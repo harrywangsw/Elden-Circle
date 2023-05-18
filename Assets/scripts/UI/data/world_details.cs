@@ -13,6 +13,7 @@ public class world_details
     public List<List<bool>> opened_doors;
     public string current_world;
     public List<string> guild_teleports;
+    public bool madman_dead;
 
     public Dictionary<string, int> npc_index;
 

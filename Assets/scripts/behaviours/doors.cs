@@ -27,6 +27,7 @@ public class doors : MonoBehaviour
 
     void Update()
     {
+        if(breakable) return;
         int ind = swi.messages.IndexOf("press enter to open the door");
         if((player.transform.position-transform.position).magnitude<=trigger_dist){
             Debug.Log(ind.ToString());
