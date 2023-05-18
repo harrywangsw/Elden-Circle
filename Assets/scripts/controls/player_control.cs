@@ -368,6 +368,9 @@ public unsafe class player_control : MonoBehaviour
         else if(item_name=="expand"){
             StartCoroutine(shrink_expand(1f/0.4f));
         }
+        else if(item_name=="mine"){
+            StartCoroutine(statics.spawn_mine(transform.position, player_stat));
+        }
     }
 
     IEnumerator dash()

@@ -5,15 +5,16 @@ using UnityEngine;
 
 public class madman_control : MonoBehaviour
 {
-    public GameObject player, bullet, dialogue_screen, t_left, t_right, b_left, b_right;
+    public GameObject player, bullet, dialogue_screen, t_left, t_right, b_left, b_right, door;
     player_control player_c;
     Rigidbody2D body;
     reactive_messages temp_message;
-    public bool shooting, start_chase, ended, player_in_sight;
+    public bool shooting, start_chase, ended, player_in_sight, visible;
     public float shoot_duration, bullet_fire_duration, loop_length, vel, loop_length_y, velocity_modifier;
     public TMPro.TextMeshProUGUI dialogue_text_bar;
     public Sprite mine;
     public Vector2 destination;
+    public Vector3 prev_player_pos;
     void Start()
     {
         player = GameObject.Find("player");
@@ -30,9 +31,7 @@ public class madman_control : MonoBehaviour
     {
         if(ended) return;
         player_in_sight = in_sight();
-        if(!start_chase){
-            start_chase = player_in_sight;
-        }
+        if(!start_chase) start_chase = player_in_sight;
         if(!start_chase) return;
 
         if(player_in_sight&&((Vector2)transform.position-destination).magnitude<=2f&&!shooting){
@@ -62,7 +61,7 @@ public class madman_control : MonoBehaviour
 
     void get_new_dest(){
         //if the player is below you, run to the left or the right, depending on which one is open
-        if(Mathf.Abs((player.transform.position-transform.position).y)>=Mathf.Abs((player.transform.position-transform.position).x)){
+        if(Mathf.Abs((prev_player_pos-transform.position).y)>=Mathf.Abs((prev_player_pos-transform.position).x)){
             if((t_left.transform.position-transform.position).magnitude<=2f||(b_left.transform.position-transform.position).magnitude<=2f){
                 destination = (Vector2)transform.position+Vector2.right*loop_length;
                 body.velocity = Vector2.right*velocity_modifier;
@@ -93,6 +92,7 @@ public class madman_control : MonoBehaviour
             return false;
         }
         else{
+            prev_player_pos = player.transform.position;
             return true;
         }
     }
@@ -101,24 +101,36 @@ public class madman_control : MonoBehaviour
         //Debug.Log(c.collider.gameObject.name);
         if(c.collider.gameObject==gameObject) return;
         damage_manager d = c.collider.gameObject.GetComponent<damage_manager>();
-        if(!d) return;   
-        if(c.collider.gameObject.GetComponent<SpriteRenderer>().sprite == mine) StartCoroutine(sad_ending());
-        else StartCoroutine(mad_ending());
+        if(!d) return; 
+        body.velocity = Vector2.zero;
+        ended = true;  
+        if(c.collider.gameObject.GetComponent<SpriteRenderer>().sprite == mine) {
+            StartCoroutine(sad_ending());
+        }
+        else {
+            StartCoroutine(mad_ending());
+        }
     }
 
     IEnumerator sad_ending(){
         ended = true;
+        while(!visible){
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
         player_c.stop = true;
         dialogue_screen.transform.parent.localScale = Vector3.one;
         dialogue_text_bar.text = "He sent you here, didn't he?";
         yield return new WaitForSeconds(3f);
         dialogue_text_bar.text = "Hahaha! He remembers me still! Hahaha!";
         player_c.stop = false;
+        body.constraints = RigidbodyConstraints2D.None;
         body.angularVelocity = 8f;
         yield return new WaitForSeconds(3f);
         dialogue_screen.transform.parent.localScale = Vector3.zero;
         player_c.current_world.madman_dead = true;
         save_load.Saveworld(player_c.current_world, player_c.player_stat.name);
+        door.GetComponent<doors>().conditional_opening = false;
+        StartCoroutine(temp_message.show_message("Somewhere, a door is unlocked."));
         Destroy(gameObject);
     }
 
@@ -130,6 +142,18 @@ public class madman_control : MonoBehaviour
         dialogue_screen.transform.parent.localScale = Vector3.zero;
         player_c.current_world.madman_dead = true;
         save_load.Saveworld(player_c.current_world, player_c.player_stat.name);
+        door.GetComponent<doors>().conditional_opening = false;
+        StartCoroutine(temp_message.show_message("Somewhere, a door is unlocked."));
         Destroy(gameObject);
+    }
+
+    void OnBecameVisible()
+    {
+        visible = true;
+    }
+
+    void OnBecameInvisible()
+    {
+        visible = false;
     }
 }

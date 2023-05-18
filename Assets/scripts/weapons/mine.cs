@@ -34,8 +34,7 @@ public unsafe class mine : MonoBehaviour
     }
 
     IEnumerator spawn_mine(){
-        attacking = true;
-        GameObject m = GameObject.Instantiate(mines, user.transform.position+init_loc, Quaternion.identity);
+        GameObject m = GameObject.Instantiate(mines, transform.position, Quaternion.identity);
         statics.apply_stats(GetComponent<damage_manager>(), m.GetComponent<damage_manager>(), new stats());
         Collider2D c = m.GetComponent<Collider2D>();
         c.enabled = false;
@@ -46,7 +45,6 @@ public unsafe class mine : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime);
             time+=Time.deltaTime;
         }
-        attacking = false;
         if(attack_interrupted){
             Destroy(m);
             yield break;

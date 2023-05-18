@@ -108,18 +108,19 @@ MonoBehaviour:
   t_right: {fileID: 0}
   b_left: {fileID: 0}
   b_right: {fileID: 0}
+  door: {fileID: 0}
   shooting: 0
   start_chase: 0
   ended: 0
   player_in_sight: 0
-  shoot_duration: 1
+  shoot_duration: 5
   bullet_fire_duration: 0.1
-  loop_length: 52
+  loop_length: 50.2
   vel: 10
   loop_length_y: 49
-  velocity_modifier: 8
+  velocity_modifier: 20
   dialogue_text_bar: {fileID: 0}
-  mine: {fileID: 0}
+  mine: {fileID: 21300000, guid: 322fd3881be6a694f9bd2d899e26d535, type: 3}
   destination: {x: 0, y: 0}
 --- !u!114 &107632715
 MonoBehaviour:
@@ -172,7 +173,7 @@ Rigidbody2D:
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!1 &7823393431345702042
 GameObject:

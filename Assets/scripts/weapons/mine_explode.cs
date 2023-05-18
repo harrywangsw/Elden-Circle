@@ -14,7 +14,7 @@ public class mine_explode : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(statics.hit_effect_period.ToString());
+        // Debug.Log(statics.hit_effect_period.ToString());
     }
 
     void OnCollisionEnter2D(Collision2D c){
@@ -22,6 +22,7 @@ public class mine_explode : MonoBehaviour
     }
 
     IEnumerator explode(){
+        Debug.Log("wtf");
         GameObject[] effs = new GameObject[num_of_effects];
         for(int i = 0; i<num_of_effects; i++){
             Vector3 eff_loc = new Vector3(transform.position.x+Random.Range(-effect_size, effect_size), transform.position.y+Random.Range(-effect_size, effect_size), transform.position.z);

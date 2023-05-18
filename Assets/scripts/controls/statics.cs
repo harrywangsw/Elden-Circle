@@ -10,6 +10,7 @@ public static class statics
 
     public static float hit_effect_angle_range = 30f, hit_effect_period = 0.3f, range = 3f;
     public static float shrink_period = 30f;
+    public static Vector3 mine_pos = new Vector3(0f, 3f, 0f);
 
     public static Dictionary<string, string> item_types = new Dictionary<string, string>(){
         {"fire_cracker", "weapon"},
@@ -20,7 +21,7 @@ public static class statics
         {"lightning_strike", "weapon"},
         {"spawn_bees", "weapon"},
         {"glintstone", "weapon"},
-        {"mine", "weapon"},
+        {"mine", "item"},
         {"machine_gun", "weapon"},
         {"shrink", "item"}
     };
@@ -169,5 +170,22 @@ public static class statics
             y = Y;
             r = R;
         }
+    }
+
+    public static IEnumerator spawn_mine(Vector3 player_pos, stats player_stat){
+        float period = 3f;
+        GameObject mines = Resources.Load<GameObject>("prefab/mine");
+        GameObject m = GameObject.Instantiate(mines, player_pos+mine_pos, Quaternion.identity);
+        statics.apply_stats(m.GetComponent<damage_manager>(), m.GetComponent<damage_manager>(), player_stat);
+        Collider2D c = m.GetComponent<Collider2D>();
+        c.enabled = false;
+        m.transform.localScale = Vector3.zero;
+        float time = 0f;
+        while(time<period){
+            m.transform.localScale+=Vector3.one*Time.deltaTime/period;
+            yield return new WaitForSeconds(Time.deltaTime);
+            time+=Time.deltaTime;
+        }
+        c.enabled = true;
     }
 }

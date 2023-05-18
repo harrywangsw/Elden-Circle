@@ -49,9 +49,9 @@ public unsafe class dagger_fan : MonoBehaviour
     }
 
     IEnumerator shoot(GameObject dag){
+        if(!dag) yield break;
         float expand_rate = 1f/period;
         while(dag.transform.localScale.x<1f){
-            if(!dag) yield break;
             dag.transform.localScale+=new Vector3(expand_rate*Time.deltaTime, 0f, 0f);
             yield return new WaitForSeconds(Time.deltaTime);
         }

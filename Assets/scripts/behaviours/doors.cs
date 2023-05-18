@@ -9,6 +9,7 @@ public class doors : MonoBehaviour
     public bool open_right;
     public bool open_left;
     public bool breakable;
+    public bool conditional_opening;
     public bool entered = false;
     public float trigger_dist, period;
     GameObject player;
@@ -47,6 +48,9 @@ public class doors : MonoBehaviour
         }
 
         if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to open the door"&&entered){
+            if(conditional_opening){
+                StartCoroutine(temporary_messages.show_message("Locked by some mechanism, or someone."));
+            }
             if(Vector3.Angle(transform.up, (player.transform.position-transform.position))>0&&open_left){
                 StartCoroutine(open());
             }
