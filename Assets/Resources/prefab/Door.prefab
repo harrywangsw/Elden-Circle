@@ -142,9 +142,10 @@ MonoBehaviour:
   open_right: 1
   open_left: 0
   breakable: 0
+  conditional_opening: 0
   entered: 0
   trigger_dist: 8
-  period: 3
+  period: 1
 --- !u!114 &5804642285850918775
 MonoBehaviour:
   m_ObjectHideFlags: 0

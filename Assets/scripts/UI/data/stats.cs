@@ -21,7 +21,7 @@ public class stats
         pierce_def = 1f;
         mag_def = 1f;
         health = 888f;
-        dash_dura = 0.2f;
+        dash_dura = 0.1f;
         item_speed = 1f;
         health_up_amount = 100f;
         slash_dmg = 1f;

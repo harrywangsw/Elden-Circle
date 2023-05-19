@@ -31,9 +31,7 @@ public class doors : MonoBehaviour
         if(breakable) return;
         int ind = swi.messages.IndexOf("press enter to open the door");
         if((player.transform.position-transform.position).magnitude<=trigger_dist){
-            Debug.Log(ind.ToString());
             if(ind<0&&!entered){
-                Debug.Log("addded");
                 entered = true;
                 swi.messages.Add("press enter to open the door");
                 swi.current = swi.messages.Count-1;
@@ -50,6 +48,7 @@ public class doors : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to open the door"&&entered){
             if(conditional_opening){
                 StartCoroutine(temporary_messages.show_message("Locked by some mechanism, or someone."));
+                return;
             }
             if(Vector3.Angle(transform.up, (player.transform.position-transform.position))>0&&open_left){
                 StartCoroutine(open());
@@ -58,7 +57,7 @@ public class doors : MonoBehaviour
                 StartCoroutine(open());
             }
             else{
-                temporary_messages.show_message("This door does not open from this side!");
+                StartCoroutine(temporary_messages.show_message("This door does not open from this side!"));
             }
         }
 
@@ -67,6 +66,8 @@ public class doors : MonoBehaviour
     IEnumerator open(){
         float time = 0f;
         SpriteRenderer sp = gameObject.GetComponent<SpriteRenderer>();
+        swi.messages.Remove("press enter to open the door");
+        swi.current = swi.messages.Count-1;
         while(time<period){
             time+=Time.deltaTime;
             sp.color=sp.color-new Color(0f, 0f, 0f, Time.deltaTime/period);
@@ -74,7 +75,7 @@ public class doors : MonoBehaviour
         }
         gameObject.GetComponent<Collider2D>().enabled = false;
         gameObject.GetComponent<SpriteRenderer>().enabled = false;
-        Debug.Log(statics.world_index[SceneManager.GetActiveScene().name].ToString()+" Doors: "+player.GetComponent<player_control>().current_world.opened_doors.Count.ToString());
+        //Debug.Log(statics.world_index[SceneManager.GetActiveScene().name].ToString()+" Doors: "+player.GetComponent<player_control>().current_world.opened_doors.Count.ToString());
         Debug.Log(num.ToString()+" D: "+player.GetComponent<player_control>().current_world.opened_doors[statics.world_index[SceneManager.GetActiveScene().name]].Count.ToString());
         player.GetComponent<player_control>().current_world.opened_doors[statics.world_index[SceneManager.GetActiveScene().name]][num] = true;
         gameObject.SetActive(false);

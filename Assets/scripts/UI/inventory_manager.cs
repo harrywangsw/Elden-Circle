@@ -32,7 +32,6 @@ public class inventory_manager : MonoBehaviour
         {
             if(p.unbuffed_player_stat.inv.inv[i].num_left==0) continue;
             GameObject it = Resources.Load<GameObject>("prefab/UI_items/"+p.unbuffed_player_stat.inv.inv[i].item_name);
-            Debug.Log(it.name);
             add_item(it, p.unbuffed_player_stat.inv.inv[i].num_left);
 
             //quickslot_up/down/left/right_indexes are the indexes of inv that represent the items in each respective quickslot
@@ -84,7 +83,7 @@ public class inventory_manager : MonoBehaviour
     }
 
     public void switchu(){
-        Debug.Log(current_itemu.ToString());
+        //Debug.Log(current_itemu.ToString());
         GameObject slot = up;
         Destroy(slot.transform.GetChild(0).gameObject);
         if(current_itemu<0) return;

@@ -58,6 +58,7 @@ public static class statics
         int i;
         GameObject p = GameObject.Find("player");
         player_control pc = p.GetComponent<player_control>();
+        pc.current_world.current_world = SceneManager.GetActiveScene().name;
         p.GetComponent<Transform>().position = new Vector2(pc.current_world.player_pos_x, pc.current_world.player_pos_y);
         GameObject[] doors = GameObject.FindGameObjectsWithTag("door");
         int world_num = statics.world_index[pc.current_world.current_world];
@@ -65,7 +66,7 @@ public static class statics
             doors[i].GetComponent<doors>().num = i;
             bool closed = doors[i].GetComponent<Collider2D>().enabled;
             if(i>=pc.current_world.opened_doors[world_num].Count) {
-                //Debug.Log("world num: "+world_num.ToString()+" num: "+doors[i].GetComponent<doors>().num.ToString());
+                Debug.Log("world num: "+world_num.ToString()+" num: "+doors[i].GetComponent<doors>().num.ToString());
                 pc.current_world.opened_doors[world_num].Add(!closed);
             }
             //if door is closed but saved world detail say it's open, then open it
@@ -76,6 +77,7 @@ public static class statics
     }
 
     public static IEnumerator load_new_world(string world_name, world_details world, stats player_stat, GameObject loader_object = null){
+        world.current_world = world_name;
         AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(world_name);
         // Wait until the asynchronous scene fully loads
         while (!asyncLoad.isDone)

@@ -114,7 +114,7 @@ public class madman_control : MonoBehaviour
 
     IEnumerator sad_ending(){
         ended = true;
-        while(!visible){
+        while((transform.position-player.transform.position).magnitude>18f||!visible){
             yield return new WaitForSeconds(Time.deltaTime);
         }
         player_c.stop = true;
@@ -124,7 +124,7 @@ public class madman_control : MonoBehaviour
         dialogue_text_bar.text = "Hahaha! He remembers me still! Hahaha!";
         player_c.stop = false;
         body.constraints = RigidbodyConstraints2D.None;
-        body.angularVelocity = 8f;
+        body.angularVelocity = 88f;
         yield return new WaitForSeconds(3f);
         dialogue_screen.transform.parent.localScale = Vector3.zero;
         player_c.current_world.madman_dead = true;

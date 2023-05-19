@@ -13,6 +13,7 @@ public class item_behaviour : MonoBehaviour
     inventory_manager inv_manager;
     player_control plac;
     switchmessages swi;
+    reactive_messages temp_message;
     void Start()
     {
         sprite = GetComponent<SpriteRenderer>();
@@ -22,6 +23,7 @@ public class item_behaviour : MonoBehaviour
         inv_manager = GameObject.Find("inventory_content").GetComponent<inventory_manager>();
         plac = player.GetComponent<player_control>();
         swi = message_screen.GetComponent<switchmessages>();
+        temp_message = GameObject.Find("temporary_messages").GetComponent<reactive_messages>();
     }
 
     void Update()
@@ -49,6 +51,7 @@ public class item_behaviour : MonoBehaviour
 
         if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to pick up item"&&entered){
                 int i;
+                StartCoroutine(temp_message.show_message("picked up a "+gameObject.name.Replace('_', ' ')));
                 //if the player already has the item in inventory, add one to the item's count
                 for(i=0; i<plac.unbuffed_player_stat.inv.inv.Count; i++){
                     //Debug.Log(plac.unbuffed_player_stat.inv.inv[i].item_name);

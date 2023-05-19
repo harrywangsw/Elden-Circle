@@ -59,6 +59,8 @@ public unsafe class player_control : MonoBehaviour
         health = player_stat.health;
         speed = player_stat.spd;
         stamina = player_stat.stamina;
+
+        statics.apply_world_details();
     }
 
     public void update_weapon(GameObject new_rweapon, GameObject new_lweapon)
@@ -377,10 +379,19 @@ public unsafe class player_control : MonoBehaviour
     {
         dashing = true;
         player_sprite.color = Color.grey;
-        body.AddForce(body.velocity/88f);
-        yield return new WaitForSeconds(player_stat.dash_dura);
+        float time = 0f;
+        while(time<player_stat.dash_dura){
+            body.AddForce(body.velocity/888f);
+            yield return new WaitForSeconds(Time.fixedDeltaTime);
+            time+=Time.fixedDeltaTime;
+        }
         player_sprite.color = Color.black;
-        body.AddForce(-body.velocity/88f);
+        time = 0f;
+        while(time<player_stat.dash_dura){
+            body.AddForce(-body.velocity/888f);
+            yield return new WaitForSeconds(Time.fixedDeltaTime);
+            time+=Time.fixedDeltaTime;
+        }
         dashing = false;
         yield return new WaitForSeconds(player_stat.dash_dura*3f);
         start_new_dash = true;
