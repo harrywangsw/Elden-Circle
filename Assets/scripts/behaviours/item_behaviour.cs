@@ -49,7 +49,7 @@ public class item_behaviour : MonoBehaviour
             entered = false;
         }
 
-        if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to pick up item"&&entered){
+        if(Input.GetButton("confirm")&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to pick up item"&&entered){
                 int i;
                 StartCoroutine(temp_message.show_message("picked up a "+gameObject.name.Replace('_', ' ')));
                 //if the player already has the item in inventory, add one to the item's count

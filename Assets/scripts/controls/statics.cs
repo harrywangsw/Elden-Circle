@@ -23,7 +23,9 @@ public static class statics
         {"glintstone", "weapon"},
         {"mine", "item"},
         {"machine_gun", "weapon"},
-        {"shrink", "item"}
+        {"shrink", "item"},
+        {"expand", "item"},
+        {"spiked_wall", "weapon"}
     };
 
     public static Dictionary<string, int> world_index = new Dictionary<string, int>(){
@@ -39,7 +41,8 @@ public static class statics
         {"Huygens", npc_dialogues.Huygens},
         {"Kirchhoff", npc_dialogues.Kirchhoff},
         {"patches", npc_dialogues.patches},
-        {"magic mirror", npc_dialogues.magic_mirror}
+        {"magic mirror", npc_dialogues.magic_mirror},
+        {"Hermite", npc_dialogues.Hermite}
     };
 
 
@@ -161,17 +164,6 @@ public static class statics
             time+=Time.deltaTime;
         }
         object_to_expand.localScale = end_size;
-    }
-
-    public class circle
-    {
-        float x, y, r;
-         
-        public circle(float X, float Y, float R){
-            x = X;
-            y = Y;
-            r = R;
-        }
     }
 
     public static IEnumerator spawn_mine(Vector3 player_pos, stats player_stat){

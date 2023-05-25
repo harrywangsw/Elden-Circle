@@ -6,12 +6,15 @@ using TMPro;
 using System;
 using UnityEngine.Tilemaps;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.LowLevel;
 
 public unsafe class player_control : MonoBehaviour
 {
-    public float stun_lock_period, dash_stamina, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
+    public float cursor_speed, dash_force, stun_lock_period, dash_stamina, stamina_cost_l, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
-    public bool attack_interrupted, stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, start_new_dash = true, using_item, ramming = true;
+    public bool use_controller, attack_interrupted, stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, start_new_dash = true, using_item, ramming = true;
     public stats player_stat, unbuffed_player_stat;
     public world_details current_world;
     public bool* pattacking, pattacking_l;
@@ -156,6 +159,16 @@ public unsafe class player_control : MonoBehaviour
                 init_loc = rweapon.GetComponent<machine_gun>().init_loc;
                 stamina_cost = rweapon.GetComponent<machine_gun>().stamina_cost;
             }
+
+            else if (rweapon.GetComponent<spiked_wall>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &rweapon.GetComponent<spiked_wall>().attacking) { pattacking = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spiked_wall>().p_newinput = p_attack_order; }
+                range = rweapon.GetComponent<spiked_wall>().range;
+                init_loc = rweapon.GetComponent<spiked_wall>().init_loc;
+                stamina_cost = rweapon.GetComponent<spiked_wall>().stamina_cost;
+            }
             rweapon.transform.localPosition = init_loc;
             statics.apply_stats(rweapon.GetComponent<damage_manager>(), rweapon.GetComponent<damage_manager>(), player_stat);
         }
@@ -171,6 +184,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<spear_attack>().p_newinput = p_attack_order; }
                 l_range = lweapon.GetComponent<spear_attack>().range;
                 init_loc = lweapon.GetComponent<spear_attack>().init_loc;
+                stamina_cost_l = lweapon.GetComponent<spear_attack>().stamina_cost;
             }
             else if (lweapon.GetComponent<fire_crackers>()!=null)
             {
@@ -179,6 +193,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<fire_crackers>().p_newinput = p_attack_order; }
                 l_range = lweapon.GetComponent<fire_crackers>().range;
                 init_loc = lweapon.GetComponent<fire_crackers>().init_loc;
+                stamina_cost_l = lweapon.GetComponent<fire_crackers>().stamina_cost;
             }
             else if (lweapon.GetComponent<dagger_fan>()!=null)
             {
@@ -187,6 +202,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<dagger_fan>().p_newinput = p_attack_order; }
                 l_range = lweapon.GetComponent<dagger_fan>().range;
                 init_loc = lweapon.GetComponent<dagger_fan>().init_loc;
+                stamina_cost_l = lweapon.GetComponent<dagger_fan>().stamina_cost;
             }
             else if (lweapon.GetComponent<parry_shield>()!=null)
             {
@@ -195,6 +211,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<parry_shield>().p_newinput = p_attack_order; }
                 l_range = lweapon.GetComponent<parry_shield>().range;
                 init_loc = lweapon.GetComponent<parry_shield>().init_loc;
+                stamina_cost_l = lweapon.GetComponent<parry_shield>().stamina_cost;
             }
             else if (lweapon.GetComponent<lightning_strike>()!=null)
             {
@@ -203,6 +220,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<lightning_strike>().p_newinput = p_attack_order; }
                 l_range = lweapon.GetComponent<lightning_strike>().range;
                 init_loc = lweapon.GetComponent<lightning_strike>().init_loc;
+                stamina_cost_l = lweapon.GetComponent<lightning_strike>().stamina_cost;
             }
 
             else if (lweapon.GetComponent<mine>()!=null)
@@ -212,6 +230,7 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<mine>().p_newinput = p_attack_order; }
                 l_range = lweapon.GetComponent<mine>().range;
                 init_loc = lweapon.GetComponent<mine>().init_loc;
+                stamina_cost_l = lweapon.GetComponent<mine>().stamina_cost;
             }
 
             else if (lweapon.GetComponent<machine_gun>()!=null)
@@ -221,6 +240,17 @@ public unsafe class player_control : MonoBehaviour
                 fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<machine_gun>().p_newinput = p_attack_order; }
                 l_range = lweapon.GetComponent<machine_gun>().range;
                 init_loc = lweapon.GetComponent<machine_gun>().init_loc;
+                stamina_cost_l = lweapon.GetComponent<machine_gun>().stamina_cost;
+            }
+
+            else if (lweapon.GetComponent<spiked_wall>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &lweapon.GetComponent<spiked_wall>().attacking) { pattacking_l = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<spiked_wall>().p_newinput = p_attack_order; }
+                l_range = lweapon.GetComponent<spiked_wall>().range;
+                init_loc = lweapon.GetComponent<spiked_wall>().init_loc;
+                stamina_cost_l = lweapon.GetComponent<spiked_wall>().stamina_cost;
             }
             lweapon.transform.localPosition = init_loc;
             statics.apply_stats(lweapon.GetComponent<damage_manager>(), lweapon.GetComponent<damage_manager>(), player_stat);
@@ -236,12 +266,13 @@ public unsafe class player_control : MonoBehaviour
             body.velocity = Vector2.zero;
             return;
         }
-        if(Input.GetKeyDown("escape")){
+        if(Input.GetKeyDown("escape")||Input.GetButtonDown("xboxStart")){
             //Debug.Log("wtf");
             if(menu.GetComponent<RectTransform>().localScale==Vector3.one) menu.GetComponent<RectTransform>().localScale= Vector3.zero;
             else menu.GetComponent<RectTransform>().localScale=Vector3.one;
         }
         if(menu.GetComponent<RectTransform>().localScale == Vector3.one){
+            move_cursor_with_controller();
             return;
         }
         if(!ramming) {
@@ -252,27 +283,37 @@ public unsafe class player_control : MonoBehaviour
         if(attacking||using_item) speed = 0f;
         else speed = player_stat.spd;
 
-        if(Input.GetKeyDown(KeyCode.LeftAlt)) lock_on();
+        if(Input.GetButtonDown("lock")) lock_on();
         if(locked_on) switch_target();
         Exp.text = unbuffed_player_stat.exp.ToString();
 
         if(stamina<0f){stamina=0f;}
         if(stamina<player_stat.stamina&&restore_stamina) stamina+=stamina_increment;
-        if (Input.GetMouseButtonDown(1)&&stamina>=stamina_cost) {
+        if (Input.GetButtonDown("attack_r")&&stamina>=stamina_cost) {
             stamina-=stamina_cost; 
             new_input = true;
             StartCoroutine(stamina_delay());
         }
         else new_input = false;
-        if (Input.GetMouseButtonDown(0)) new_input_l = true;
+        if (Input.GetButtonDown("attack_l")&&stamina>=stamina_cost_l) {
+            stamina-=stamina_cost_l; 
+            new_input_l = true;
+            StartCoroutine(stamina_delay());
+        }
         else new_input_l = false;
-        if (Input.GetKeyDown("space")&&start_new_dash&&stamina>dash_stamina) {
+        if (Input.GetButtonDown("dash")&&start_new_dash&&stamina>dash_stamina) {
             StartCoroutine(stamina_delay());
             StartCoroutine(dash());
             stamina-=dash_stamina;
             start_new_dash = false;
         }
         look_at_npc();
+    }
+
+    void move_cursor_with_controller(){
+        // Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        // Debug.Log(worldMousePos);
+        if(Input.GetAxisRaw("xboxHorizontal")!=0||Input.GetAxisRaw("xboxVertical")!=0) Mouse.current.WarpCursorPosition((Vector2)Input.mousePosition+new Vector2(Input.GetAxisRaw("xboxHorizontal"), -Input.GetAxisRaw("xboxVertical"))*cursor_speed*Time.deltaTime);
     }
     
     IEnumerator stamina_delay(){
@@ -333,6 +374,7 @@ public unsafe class player_control : MonoBehaviour
         walkAcceleration = speed*10f;
         transform.rotation = Quaternion.identity;
         Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        //if(use_controller) moveInput = new Vector2(Input.GetAxisRaw("xboxHorizontal"), Input.GetAxisRaw("xboxVertical"));
         //moveInput = statics.rotate(moveInput, transform.eulerAngles.z);
         velocity.x = Mathf.MoveTowards(velocity.x, speed * moveInput.x, walkAcceleration * Time.fixedDeltaTime);
         velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInput.y, walkAcceleration * Time.fixedDeltaTime);
@@ -349,6 +391,7 @@ public unsafe class player_control : MonoBehaviour
         }
         else{
             direction = (Vector2)((worldMousePos - transform.position));
+            if(Input.GetAxisRaw("xboxHorizontal")!=0||Input.GetAxisRaw("xboxVertical")!=0) direction = new Vector2(Input.GetAxisRaw("xboxHorizontal"), -Input.GetAxisRaw("xboxVertical"));
         }
         if(attacking) {
             transform.eulerAngles = previous_angle;
@@ -381,14 +424,14 @@ public unsafe class player_control : MonoBehaviour
         player_sprite.color = Color.grey;
         float time = 0f;
         while(time<player_stat.dash_dura){
-            body.AddForce(body.velocity/888f);
+            body.AddForce(body.velocity*dash_force);
             yield return new WaitForSeconds(Time.fixedDeltaTime);
             time+=Time.fixedDeltaTime;
         }
         player_sprite.color = Color.black;
         time = 0f;
         while(time<player_stat.dash_dura){
-            body.AddForce(-body.velocity/888f);
+            body.AddForce(-body.velocity*dash_force);
             yield return new WaitForSeconds(Time.fixedDeltaTime);
             time+=Time.fixedDeltaTime;
         }

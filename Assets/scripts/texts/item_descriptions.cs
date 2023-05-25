@@ -16,6 +16,8 @@ public static class item_descriptions
         {"glintstone", "shoots...something"},
         {"mine", "deploys a mine that explodes when an enemy steps on it"},
         {"machine_gun", "Shoots shrapnel at a rapid rate. Takes a long time to deploy."},
-        {"shrink", "shrinks the player character; makes it more nimble"}
+        {"shrink", "shrinks the player character; makes it more nimble"},
+        {"expand", "enlarge the player character"},
+        {"spiked_wall", "spawns a spiked wall behind the enemy and force it toward you"}
     };
 }

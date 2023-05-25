@@ -15,6 +15,7 @@ public class main_menu : MonoBehaviour
     AsyncOperation asyncLoad;
     void Start()
     {
+        StartCoroutine(play_music());
         worlds = new List<world_details>();
         stat = new List<stats>();
         //string path = "P:/GitHub/saves"+"/";
@@ -29,6 +30,11 @@ public class main_menu : MonoBehaviour
             }
         }
         DontDestroyOnLoad(gameObject);
+    }
+
+    IEnumerator play_music(){
+        yield return new WaitForSeconds(1f);
+        Camera.main.gameObject.GetComponent<AudioSource>().Play();
     }
 
     // Update is called once per frame

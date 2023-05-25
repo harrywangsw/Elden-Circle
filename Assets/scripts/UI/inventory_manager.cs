@@ -95,7 +95,7 @@ public class inventory_manager : MonoBehaviour
     }
 
     public void switch_quickslot_item(){
-        if(!p.attacking&&Input.GetKey(KeyCode.LeftShift)&&Input.mouseScrollDelta.y!=0f&&r_gameobjects.Count>0){
+        if(!p.attacking&&((Input.GetKey(KeyCode.LeftShift)&&Input.mouseScrollDelta.y!=0f)||Input.GetAxisRaw("xboxdpadhori")>0.75f)&&r_gameobjects.Count>0){
             if(Input.mouseScrollDelta.y>0f) current_itemr = (current_itemr+1)%r_gameobjects.Count;
             else if(current_itemr==0){
                 current_itemr = r_gameobjects.Count;
@@ -107,7 +107,19 @@ public class inventory_manager : MonoBehaviour
             switchr();
         }
 
-        if(Input.mouseScrollDelta.y!=0f&&u_gameobjects.Count>0){
+        if(!p.attacking&&((Input.GetKey(KeyCode.LeftControl)&&Input.mouseScrollDelta.y!=0f)||Input.GetAxisRaw("xboxdpadhori")<-0.75f)&&l_gameobjects.Count>0){
+            if(Input.mouseScrollDelta.y>0f) current_iteml = (current_iteml+1)%l_gameobjects.Count;
+            else if(current_iteml==0){
+                current_iteml = l_gameobjects.Count;
+                current_iteml = (current_iteml-1)%l_gameobjects.Count;
+            }
+            else{
+                current_iteml = (current_itemr-1)%l_gameobjects.Count;
+            }
+            switchl();
+        }
+
+        if((Input.mouseScrollDelta.y!=0f||Input.GetAxisRaw("xboxdpadverti")>0.75f)&&u_gameobjects.Count>0){
             if(Input.mouseScrollDelta.y>0f) current_itemu = (current_itemu+1)%u_gameobjects.Count;
             else if(current_itemu==0){
                 current_itemu = u_gameobjects.Count;
@@ -119,7 +131,7 @@ public class inventory_manager : MonoBehaviour
             switchu();
         }
 
-        if(!p.using_item&&!p.attacking&&!p.dashing&&Input.GetKeyDown("e")&&u_gameobjects.Count>0){
+        if(!p.using_item&&!p.attacking&&!p.dashing&&Input.GetAxisRaw("use_item")>0f&&u_gameobjects.Count>0){
             p.use_item(u_gameobjects[current_itemu].name);
             int ind = p.unbuffed_player_stat.inv.inv.FindIndex(obj=>obj.item_name==u_gameobjects[current_itemu].name);
             p.unbuffed_player_stat.inv.inv[ind] = new item(p.unbuffed_player_stat.inv.inv[ind].item_name, p.unbuffed_player_stat.inv.inv[ind].num_left-1, p.unbuffed_player_stat.inv.inv[ind].item_type);

@@ -13,7 +13,7 @@ public class world_details
     public List<List<bool>> opened_doors;
     public string current_world;
     public List<string> guild_teleports;
-    public bool madman_dead;
+    public bool madman_dead, hermite_dead;
 
     public Dictionary<string, int> npc_index;
 
@@ -33,7 +33,8 @@ public class world_details
             {"Hali", 0},
             {"Huygens", 0},
             {"Patches", 0},
-            {"magic mirror", 0}
+            {"magic mirror", 0},
+            {"Hermite", 0}
         };
     }
 }

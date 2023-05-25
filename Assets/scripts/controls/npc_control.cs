@@ -64,7 +64,7 @@ public class npc_control : MonoBehaviour
                 message_controller.messages.Add("press enter to talk");
                 message_controller.current = message_controller.messages.Count-1;
             }
-            if(Input.GetKeyDown(KeyCode.Return)&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to talk"&&!in_conversation&&p.locked_npc==gameObject){
+            if(Input.GetButton("confirm")&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to talk"&&!in_conversation&&p.locked_npc==gameObject){
                 message_screen.transform.parent.localScale = Vector3.zero;
                 switch_message.transform.parent.localScale = Vector3.zero;
                 dialogue_screen.transform.parent.localScale = Vector3.one;
@@ -90,7 +90,7 @@ public class npc_control : MonoBehaviour
 
     void converse(){
         npc_name_bar.text = gameObject.name+":";
-        if(Input.GetKeyDown(KeyCode.Return)) current_line+=1;
+        if(Input.GetButton("confirm")) current_line+=1;
     
         //if npc has finished a set of dialogues, stop the conversation and prevent it from starting again in this frame
         if(current_line>=lines.Length){

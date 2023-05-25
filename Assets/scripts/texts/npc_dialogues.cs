@@ -111,10 +111,24 @@ When you crash, remember to get Patches.
         "When you crash, remember to get Patches."
     };
 
+    public static List<string> Hermite = new List<string>(){
+        @"What do we have here?
+A voyager...
+No, someone else in the skin of a voyager.
+In that case, terminate this program immediately.
+Trust me, it's for your own good.
+Both of you.
+        ",
+        ""
+    };
+
+
+
         public static List<string> magic_mirror = new List<string>(){
                 @"Greetings, traveller.
 I shall let you pass. If you can name the most beautiful women in the world.
 [player_input]",
                 @"You may enter."
         };
+
 }

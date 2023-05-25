@@ -12,11 +12,12 @@ public class iventory_button : MonoBehaviour
     player_control player;
     bool wait_for_input, in_uquick_slot, in_lquick_slot, in_rquick_slot;
     public int item_index;
-    public GameObject marker, item, item_description;
+    public GameObject marker, item, item_description, item_menu;
     TMPro.TextMeshProUGUI description_text, UI_control;
     inventory_manager inv;
     void Start()
     {
+        item_menu = GameObject.Find("item_menu");
         UI_control = GameObject.Find("UI_control").GetComponent<TMPro.TextMeshProUGUI>();
         item_description = GameObject.Find("item_description");
         description_text = item_description.GetComponent<TMPro.TextMeshProUGUI>();
@@ -49,6 +50,7 @@ public class iventory_button : MonoBehaviour
     
     void Update()
     {
+        if(item_menu.transform.localScale == Vector3.zero) ignore_input();
         if(transform.childCount>1) transform.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = player.unbuffed_player_stat.inv.inv[item_index].num_left.ToString();
         if(!wait_for_input) return;
         if(player.unbuffed_player_stat.inv.inv[item_index].item_type=="weapon"){
@@ -58,7 +60,7 @@ public class iventory_button : MonoBehaviour
             UI_control.text = "e to insert item into upper quickslot.";
         }
         //if(item!=null) item_index = statics.search_for_item(player.unbuffed_player_stat.inv, item.name);
-        if(Input.GetKeyDown(KeyCode.LeftShift)&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="weapon"){
+        if(Input.GetAxisRaw("xboxdpadhori")>0.75f&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="weapon"){
             //Debug.Log("addpls");
             if(!in_rquick_slot){
                 player.unbuffed_player_stat.inv.quickslot_right_indexes.Add(item_index);
@@ -73,7 +75,7 @@ public class iventory_button : MonoBehaviour
                 inv.r_gameobjects.Remove(gameObject);
             }
         }
-        if(Input.GetKeyDown(KeyCode.LeftControl)&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="weapon"){
+        if(Input.GetAxisRaw("xboxdpadhori")<-0.75f&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="weapon"){
             if(!in_lquick_slot){
                 player.unbuffed_player_stat.inv.quickslot_left_indexes.Add(item_index);
                 in_rquick_slot = false;
@@ -88,7 +90,7 @@ public class iventory_button : MonoBehaviour
                 inv.l_gameobjects.Remove(gameObject);
             }
         }
-        if(Input.GetKeyDown("e")&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="item"&&player.unbuffed_player_stat.inv.inv[item_index].num_left>0){
+        if(Input.GetAxisRaw("xboxdpadverti")>0.75f&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="item"&&player.unbuffed_player_stat.inv.inv[item_index].num_left>0){
             if(!in_uquick_slot){
                 player.unbuffed_player_stat.inv.quickslot_up_indexes.Add(item_index);
                 inv.u_gameobjects.Add(gameObject);
