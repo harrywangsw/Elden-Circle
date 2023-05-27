@@ -42,9 +42,23 @@ public class hermite_behaviour : MonoBehaviour
         TMPro.TextMeshProUGUI dialogue_text_bar = dialogue_screen.GetComponent<TMPro.TextMeshProUGUI>();
         dialogue_screen.transform.parent.localScale = Vector3.one;
         dialogue_text_bar.text = "You don't understand";
-        yield return new WaitForSeconds(3f);
+        float time = 0f;
+        while(time<3f){
+            if(Input.GetButtonDown("confirm")){
+                break;
+            }
+            time+=Time.deltaTime;
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
         dialogue_text_bar.text = "You will never understand";
-        yield return new WaitForSeconds(3f);
+        time = 0f;
+        while(time<3f){
+            if(Input.GetButtonDown("confirm")){
+                break;
+            }
+            time+=Time.deltaTime;
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
         dialogue_screen.transform.parent.localScale = Vector3.zero;
     }
 }

@@ -37,7 +37,7 @@ public static class statics
 
     public static Dictionary<string, List<string>> npc_lines = new Dictionary<string, List<string>>(){
         {"Thales", npc_dialogues.thales},
-        {"Hali", npc_dialogues.hali},
+        {"hari", npc_dialogues.hari},
         {"Huygens", npc_dialogues.Huygens},
         {"Kirchhoff", npc_dialogues.Kirchhoff},
         {"patches", npc_dialogues.patches},

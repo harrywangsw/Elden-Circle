@@ -32,7 +32,7 @@ public class note_behaviour : MonoBehaviour
         if(controled){
             move();
         }
-        if(Input.GetButton("confirm")&&controled){
+        if(Input.GetButtonDown("confirm")&&controled){
             controled = false;
             player_c.stop = false;
             foreach(Collider2D col in c) col.enabled = false;
@@ -40,12 +40,12 @@ public class note_behaviour : MonoBehaviour
     }
 
     void move(){
-        if(Input.GetAxisRaw("Vertical")>0f&&space<4){
+        if(Input.GetAxis("Vertical")>0f&&space<4){
             transform.position+=new Vector3(0f, spacing, 0f);
             player.transform.position = transform.position;
             space+=1;
         }
-        else if(Input.GetAxisRaw("Vertical")<0f&&space>0){
+        else if(Input.GetAxis("Vertical")<0f&&space>0){
             transform.position-=new Vector3(0f, spacing, 0f);
             player.transform.position = transform.position;
             space-=1;

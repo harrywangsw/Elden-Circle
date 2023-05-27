@@ -25,7 +25,7 @@ public unsafe class player_control : MonoBehaviour
     public GameObject npc_marker, locked_npc, n_marker, locked_enemy, marker, rweapon, overlay, death_screen, menu, inventory_content, lweapon, lock_on_marker;
     TMPro.TextMeshProUGUI Exp;
     public SpriteRenderer player_sprite;
-    List<SpriteRenderer> enemies = new List<SpriteRenderer>();
+    List<enemy_control> enemies = new List<enemy_control>();
     string type;
     Rigidbody2D body;
     public List<GameObject> near_by_npcs = new List<GameObject>();
@@ -51,7 +51,7 @@ public unsafe class player_control : MonoBehaviour
 
     public void init(){
         foreach(GameObject enemy in GameObject.FindGameObjectsWithTag("enemy")){
-            enemies.Add(enemy.GetComponent<SpriteRenderer>());
+            enemies.Add(enemy.GetComponent<enemy_control>());
         }
         inventory_content = GameObject.Find("inventory_content");
         menu = GameObject.Find("item_menu");
@@ -280,7 +280,10 @@ public unsafe class player_control : MonoBehaviour
             if(pattacking_l!=null&&!attacking) attacking = *pattacking_l;
         }
         else attacking = dashing;
-        if(attacking||using_item) speed = 0f;
+        if(attacking||using_item) {
+            body.velocity = Vector2.zero;
+            speed = 0f;
+        }
         else speed = player_stat.spd;
 
         if(Input.GetButtonDown("lock")) lock_on();
@@ -313,7 +316,7 @@ public unsafe class player_control : MonoBehaviour
     void move_cursor_with_controller(){
         // Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         // Debug.Log(worldMousePos);
-        if(Input.GetAxisRaw("xboxHorizontal")!=0||Input.GetAxisRaw("xboxVertical")!=0) Mouse.current.WarpCursorPosition((Vector2)Input.mousePosition+new Vector2(Input.GetAxisRaw("xboxHorizontal"), -Input.GetAxisRaw("xboxVertical"))*cursor_speed*Time.deltaTime);
+        if(Input.GetAxis("xboxHorizontal")!=0||Input.GetAxis("xboxVertical")!=0) Mouse.current.WarpCursorPosition((Vector2)Input.mousePosition+new Vector2(Input.GetAxis("xboxHorizontal"), -Input.GetAxis("xboxVertical"))*cursor_speed*Time.deltaTime);
     }
     
     IEnumerator stamina_delay(){
@@ -373,8 +376,8 @@ public unsafe class player_control : MonoBehaviour
     {
         walkAcceleration = speed*10f;
         transform.rotation = Quaternion.identity;
-        Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        //if(use_controller) moveInput = new Vector2(Input.GetAxisRaw("xboxHorizontal"), Input.GetAxisRaw("xboxVertical"));
+        Vector2 moveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        //if(use_controller) moveInput = new Vector2(Input.GetAxis("xboxHorizontal"), Input.GetAxis("xboxVertical"));
         //moveInput = statics.rotate(moveInput, transform.eulerAngles.z);
         velocity.x = Mathf.MoveTowards(velocity.x, speed * moveInput.x, walkAcceleration * Time.fixedDeltaTime);
         velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInput.y, walkAcceleration * Time.fixedDeltaTime);
@@ -391,7 +394,7 @@ public unsafe class player_control : MonoBehaviour
         }
         else{
             direction = (Vector2)((worldMousePos - transform.position));
-            if(Input.GetAxisRaw("xboxHorizontal")!=0||Input.GetAxisRaw("xboxVertical")!=0) direction = new Vector2(Input.GetAxisRaw("xboxHorizontal"), -Input.GetAxisRaw("xboxVertical"));
+            if(Input.GetAxis("xboxHorizontal")!=0||Input.GetAxis("xboxVertical")!=0) direction = new Vector2(Input.GetAxis("xboxHorizontal"), -Input.GetAxis("xboxVertical"));
         }
         if(attacking) {
             transform.eulerAngles = previous_angle;
@@ -498,13 +501,18 @@ public unsafe class player_control : MonoBehaviour
             return;
         }
         
-        foreach(SpriteRenderer enemy_sprite in enemies){
-            if(!enemy_sprite.isVisible) continue;
-            // Debug.Log(Vector2.Angle(transform.rotation*Vector2.up, (Vector2)(enemy_sprite.gameObject.transform.position-transform.position)).ToString());
-            if(Vector2.Angle(transform.rotation*Vector2.up, (Vector2)(enemy_sprite.gameObject.transform.position-transform.position))<=lock_angle){
-                locked_enemy = enemy_sprite.gameObject;
+        foreach(enemy_control enemy_c in enemies){
+            if(enemy_c.sight_lost&&enemy_c.gameObject==locked_enemy){
+                locked_enemy = null;
                 Destroy(marker);
-                marker = GameObject.Instantiate(lock_on_marker, enemy_sprite.gameObject.transform, false);
+                continue;
+            }
+            if(enemy_c.sight_lost) continue;
+            // Debug.Log(Vector2.Angle(transform.rotation*Vector2.up, (Vector2)(enemy_c.gameObject.transform.position-transform.position)).ToString());
+            if(Vector2.Angle(transform.rotation*Vector2.up, (Vector2)(enemy_c.gameObject.transform.position-transform.position))<=lock_angle){
+                locked_enemy = enemy_c.gameObject;
+                Destroy(marker);
+                marker = GameObject.Instantiate(lock_on_marker, enemy_c.gameObject.transform, false);
                 StartCoroutine(lock_anim(marker, locked_enemy));
                 locked_on = true;
                 return;
@@ -537,21 +545,26 @@ public unsafe class player_control : MonoBehaviour
             locked_on = false;
             return;
         }
-        foreach(SpriteRenderer enemy_sprite in enemies){
-            if(enemy_sprite==null) {
-                enemies.Remove(enemy_sprite);
+        foreach(enemy_control enemy_c in enemies){
+            if(enemy_c.gameObject==null) {
+                enemies.Remove(enemy_c);
                 continue;
             }
-            if(!enemy_sprite.isVisible) continue;
-            if(enemy_sprite.gameObject == locked_enemy) continue;
+            if(enemy_c.gameObject==locked_enemy&&enemy_c.sight_lost){
+                locked_enemy = null;
+                Destroy(marker);
+                continue;
+            }
+            if(enemy_c.sight_lost) continue;
+            if(enemy_c.gameObject == locked_enemy) continue;
             //use dot product=cos(a) to determine which enemy has the least angulare seperation from the direction
             //the player's facing
-            float dot1 = Vector3.Dot(enemy_sprite.gameObject.transform.position, transform.rotation*Vector3.up);
+            float dot1 = Vector3.Dot(enemy_c.gameObject.transform.position, transform.rotation*Vector3.up);
             float dot2 = Vector3.Dot(transform.rotation*Vector3.up, locked_enemy.transform.position);
             if(dot1>dot2){
-                locked_enemy = enemy_sprite.gameObject;
+                locked_enemy = enemy_c.gameObject;
                 Destroy(marker);
-                marker = GameObject.Instantiate(lock_on_marker, enemy_sprite.gameObject.transform, false);
+                marker = GameObject.Instantiate(lock_on_marker, enemy_c.gameObject.transform, false);
                 StartCoroutine(lock_anim(marker, locked_enemy));
             }
         }

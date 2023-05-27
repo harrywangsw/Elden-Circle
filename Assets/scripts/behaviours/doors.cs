@@ -45,7 +45,7 @@ public class doors : MonoBehaviour
             entered = false;
         }
 
-        if(Input.GetButton("confirm")&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to open the door"&&entered){
+        if(Input.GetButtonDown("confirm")&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to open the door"&&entered){
             if(conditional_opening){
                 StartCoroutine(temporary_messages.show_message("Locked by some mechanism, or someone."));
                 return;

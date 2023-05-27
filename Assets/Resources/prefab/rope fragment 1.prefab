@@ -181,6 +181,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slash: 0
-  strike: 0
+  strike: 12
   pierce: 0
   magic: 0

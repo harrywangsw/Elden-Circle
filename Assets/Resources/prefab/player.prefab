@@ -207,7 +207,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cursor_speed: 888
-  dash_force: 11111111
+  dash_force: 8880000
   stun_lock_period: 0.2
   dash_stamina: 20
   stamina_cost_l: 0

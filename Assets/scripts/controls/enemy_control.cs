@@ -228,9 +228,11 @@ public unsafe class enemy_control : MonoBehaviour
     }
 
     void death(){
+        player.GetComponent<player_control>().unbuffed_player_stat.exp+=enemy_stat.exp;
+        //Debug.Log(player.GetComponent<player_control>().unbuffed_player_stat.exp.ToString());
         if(dead) return;
         dead = true;
-        player.GetComponent<player_control>().unbuffed_player_stat.exp+=exp;
+        //player.GetComponent<player_control>().unbuffed_player_stat.exp+=exp;
         spawn_item();
         Destroy(gameObject);
     }
@@ -330,6 +332,16 @@ public unsafe class enemy_control : MonoBehaviour
             range = rweapon.GetComponent<machine_gun>().range;
             init_loc = rweapon.GetComponent<machine_gun>().init_loc;
             stamina_cost = rweapon.GetComponent<machine_gun>().stamina_cost;
+        }
+
+        else if (rweapon.GetComponent<spawn_bees>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<spawn_bees>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spawn_bees>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<spawn_bees>().range;
+            init_loc = rweapon.GetComponent<spawn_bees>().init_loc;
+            stamina_cost = rweapon.GetComponent<spawn_bees>().stamina_cost;
         }
         rweapon.transform.localPosition = init_loc*GetComponent<SpriteRenderer>().bounds.extents.magnitude;
         statics.apply_stats(rweapon.GetComponent<damage_manager>(), rweapon.GetComponent<damage_manager>(), enemy_stat);

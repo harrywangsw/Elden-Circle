@@ -49,7 +49,7 @@ MonoBehaviour:
   new_input: 0
   attacking: 0
   bee_speed: 88
-  range: 8
+  range: 18
   parriable_window: 0
   init_angle_range: 20
   stamina_cost: 50

@@ -9,7 +9,7 @@ public class fractal_generator : MonoBehaviour
 
     //circle object has radius of 1
     public GameObject circle_object, zooming_object;
-    public float radius_range, min_radius, cam_change_rate, expand_period, min_change;
+    public float radius_range, min_radius, expand_period, min_change;
     public List<circle> circle_list;
     public List<GameObject> object_list; 
     public circle smallest;
@@ -38,16 +38,18 @@ public class fractal_generator : MonoBehaviour
                 //because the circles's positions are calculated as if zooming_object has to stretch, 
                 //we must multiply all distance by the scale
                 object_list[i].transform.position*=zooming_object.transform.localScale.x;
+                //object_list[i].GetComponent<SpriteRenderer>().enabled = true;
             }
 
-            Vector3 final_size = zooming_object.transform.localScale*2f;
+            Vector3 final_size = zooming_object.transform.localScale*expand_period;
             yield return StartCoroutine(statics.expand(zooming_object.transform, expand_period, final_size));
-            min_radius/=2f;
+            min_radius/=expand_period;
             List<Tuple<circle, circle, circle>> break_point_cpy = break_point;
             break_point = new List<Tuple<circle, circle, circle>>();
             min_change = float.PositiveInfinity;
             foreach(Tuple<circle, circle, circle> triplet in break_point_cpy){
                 if(circle_list.IndexOf(triplet.Item1)<0||circle_list.IndexOf(triplet.Item2)<0||circle_list.IndexOf(triplet.Item3)<0){
+                    Debug.Log("sdas");
                     continue;
                 }
                 generate_apollo(triplet.Item1, triplet.Item2, triplet.Item3);

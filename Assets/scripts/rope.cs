@@ -161,7 +161,7 @@ public class rope : MonoBehaviour
         for(int i=0; i<num_arms; i++){
             for(int j = 0; j<fragmentCount; j++){
                 Destroy(fragments[j]);
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.08f);
             }
         }
     }

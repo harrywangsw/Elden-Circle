@@ -19,7 +19,7 @@ it's nice talking to you",
         Me swerving to the left just then is an example of such action. "
     };
 
-    public static List<string> hali = new List<string>(){
+    public static List<string> hari = new List<string>(){
         //0
         @"I told you so.
 *Sigh*, No matter. As far as I'm concerned, you've already finished the game
