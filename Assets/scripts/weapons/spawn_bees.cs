@@ -12,6 +12,7 @@ public unsafe class spawn_bees : MonoBehaviour
     public GameObject bee, user;
     stats player_stat, enemy_stat;
     Collider2D userc;
+    List<GameObject> bees = new List<GameObject>();
 
     void Start()
     {
@@ -30,18 +31,11 @@ public unsafe class spawn_bees : MonoBehaviour
     void Update()
     {
         new_input = *p_newinput;
+        if(bees.Count==0) attacking = false;
         if(new_input&&!attacking){
             attacking = true;
-            StartCoroutine(spawn());
-        }
-    }
-
-    IEnumerator spawn(){
-        while(new_input){
             StartCoroutine(new_wave());
-            yield return new WaitForSeconds(1.8f);
         }
-        attacking = false;
     }
 
     IEnumerator new_wave(){
@@ -51,6 +45,7 @@ public unsafe class spawn_bees : MonoBehaviour
         user_agent.obstacleAvoidanceType = UnityEngine.AI.ObstacleAvoidanceType.NoObstacleAvoidance;
         for(int i=0; i<num; i++){
             GameObject b = GameObject.Instantiate(bee, user.transform, false);
+            b.transform.SetParent(null);
             Physics2D.IgnoreCollision(b.GetComponent<Collider2D>(), userc, true);
             statics.apply_stats(GetComponent<damage_manager>(), b.GetComponent<damage_manager>(), new stats());
             Vector3 heading = transform.rotation*Vector3.up;
@@ -73,7 +68,10 @@ public unsafe class spawn_bees : MonoBehaviour
     }
 
     IEnumerator destroy_bee(GameObject bee){
-        yield return new WaitForSeconds(20f*range/bee_speed);
+        yield return new WaitForSeconds(range/bee_speed);
+        if(transform.parent.GetComponent<player_control>()==null) bee.GetComponent<UnityEngine.AI.NavMeshAgent>().SetDestination(GameObject.Find("player").transform.position);
+        yield return new WaitForSeconds(range/bee_speed);
+        bees.Remove(bee);
         Destroy(bee);
     }
 }

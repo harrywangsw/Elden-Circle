@@ -105,7 +105,9 @@ public unsafe class enemy_control : MonoBehaviour
         new_input = true;
         start_new_attack = false;
         agent.SetDestination(transform.position);
-        yield return new WaitForSeconds(Random.Range(attack_seperation, attack_seperation*2f));
+        //the closer you are to the player, the longer you wait
+        float dist = (player.transform.position-transform.position).magnitude;
+        yield return new WaitForSeconds(Random.Range(attack_seperation/dist, attack_seperation));
         start_new_attack = true;
     }
 
@@ -124,10 +126,10 @@ public unsafe class enemy_control : MonoBehaviour
 
     public void follow_player(){
         float stray_angle = 0f;
-        face_player();
+        if(!attacking) face_player();
         if(sight_lost) agent.SetDestination(prev_player_pos);
         else agent.SetDestination(player.transform.position);
-        if(playerc.attacking&&!dashing&&playerc.locked_enemy==gameObject){
+        if(playerc.attacking&&!dashing){
             StartCoroutine(dodge());
         }
     }

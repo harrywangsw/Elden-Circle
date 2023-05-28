@@ -128,7 +128,7 @@ public class inventory_manager : MonoBehaviour
             switchr();
         }
 
-        if(!p.attacking&&((Input.GetKey(KeyCode.LeftControl)&&Input.mouseScrollDelta.y!=0f)||Input.GetAxis("xboxdpadhori")<-0.75f)&&!dpadhori_triggered&&l_gameobjects.Count>0){
+        else if(!p.attacking&&((Input.GetKey(KeyCode.LeftControl)&&Input.mouseScrollDelta.y!=0f)||Input.GetAxis("xboxdpadhori")<-0.75f)&&!dpadhori_triggered&&l_gameobjects.Count>0){
             dpadhori_triggered =true;
             if(Input.mouseScrollDelta.y>0f) current_iteml = (current_iteml+1)%l_gameobjects.Count;
             else if(current_iteml==0){
@@ -141,7 +141,7 @@ public class inventory_manager : MonoBehaviour
             switchl();
         }
 
-        if((Input.mouseScrollDelta.y!=0f||Input.GetAxis("xboxdpadverti")>0.75f)&&u_gameobjects.Count>0&&!dpadverti_triggered){
+        else if((Input.mouseScrollDelta.y!=0f||Input.GetAxis("xboxdpadverti")>0.75f)&&u_gameobjects.Count>0&&!dpadverti_triggered){
             dpadverti_triggered = true;
             if(Input.mouseScrollDelta.y>0f) current_itemu = (current_itemu+1)%u_gameobjects.Count;
             else if(current_itemu==0){

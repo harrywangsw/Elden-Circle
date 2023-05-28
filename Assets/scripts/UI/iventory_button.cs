@@ -62,7 +62,7 @@ public class iventory_button : MonoBehaviour
             UI_control.text = "e to insert item into upper quickslot.";
         }
         //if(item!=null) item_index = statics.search_for_item(player.unbuffed_player_stat.inv, item.name);
-        if(!dpadhori_triggered&&Input.GetAxis("xboxdpadhori")==1f&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="weapon"){
+        if(!dpadhori_triggered&&(Input.GetAxis("xboxdpadhori")==1f||Input.GetKeyDown("left shift")) &&player.unbuffed_player_stat.inv.inv[item_index].item_type=="weapon"){
             dpadhori_triggered =true;
             if(!in_rquick_slot){
                 player.unbuffed_player_stat.inv.quickslot_right_indexes.Add(item_index);
@@ -77,7 +77,7 @@ public class iventory_button : MonoBehaviour
                 inv.remove_item_from_rquickslot(gameObject);
             }
         }
-        if(!dpadhori_triggered&&Input.GetAxis("xboxdpadhori")==-1f&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="weapon"){
+        if(!dpadhori_triggered&&(Input.GetAxis("xboxdpadhori")==-1f||Input.GetKeyDown("left ctrl"))&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="weapon"){
             dpadhori_triggered =true;
             if(!in_lquick_slot){
                 player.unbuffed_player_stat.inv.quickslot_left_indexes.Add(item_index);
@@ -93,7 +93,7 @@ public class iventory_button : MonoBehaviour
                 inv.remove_item_from_lquickslot(gameObject);
             }
         }
-        if(!dpadverti_triggered&&Input.GetAxis("xboxdpadverti")==1f&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="item"&&player.unbuffed_player_stat.inv.inv[item_index].num_left>0){
+        if(!dpadverti_triggered&&(Input.GetAxis("xboxdpadverti")==1f||Input.GetKeyDown("e"))&&player.unbuffed_player_stat.inv.inv[item_index].item_type=="item"&&player.unbuffed_player_stat.inv.inv[item_index].num_left>0){
             dpadverti_triggered = true;
             if(!in_uquick_slot){
                 player.unbuffed_player_stat.inv.quickslot_up_indexes.Add(item_index);

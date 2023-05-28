@@ -117,8 +117,7 @@ A voyager...
 No, someone else in the skin of a voyager.
 In that case, terminate this program immediately.
 Trust me, it's for your own good.
-Both of you.
-        ",
+Both of you.",
         ""
     };
 

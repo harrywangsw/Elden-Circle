@@ -36,10 +36,10 @@ public class item_behaviour : MonoBehaviour
             // float player_pointing = player.transform.rotation.eulerAngles.z;
 
             if(ind<0&&!entered){
-                entered = true;
                 swi.messages.Add("press enter to pick up item");
                 swi.current = swi.messages.Count-1;
             }
+            entered = true;
         }
         else{
             if(ind>=0&&entered) {

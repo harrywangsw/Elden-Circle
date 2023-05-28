@@ -66,10 +66,10 @@ public unsafe class spear_attack : MonoBehaviour
         // }
         yield return new WaitForSeconds(thrust_period);
         body.velocity = Vector3.zero;
-        transform.localPosition = init_loc;
+        transform.position = user.transform.position;
+        c.enabled = false;
         yield return new WaitForSeconds(0.2f);
         attacking = false;
-        c.enabled = false;
         sprite.enabled = false;
         transform.parent = user.transform;
         transform.localRotation = Quaternion.identity;

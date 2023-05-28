@@ -25,6 +25,7 @@ public class save_point_behaviour : MonoBehaviour
                 message_screen.GetComponent<switchmessages>().current = message_screen.GetComponent<switchmessages>().messages.Count-1;
             }
             if(Input.GetButtonDown("confirm")&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to save"&&!p.dashing){
+                StartCoroutine(GameObject.Find("temporary_messages").GetComponent<reactive_messages>().show_message("saved!"));
                 save_load.SavePlayer(p.unbuffed_player_stat);
                 p.current_world.player_pos_x = player.transform.position.x;
                 p.current_world.player_pos_y = player.transform.position.y;

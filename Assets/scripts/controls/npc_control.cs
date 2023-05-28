@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class npc_control : MonoBehaviour
 {
     public float trigger_dist = 0f;
-    public bool in_conversation, force_talk, wait_for_input, look_at_player = true;
+    public bool in_conversation, force_talk, wait_for_input, look_at_player = true, entered;
     GameObject message_screen, switch_message, player, dialogue_screen;
     public GameObject player_input_box;
     switchmessages message_controller;
@@ -47,8 +47,31 @@ public class npc_control : MonoBehaviour
             return;
         }
         
-        int ind = message_controller.messages.IndexOf("press enter to talk");
+        int ind = message_controller.messages.IndexOf("press enter/B to talk");
         if((player.transform.position-transform.position).magnitude<=trigger_dist){
+            // Debug.Log("vector3 angle: "+Vector3.Angle(transform.up, (player.transform.position-transform.position)).ToString());
+            // Debug.Log(player.transform.rotation.eulerAngles.z);
+            // float ang = Vector3.Angle(transform.position-player.transform.position);
+            // float player_pointing = player.transform.rotation.eulerAngles.z;
+
+            if(ind<0&&!entered){
+                entered = true;
+                message_controller.messages.Add("press enter/B to talk");
+                message_controller.current = message_controller.messages.Count-1;
+            }
+        }
+        else{
+            if(ind>=0&&entered) {
+                message_controller.messages.RemoveAt(ind);
+                message_controller.current = message_controller.messages.Count-1;
+            }
+            entered = false;
+            if(gameObject==p.locked_npc) Destroy(p.npc_marker);
+            int a = p.near_by_npcs.IndexOf(gameObject);
+            if(a<0) return;
+            p.near_by_npcs.RemoveAt(a);
+        }
+        if(entered){
             if(force_talk&&!in_conversation) {
                 message_screen.transform.parent.localScale = Vector3.zero;
                 switch_message.transform.parent.localScale = Vector3.zero;
@@ -60,11 +83,7 @@ public class npc_control : MonoBehaviour
             if(look_at_player) face_player();
             if(p.near_by_npcs.IndexOf(gameObject)<0) p.near_by_npcs.Add(gameObject);
             if(p.locked_npc==null) p.locked_npc = gameObject;
-            if(ind<0){
-                message_controller.messages.Add("press enter to talk");
-                message_controller.current = message_controller.messages.Count-1;
-            }
-            if(Input.GetButtonDown("confirm")&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to talk"&&!in_conversation&&p.locked_npc==gameObject){
+            if(Input.GetButtonDown("confirm")&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter/B to talk"&&!in_conversation&&p.locked_npc==gameObject){
                 message_screen.transform.parent.localScale = Vector3.zero;
                 switch_message.transform.parent.localScale = Vector3.zero;
                 dialogue_screen.transform.parent.localScale = Vector3.one;
@@ -72,15 +91,6 @@ public class npc_control : MonoBehaviour
                 in_conversation = true;
                 start_new_lines();
             }
-        }
-        else{
-            if(gameObject==p.locked_npc) Destroy(p.npc_marker);
-            if(ind>=0){
-                message_controller.messages.RemoveAt(ind);
-            }
-            int a = p.near_by_npcs.IndexOf(gameObject);
-            if(a<0) return;
-            p.near_by_npcs.RemoveAt(a);
         }
     }
 

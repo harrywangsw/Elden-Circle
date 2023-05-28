@@ -12,19 +12,19 @@ public class rope : MonoBehaviour
     public GameObject fragmentPrefab, Marker;
     GameObject marker, first_link, player;
     Vector3 COM, distance, velocity;
-    public float torq, period, ang_vel, dash_period, force, health;
+    public float torq, period, ang_vel, dash_period, force;
     Rigidbody2D body;
-    public stats stat;
     public bool dead;
+    Collider2D selfc;
     void Start()
     {
-        
+        selfc = GetComponent<Collider2D>();
     }
 
     public void init(){
-        health = stat.health;
+        selfc = GetComponent<Collider2D>();
         body = GetComponent<Rigidbody2D>();
-        float bound = GetComponent<SpriteRenderer>().bounds.extents.magnitude;
+        float bound = 3f*GetComponent<SpriteRenderer>().bounds.extents.magnitude;
         Collider2D[,] colliders = new Collider2D[num_arms,fragmentCount];
         for(int i=0; i<num_arms; i++){
             init_arm(Quaternion.Euler(0f, 0f, i*360f/num_arms)*Vector3.up*bound, Quaternion.Euler(0f, 0f, i*360f/num_arms), colliders, i);
@@ -62,6 +62,7 @@ public class rope : MonoBehaviour
             }
             joint.connectedAnchor = rot*new Vector2(0f, -0.8f);
             col[ind,i] = fragments[i].GetComponent<Collider2D>();
+            Physics2D.IgnoreCollision(col[ind,i], selfc, true);
         }
         fragments[0].GetComponent<FixedJoint2D>().connectedBody = GetComponent<Rigidbody2D>();
         StartCoroutine(swing_back_forth(fragments, bodies));
@@ -118,6 +119,7 @@ public class rope : MonoBehaviour
             }
             yield return new WaitForSeconds(period);
         }
+        Destroy(body);
         foreach(Rigidbody2D b in bodies){
                 //if(b==null) StartCoroutine(respawn_frag());
             b.angularVelocity = 0f;
@@ -135,7 +137,7 @@ public class rope : MonoBehaviour
         Vector3 prev_pos = player.transform.position;
         float time = 0f;
         while(!dead){
-            if((transform.position-prev_pos).magnitude>=8f&&time<dash_period){
+            if((transform.position-prev_pos).magnitude>=8f&&time>dash_period){
                 prev_pos = player.transform.position;
                 body.AddForce((Vector2)(prev_pos-transform.position)*force);
                 time = 0f;
@@ -144,25 +146,23 @@ public class rope : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime);
             time+=Time.deltaTime;
         }
-        body.velocity = Vector2.zero;
     }
 
-    void OnCollisionEnter2D(Collision2D c){
-        damage_manager d = c.collider.gameObject.GetComponent<damage_manager>();
-        if(!d) return;  
-        statics.animate_hurt(GetComponent<SpriteRenderer>());
-        health-=statics.calc_damage(stat, d);
-        if(health<=0f){
-            dead = true;
-        }
-    }
+    // void OnCollisionEnter2D(Collision2D c){
+    //     damage_manager d = c.collider.gameObject.GetComponent<damage_manager>();
+    //     if(!d) return; 
+    //     StartCoroutine(statics.animate_hurt(GetComponent<SpriteRenderer>()));
+    //     health-=statics.calc_damage(stat, d);
+    //     if(health<=0f){
+    //         dead = true;
+    //     }
+    // }
 
     IEnumerator death(GameObject[] fragments){
-        for(int i=0; i<num_arms; i++){
-            for(int j = 0; j<fragmentCount; j++){
-                Destroy(fragments[j]);
-                yield return new WaitForSeconds(0.08f);
-            }
+        int j;
+        for(j = 0; j<fragmentCount; j++){
+            Destroy(fragments[j]);
+            yield return new WaitForSeconds(0.8f);
         }
     }
 }

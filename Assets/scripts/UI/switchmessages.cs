@@ -42,6 +42,8 @@ public class switchmessages : MonoBehaviour
             message_screen.GetComponent<TMPro.TextMeshProUGUI>().text = messages[(current)%messages.Count];
         }
         else message_screen.GetComponent<TMPro.TextMeshProUGUI>().text = "";
-        if(Input.GetKeyDown(KeyCode.Y))current+=1;
+        if(Input.GetButtonDown("xboxY")){
+            current+=1;
+        }
     }
 }

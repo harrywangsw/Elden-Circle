@@ -223,6 +223,16 @@ public unsafe class player_control : MonoBehaviour
                 stamina_cost_l = lweapon.GetComponent<lightning_strike>().stamina_cost;
             }
 
+            else if (lweapon.GetComponent<glint_stone>()!=null)
+            {
+                //get adress of attacking from right-hand weapon and save the adress in pattacking
+                fixed (bool* pattack_fixed = &lweapon.GetComponent<glint_stone>().attacking) { pattacking_l = pattack_fixed; }
+                fixed(bool* p_attack_order = &new_input_l) { lweapon.GetComponent<glint_stone>().p_newinput = p_attack_order; }
+                l_range = lweapon.GetComponent<glint_stone>().range;
+                init_loc = lweapon.GetComponent<glint_stone>().init_loc;
+                stamina_cost_l = lweapon.GetComponent<glint_stone>().stamina_cost;
+            }
+
             else if (lweapon.GetComponent<mine>()!=null)
             {
                 //get adress of attacking from right-hand weapon and save the adress in pattacking
@@ -282,7 +292,6 @@ public unsafe class player_control : MonoBehaviour
         else attacking = dashing;
         if(attacking||using_item) {
             body.velocity = Vector2.zero;
-            speed = 0f;
         }
         else speed = player_stat.spd;
 
@@ -368,7 +377,7 @@ public unsafe class player_control : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(!dashing&&!stop) move();
+        if(!dashing&&!stop&&!attacking) move();
         Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
     }
 

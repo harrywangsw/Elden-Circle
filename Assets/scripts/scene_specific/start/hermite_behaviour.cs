@@ -5,16 +5,20 @@ using TMPro;
 
 public class hermite_behaviour : MonoBehaviour
 {
-    public GameObject boss_stopper;
+    public GameObject boss_stopper, teleporter, message_screen;
     npc_control n;
     rope r;
     player_control player;
+    public float health;
+    public stats stat;
+
     void Start()
     {
         player = GameObject.Find("player").GetComponent<player_control>();
         n = GetComponent<npc_control>();
         r = GetComponent<rope>();
         r.enabled = false;
+        message_screen = GameObject.Find("message_screen");
     }
 
     void Update()
@@ -22,14 +26,10 @@ public class hermite_behaviour : MonoBehaviour
         if(player.current_world.hermite_dead){
             Destroy(gameObject);
         }
-        if(r.dead){
-            player.current_world.hermite_dead = true;
-            save_load.SavePlayer(player.player_stat);
-            save_load.Saveworld(player.current_world, player.player_stat.name);
-            StartCoroutine(diag());
-        }
         if(!n.enabled) return;
+        //if the boss has finished the monologue
         if(n.index==1) {
+            message_screen.GetComponent<switchmessages>().messages.Remove("press enter/B to talk");
             boss_stopper.SetActive(true);
             r.enabled = true;
             r.init();
@@ -38,6 +38,7 @@ public class hermite_behaviour : MonoBehaviour
     }
 
     IEnumerator diag(){
+        boss_stopper.SetActive(false);
         GameObject dialogue_screen = GameObject.Find("dialogue_screen");
         TMPro.TextMeshProUGUI dialogue_text_bar = dialogue_screen.GetComponent<TMPro.TextMeshProUGUI>();
         dialogue_screen.transform.parent.localScale = Vector3.one;
@@ -60,5 +61,22 @@ public class hermite_behaviour : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime);
         }
         dialogue_screen.transform.parent.localScale = Vector3.zero;
+        StartCoroutine(GameObject.Find("temporary_messages").GetComponent<reactive_messages>().show_message("walk into the teleporter"));
+        teleporter.SetActive(true);
+        teleporter.transform.position = transform.position;
+        player.current_world.hermite_dead = true;
+        save_load.SavePlayer(player.player_stat);
+        save_load.Saveworld(player.current_world, player.player_stat.name);
+    }
+
+    void OnCollisionEnter2D(Collision2D c){
+        damage_manager d = c.collider.gameObject.GetComponent<damage_manager>();
+        if(!d) return; 
+        StartCoroutine(statics.animate_hurt(GetComponent<SpriteRenderer>()));
+        health-=statics.calc_damage(stat, d);
+        if(health<=0f){
+            StartCoroutine(diag());
+            GetComponent<rope>().dead = true;
+        }
     }
 }
