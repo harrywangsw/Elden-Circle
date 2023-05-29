@@ -1,3 +1,4 @@
-limit the use of mines(make it an item?)
 npc marker doesn't always show up
 make enemy patrol back and forth from two points as opposed to random each time
+xbox controls in the start menu
+continue game functionality

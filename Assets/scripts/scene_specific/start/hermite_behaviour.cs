@@ -30,6 +30,7 @@ public class hermite_behaviour : MonoBehaviour
         //if the boss has finished the monologue
         if(n.index==1) {
             message_screen.GetComponent<switchmessages>().messages.Remove("press enter/B to talk");
+            GetComponent<AudioSource>().Play();
             boss_stopper.SetActive(true);
             r.enabled = true;
             r.init();
@@ -38,6 +39,7 @@ public class hermite_behaviour : MonoBehaviour
     }
 
     IEnumerator diag(){
+        StartCoroutine(lower_volume());
         boss_stopper.SetActive(false);
         GameObject dialogue_screen = GameObject.Find("dialogue_screen");
         TMPro.TextMeshProUGUI dialogue_text_bar = dialogue_screen.GetComponent<TMPro.TextMeshProUGUI>();
@@ -67,6 +69,15 @@ public class hermite_behaviour : MonoBehaviour
         player.current_world.hermite_dead = true;
         save_load.SavePlayer(player.player_stat);
         save_load.Saveworld(player.current_world, player.player_stat.name);
+    }
+
+    IEnumerator lower_volume(){
+        float time = 0f;
+        while(time<6f){
+            GetComponent<AudioSource>().volume-=Time.deltaTime/6f;
+            time+=Time.deltaTime;
+            yield return new WaitForSeconds(Time.deltaTime);
+        }
     }
 
     void OnCollisionEnter2D(Collision2D c){

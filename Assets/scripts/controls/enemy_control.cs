@@ -345,6 +345,16 @@ public unsafe class enemy_control : MonoBehaviour
             init_loc = rweapon.GetComponent<spawn_bees>().init_loc;
             stamina_cost = rweapon.GetComponent<spawn_bees>().stamina_cost;
         }
+
+        else if (rweapon.GetComponent<spiked_wall>()!=null)
+        {
+            //get adress of attacking from right-hand weapon and save the adress in pattacking
+            fixed (bool* pattack_fixed = &rweapon.GetComponent<spiked_wall>().attacking) { pattacking = pattack_fixed; }
+            fixed(bool* p_attack_order = &new_input) { rweapon.GetComponent<spiked_wall>().p_newinput = p_attack_order; }
+            range = rweapon.GetComponent<spiked_wall>().range;
+            init_loc = rweapon.GetComponent<spiked_wall>().init_loc;
+            stamina_cost = rweapon.GetComponent<spiked_wall>().stamina_cost;
+        }
         rweapon.transform.localPosition = init_loc*GetComponent<SpriteRenderer>().bounds.extents.magnitude;
         statics.apply_stats(rweapon.GetComponent<damage_manager>(), rweapon.GetComponent<damage_manager>(), enemy_stat);
     }

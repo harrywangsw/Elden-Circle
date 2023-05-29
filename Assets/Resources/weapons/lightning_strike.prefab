@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   period: 0
-  range: 0
+  range: 6
   new_branch_prob: 0.2
   stamina_cost: 10
   max_count: 10
