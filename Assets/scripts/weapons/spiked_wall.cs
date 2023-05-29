@@ -18,7 +18,6 @@ public unsafe class spiked_wall : MonoBehaviour
     void Start()
     {
         user = transform.parent.gameObject;
-        
         if(user.GetComponent<player_control>()!=null){
             player = user.GetComponent<player_control>();
         }
@@ -37,17 +36,15 @@ public unsafe class spiked_wall : MonoBehaviour
 
     IEnumerator spawn_wall(){
         init_new_attacking = false;
-        attacking = true;
+        player.stop = true;
         GameObject w = GameObject.Instantiate(wall, user.transform.position+user.transform.rotation*Vector3.up*range, Quaternion.Euler(user.transform.rotation.eulerAngles.x, user.transform.rotation.eulerAngles.y, user.transform.rotation.eulerAngles.z-180f));
-        Physics2D.IgnoreCollision(w.GetComponent<Collider2D>(), GameObject.Find("Grid").GetComponent<Collider2D>(), true);
-        if(enemy!=null) Physics2D.IgnoreCollision(w.GetComponent<Collider2D>(), user.GetComponent<Collider2D>(), true);
         statics.apply_stats(GetComponent<damage_manager>(), w.GetComponent<damage_manager>(), new stats());
         w.transform.localScale = Vector3.zero;
         yield return StartCoroutine(statics.expand(w.transform, period, Vector3.one));
         w.GetComponent<Collider2D>().enabled = true;
         w.GetComponent<Rigidbody2D>().velocity = ((Vector2)(w.transform.rotation*(Vector3.up))*vel);
         float time = range/w.GetComponent<Rigidbody2D>().velocity.magnitude;
-        attacking = false;
+        player.stop = false;
         yield return new WaitForSeconds(time);
         init_new_attacking = true;
     }

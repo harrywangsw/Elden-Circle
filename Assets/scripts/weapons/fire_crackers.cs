@@ -13,7 +13,6 @@ public unsafe class fire_crackers : MonoBehaviour
     GameObject user;
 
     void Start(){
-        Physics2D.IgnoreCollision(GetComponent<Collider2D>(), GameObject.Find("Grid").GetComponent<Collider2D>(), true);
         cracker = Resources.Load<Sprite>("sprites/firecracker");
         if(transform.parent!=null) user = transform.parent.gameObject;
         if(num==final_num){

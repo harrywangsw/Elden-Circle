@@ -7,11 +7,16 @@ public static class npc_dialogues
     //buffer dialogues is in the element next to the main one
     public static List<string> thales = new List<string>(){
         //0
-        @"Welcome, to the lodge of voyagers.
-This will be the hub of your many adventurers.
-Don't be discouraged by its forlorn state.
-This world does not lack adventurers nor adventures.",
-        "This world does not lack adventurers nor adventures."
+        @"Well met, voyager.
+it's nice talking to you",
+        //1
+        "It was a pleasure",
+        //2
+        "Created by Hali the all-knowing",
+        //3
+        @"What do you mean? I did not pass anyone.
+        Most of our actions can be rationalized and predicted, except for a small set of axiomatic actions that cannot. 
+        Me swerving to the left just then is an example of such action. "
     };
 
     public static List<string> hari = new List<string>(){
@@ -28,7 +33,9 @@ Hehe, I’m afraid there’s little I can do to remedy that.
 Oh, come. I am not so cruel as to abandon you during this hour of confusion. 
 Press escape; I have laid out the basic tools you’ll need to interact with this world.",
 //1
-"Farewell, traveller. Next time we meet, I hope you won’t fail like last time."
+"Farewell, traveller. Next time we meet, I hope you won’t fail like last time.",
+        //2
+        "Welcome, traveller. To the lodge of voyagers. "
     };
 
     public static List<string> Huygens = new List<string>(){

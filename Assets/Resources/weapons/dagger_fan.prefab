@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   num: 6
-  period: 0.4
+  period: 0.8
   range: 20
   stamina_cost: 10
   dist_from_user: 3

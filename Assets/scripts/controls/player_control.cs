@@ -23,7 +23,6 @@ public unsafe class player_control : MonoBehaviour
     public Vector3 previous_angle = new Vector3();
     Vector3 init_loc = new Vector3();
     public GameObject npc_marker, locked_npc, n_marker, locked_enemy, marker, rweapon, overlay, death_screen, menu, inventory_content, lweapon, lock_on_marker;
-    public AudioSource walking_sound;
     TMPro.TextMeshProUGUI Exp;
     public SpriteRenderer player_sprite;
     List<enemy_control> enemies = new List<enemy_control>();
@@ -35,7 +34,6 @@ public unsafe class player_control : MonoBehaviour
 
     void Start()
     {
-        walking_sound = GameObject.Find("walking_sound").GetComponent<AudioSource>();
         orig_cam_size = Camera.main.orthographicSize; 
         update_weapon(rweapon, lweapon);
         if(rweapon!=null){
@@ -379,7 +377,6 @@ public unsafe class player_control : MonoBehaviour
 
     void FixedUpdate()
     {
-        walking_sound.mute = true;
         if(!dashing&&!stop&&!attacking) move();
         Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
     }
@@ -395,7 +392,6 @@ public unsafe class player_control : MonoBehaviour
         velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInput.y, walkAcceleration * Time.fixedDeltaTime);
         //velocity = Quaternion.AngleAxis(-transform.eulerAngles.z, Vector3.forward) * velocity;
         body.velocity = velocity;
-        if(velocity.magnitude>speed*0.08f)walking_sound.mute = false;
         //transform.Translate(velocity * Time.fixedDeltaTime);
 
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);

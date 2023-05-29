@@ -64,11 +64,11 @@ MonoBehaviour:
   new_input: 0
   attacking: 0
   attack_interrupted: 0
-  range: 18
+  range: 10
   stamina_cost: 30
   init_loc: {x: 0, y: 0, z: 0}
   user: {fileID: 0}
   wall: {fileID: 6585350171406650642, guid: 4f1a7fd95b232064da2a97e760a232db, type: 3}
-  period: 0.2
+  period: 1
   vel: 23
   init_new_attacking: 1
