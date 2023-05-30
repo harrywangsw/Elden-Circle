@@ -7,6 +7,8 @@ using TMPro;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.LowLevel;
+using System.IO;
+using System.Linq;
 
 public class main_menu : MonoBehaviour
 {
@@ -24,13 +26,14 @@ public class main_menu : MonoBehaviour
         stat = new List<stats>();
         //string path = "P:/GitHub/saves"+"/";
         string path = save_load.save_path;
-        foreach (string file in System.IO.Directory.GetFiles(path)){
+        DirectoryInfo info = new DirectoryInfo(path);
+        foreach (FileInfo file in info.GetFiles().OrderBy(f=>f.CreationTime).ToArray()){
             //Debug.Log(file);
-            if(file.Split(".")[1]=="wor"){
-                worlds.Add(save_load.Loadworld(file));
+            if(file.FullName.Split(".")[1]=="wor"){
+                worlds.Add(save_load.Loadworld(file.FullName));
             }
-            if(file.Split(".")[1]=="pl"){
-                stat.Add(save_load.LoadPlayer(file));
+            if(file.FullName.Split(".")[1]=="pl"){
+                stat.Add(save_load.LoadPlayer(file.FullName));
             }
         }
         DontDestroyOnLoad(gameObject);
@@ -103,6 +106,6 @@ public class main_menu : MonoBehaviour
     }
 
     public void continue_game(){
-        
+        LoadYourAsyncScene(0);
     }
 }

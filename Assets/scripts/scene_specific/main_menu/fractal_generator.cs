@@ -42,7 +42,7 @@ public class fractal_generator : MonoBehaviour
             }
 
             Vector3 final_size = zooming_object.transform.localScale*expand_period;
-            yield return StartCoroutine(statics.expand(zooming_object.transform, expand_period, final_size));
+            yield return StartCoroutine(statics.expand(zooming_object.transform, expand_period/2.8f, final_size));
             min_radius/=expand_period;
             List<Tuple<circle, circle, circle>> break_point_cpy = break_point;
             break_point = new List<Tuple<circle, circle, circle>>();
