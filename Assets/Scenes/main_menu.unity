@@ -1527,7 +1527,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 0.8
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -1711,7 +1711,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 801947298}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.12573534, y: -0.35344064, z: -9.912155}
+  m_LocalPosition: {x: 0, y: 0, z: -9.912155}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2381,12 +2381,16 @@ MonoBehaviour:
   circle_object: {fileID: 7047917661194182036, guid: a61c9e0547de8064f8479332d25953cb,
     type: 3}
   zooming_object: {fileID: 1696971004}
-  radius_range: 9
-  min_radius: 0.02
+  radius_range: 19
+  min_radius: 0.04
   expand_period: 1.1
   min_change: 0
+  cam_size_y: 18
+  cam_size_x: 28
   object_list: []
   amount_shifted: {x: 0, y: 0}
+  regenerate: 0
+  expanding: 0
 --- !u!1 &1182563786
 GameObject:
   m_ObjectHideFlags: 0

@@ -49,17 +49,16 @@ public class main_menu : MonoBehaviour
     {
         //Debug.Log(loaded.ToString());
         if(Input.anyKey){
-            if(title){
-                buttons.transform.localScale = Vector3.one;
-                title = false;
-                transform.GetChild(1).gameObject.transform.localScale = Vector3.zero;
-                buttons.transform.GetChild(0).gameObject.GetComponent<Button>().onClick.AddListener(delegate{continue_game();});
-                buttons.transform.GetChild(1).gameObject.GetComponent<Button>().onClick.AddListener(delegate{show_saves();});
-                buttons.transform.GetChild(2).gameObject.GetComponent<Button>().onClick.AddListener(delegate{new_player();});
-            }
             if(Input.GetKeyDown("backspace")&&!title){
                 current_obj.transform.localScale = Vector3.zero;
                 buttons.transform.localScale = Vector3.one;
+            }
+            if(title){
+                buttons.transform.localScale = Vector3.one;
+                title = false;
+                buttons.transform.GetChild(0).gameObject.GetComponent<Button>().onClick.AddListener(delegate{continue_game();});
+                buttons.transform.GetChild(1).gameObject.GetComponent<Button>().onClick.AddListener(delegate{show_saves();});
+                buttons.transform.GetChild(2).gameObject.GetComponent<Button>().onClick.AddListener(delegate{new_player();});
             }
         }
         if(saves.transform.localScale == Vector3.zero){
@@ -94,6 +93,7 @@ public class main_menu : MonoBehaviour
 
     public void show_saves(){
         int i;
+        transform.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "Press backspace/B to go back";
         current_obj = saves;
         buttons.transform.localScale = Vector3.zero;
         saves.transform.localScale = Vector3.one;
