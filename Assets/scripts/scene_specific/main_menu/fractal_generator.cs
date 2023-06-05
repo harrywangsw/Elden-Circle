@@ -14,7 +14,7 @@ public class fractal_generator : MonoBehaviour
     public List<circle> circle_list;
     //object_list keeps track of the objects' shifted positions
     public List<GameObject> object_list; 
-    public circle smallest;
+    public circle smallest = new circle();
     public Vector2 amount_shifted;
     public bool regenerate, expanding;
     public List<Tuple<GameObject, GameObject, GameObject>> break_point = new List<Tuple<GameObject, GameObject, GameObject>>();
@@ -58,9 +58,6 @@ public class fractal_generator : MonoBehaviour
                 three = new circle(radius, (Vector2)c.transform.position);
             }
         }
-        // spawn_circle_object(one, true);
-        // spawn_circle_object(two, true);
-        // spawn_circle_object(three, true);
         foreach(Transform cir in zooming_object.transform){
             Destroy(cir.gameObject);
         }
@@ -116,14 +113,8 @@ public class fractal_generator : MonoBehaviour
             zooming_object_size = zooming_object.transform.localScale.x;
             zooming_object.transform.localScale = Vector3.one;
             foreach(Transform c in zooming_object.transform){
-                //c.SetParent(null);
                 c.position*=zooming_object_size;
                 c.localScale *= zooming_object_size;
-                //now that the radius and position of the circle objects have been "reset" as if they haven't been stretched, 
-                //change the circle objects in circle_list to match the objects
-                // circle_list[i].pos=(Vector2)object_list[i].transform.position;
-                // circle_list[i].r = object_list[i].transform.localScale.x;
-                //c.SetParent(zooming_object.transform);
             }
 
             List<Tuple<GameObject, GameObject, GameObject>> break_point_cpy = break_point;
@@ -147,15 +138,9 @@ public class fractal_generator : MonoBehaviour
         circle tangent_3 = new circle(object_3.transform.localScale.x, (Vector2)object_3.transform.position);
         circle new_circle = generate_next_circle(tangent_1, tangent_2, tangent_3);
         if(new_circle.r<=min_radius) {
-            // GameObject c1 = Instantiate(circle_object, tangent_1.pos, Quaternion.identity);
-            // c1.transform.localScale = tangent_1.r*Vector3.one;
-            // GameObject c2 = Instantiate(circle_object, tangent_2.pos, Quaternion.identity);
-            // c2.transform.localScale = tangent_2.r*Vector3.one;
-            // GameObject c3 = Instantiate(circle_object, tangent_3.pos, Quaternion.identity);
-            // c3.transform.localScale = tangent_3.r*Vector3.one;
             break_point.Add(Tuple.Create(object_1, object_2, object_3));
             //get the circle that requires the least shifting for the entire fractal
-            //if(min_change>(new_circle.pos-amount_shifted).magnitude) smallest = new_circle;
+            if(min_change>(new_circle.pos-smallest.pos).magnitude) smallest = new_circle;
             smallest = new_circle;
             return;
         }

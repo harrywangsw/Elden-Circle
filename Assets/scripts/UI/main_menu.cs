@@ -54,6 +54,7 @@ public class main_menu : MonoBehaviour
                 buttons.transform.localScale = Vector3.one;
             }
             if(title){
+                transform.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = "";
                 buttons.transform.localScale = Vector3.one;
                 title = false;
                 buttons.transform.GetChild(0).gameObject.GetComponent<Button>().onClick.AddListener(delegate{continue_game();});

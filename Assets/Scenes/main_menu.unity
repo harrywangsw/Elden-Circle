@@ -2385,8 +2385,8 @@ MonoBehaviour:
   min_radius: 0.04
   expand_period: 1.1
   min_change: 0
-  cam_size_y: 18
-  cam_size_x: 28
+  cam_size_y: 5
+  cam_size_x: 12
   object_list: []
   amount_shifted: {x: 0, y: 0}
   regenerate: 0
