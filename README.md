@@ -1,2 +1,2 @@
 # Elden Circle
- How to play: Download and unzip the file and run Elden-circle.exe in builds/
+ This is the repository for the code only. To play the game, download the files in https://github.com/harrywangsw/Name-of-The-Game and run build/Elden circle.exe
