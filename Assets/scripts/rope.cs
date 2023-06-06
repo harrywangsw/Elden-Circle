@@ -124,7 +124,7 @@ public class rope : MonoBehaviour
                 //if(b==null) StartCoroutine(respawn_frag());
             b.angularVelocity = 0f;
         }
-        StartCoroutine(death(fragments));
+        death(fragments);
     }
 
     // IEnumerator respawn_frag(int index){
@@ -158,11 +158,10 @@ public class rope : MonoBehaviour
     //     }
     // }
 
-    IEnumerator death(GameObject[] fragments){
+    void death(GameObject[] fragments){
         int j;
         for(j = 0; j<fragmentCount; j++){
             Destroy(fragments[j]);
-            yield return new WaitForSeconds(0.8f);
         }
     }
 }

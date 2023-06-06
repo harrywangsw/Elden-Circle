@@ -301,12 +301,12 @@ MonoBehaviour:
   n_marker: {fileID: 0}
   locked_enemy: {fileID: 0}
   marker: {fileID: 0}
-  rweapon: {fileID: 1495373251946413818, guid: 05f0b0050d6ed324bb56f29ba21fcf45, type: 3}
+  rweapon: {fileID: 0}
   overlay: {fileID: 0}
   death_screen: {fileID: 0}
   menu: {fileID: 0}
   inventory_content: {fileID: 0}
-  lweapon: {fileID: 450404184206558630, guid: 6a565e9ebf002f5468e5dfbb82efa2c7, type: 3}
+  lweapon: {fileID: 0}
   lock_on_marker: {fileID: 3130184260024326521, guid: 96138267aef0e164491638dfe20d5165,
     type: 3}
   player_sprite: {fileID: 0}

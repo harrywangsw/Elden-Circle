@@ -47,9 +47,10 @@ public class main_menu : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(Input.GetAxis("xboxHorizontal")!=0||Input.GetAxis("xboxVertical")!=0) Mouse.current.WarpCursorPosition((Vector2)Input.mousePosition+new Vector2(Input.GetAxis("xboxHorizontal"), -Input.GetAxis("xboxVertical"))*cursor_speed*Time.deltaTime);
         //Debug.Log(loaded.ToString());
         if(Input.anyKey){
-            if(Input.GetKeyDown("backspace")&&!title){
+            if((Input.GetKeyDown("backspace")||Input.GetButtonDown("xboxStart"))&&!title){
                 current_obj.transform.localScale = Vector3.zero;
                 buttons.transform.localScale = Vector3.one;
             }
@@ -81,7 +82,10 @@ public class main_menu : MonoBehaviour
         buttons.transform.localScale = Vector3.zero;
         world_details new_world = new world_details();
         worlds.Add(new_world);
-        stat.Add(new stats());
+        stats new_stat = new stats();
+        new_stat.inv.inv.Add(new item("spear", 1, "weapon"));
+        new_stat.inv.inv.Add(new item("health_potion", 3, "item"));
+        stat.Add(new_stat);
         your_name.GetComponent<TMP_InputField>().onEndEdit.AddListener(delegate{start_new(your_name.GetComponent<TMP_InputField>().text);});
     }
 

@@ -14,14 +14,14 @@ public unsafe class player_control : MonoBehaviour
 {
     public float cursor_speed, dash_force, stun_lock_period, dash_stamina, stamina_cost_l, stamina_cost, stamina_increment, stamina, walkAcceleration, item_speed, range, l_range, death_period, health, lock_dura, lock_angle;
     public float speed;
-    public bool use_controller, attack_interrupted, stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, start_new_dash = true, using_item, ramming = true;
+    public bool menu_open, use_controller, attack_interrupted, stop, restore_stamina = true, locked_on, new_input, new_input_l, attacking, movable, dashing, start_new_dash = true, using_item, ramming = true;
     public stats player_stat, unbuffed_player_stat;
     public world_details current_world;
     public bool* pattacking, pattacking_l;
     damage_manager damages;
-    public AudioSource walking_sound, dashing_sound;
+    public AudioSource walking_sound, dashing_sound, dying_sound;
     public Vector2 velocity = new Vector2();
-    public Vector3 previous_angle = new Vector3();
+    public Vector3 previous_angle = new Vector3(), previous_mouse_pos = new Vector3();
     Vector3 init_loc = new Vector3();
     public GameObject npc_marker, locked_npc, n_marker, locked_enemy, marker, rweapon, overlay, death_screen, menu, inventory_content, lweapon, lock_on_marker;
     TMPro.TextMeshProUGUI Exp;
@@ -38,6 +38,7 @@ public unsafe class player_control : MonoBehaviour
         AudioSource[] auds = GameObject.Find("walking_sound").GetComponents<AudioSource>();
         walking_sound = auds[0];
         dashing_sound = auds[1];
+        dying_sound = auds[2];
         orig_cam_size = Camera.main.orthographicSize; 
         update_weapon(rweapon, lweapon);
         if(rweapon!=null){
@@ -66,7 +67,7 @@ public unsafe class player_control : MonoBehaviour
         health = player_stat.health;
         speed = player_stat.spd;
         stamina = player_stat.stamina;
-
+        if(unbuffed_player_stat.exp_pos_x!=float.PositiveInfinity&&GameObject.Find("lost_exp(Clone)")==null) GameObject.Instantiate(Resources.Load<GameObject>("prefab/lost_exp"), new Vector3(unbuffed_player_stat.exp_pos_x, unbuffed_player_stat.exp_pos_y, 0f), Quaternion.identity);
         statics.apply_world_details();
     }
 
@@ -283,18 +284,20 @@ public unsafe class player_control : MonoBehaviour
         }
         if(Input.GetKeyDown("escape")||Input.GetButtonDown("xboxStart")){
             //Debug.Log("wtf");
-            if(menu.GetComponent<RectTransform>().localScale==Vector3.one) menu.GetComponent<RectTransform>().localScale= Vector3.zero;
-            else menu.GetComponent<RectTransform>().localScale=Vector3.one;
+            if(menu.GetComponent<RectTransform>().localScale==Vector3.one) {
+                menu.GetComponent<RectTransform>().localScale= Vector3.zero;
+                menu_open = false;
+            }
+            else {
+                menu.GetComponent<RectTransform>().localScale=Vector3.one;
+                menu_open = true;
+                body.velocity = Vector2.zero;
+                return;
+            }
         }
-        if(menu.GetComponent<RectTransform>().localScale == Vector3.one){
-            move_cursor_with_controller();
-            return;
-        }
-        if(!ramming) {
-            if(pattacking!=null) attacking = *pattacking;
-            if(pattacking_l!=null&&!attacking) attacking = *pattacking_l;
-        }
-        else attacking = dashing;
+        if(menu_open)return;
+        if(pattacking!=null) attacking = *pattacking;
+        if(pattacking_l!=null) attacking = *pattacking_l;
         if(attacking||using_item) {
             body.velocity = Vector2.zero;
         }
@@ -360,6 +363,7 @@ public unsafe class player_control : MonoBehaviour
     }
 
     public IEnumerator death(){
+        dying_sound.Play();
         GetComponent<Collider2D>().enabled = false;
         body.velocity = Vector2.zero;
         walking_sound.mute = true;
@@ -374,6 +378,8 @@ public unsafe class player_control : MonoBehaviour
             yield return new WaitForSeconds(Time.deltaTime);
         }
         GameObject.Instantiate(Resources.Load<GameObject>("prefab/lost_exp"), transform.position, Quaternion.identity);
+        unbuffed_player_stat.exp_pos_x = transform.position.x;
+        unbuffed_player_stat.exp_pos_y = transform.position.y;
         yield return new WaitForSeconds(1f);
         gameObject.name = "old_player";
         //save so that the player can't revert their death
@@ -387,7 +393,7 @@ public unsafe class player_control : MonoBehaviour
     {
         if(health<=0f) return;
         if(walking_sound!=null) walking_sound.mute = true;
-        if(!dashing&&!stop&&!attacking) move();
+        if(!dashing&&!stop&&!attacking&&!menu_open) move();
         Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
     }
 
@@ -406,15 +412,19 @@ public unsafe class player_control : MonoBehaviour
         //transform.Translate(velocity * Time.fixedDeltaTime);
 
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector2 direction;
+        Vector2 direction = new Vector2();
         
         if(locked_enemy!=null){
             direction = locked_enemy.transform.position-transform.position;
             previous_angle = new Vector3(0f,0f,Vector2.SignedAngle(Vector2.up, direction));
         }
         else{
-            direction = (Vector2)((worldMousePos - transform.position));
-            if(Input.GetAxis("xboxHorizontal")!=0||Input.GetAxis("xboxVertical")!=0) direction = new Vector2(Input.GetAxis("xboxHorizontal"), -Input.GetAxis("xboxVertical"));
+            if(Input.GetAxis("xboxHorizontal")!=0||Input.GetAxis("xboxVertical")!=0) {
+                direction = new Vector2(Input.GetAxis("xboxHorizontal"), -Input.GetAxis("xboxVertical"));
+            }
+            else {
+                direction = (Vector2)((worldMousePos - transform.position));
+            }
         }
         if(attacking) {
             transform.eulerAngles = previous_angle;

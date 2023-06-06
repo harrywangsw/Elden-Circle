@@ -121,7 +121,7 @@ MonoBehaviour:
   attacking: 0
   thrust_vel: 10
   thrust_period: 0.2
-  range: 5
+  range: 8
   parriable_window: 1
   stamina_cost: 10
   init_loc: {x: 0, y: 0, z: 0}

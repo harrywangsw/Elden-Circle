@@ -158,7 +158,9 @@ MonoBehaviour:
     mag_dmg: 1
     stamina: 100
     spd: 10
-    exp: 100
+    exp_pos_x: Infinity
+    exp_pos_y: Infinity
+    exp: 40
     level: 0
     exp_lost: 0
     name: 

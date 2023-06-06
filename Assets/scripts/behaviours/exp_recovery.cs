@@ -31,6 +31,8 @@ public class exp_recovery : MonoBehaviour
         if(Input.GetButtonDown("confirm")&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="recover lost exp"){
             player.unbuffed_player_stat.exp+=player.unbuffed_player_stat.exp_lost;
             player.unbuffed_player_stat.exp_lost = 0;
+            player.unbuffed_player_stat.exp_pos_x = float.PositiveInfinity;
+            player.unbuffed_player_stat.exp_pos_y = float.PositiveInfinity;
             if(swi.messages.IndexOf("recover lost exp")>=0) swi.messages.RemoveAt(ind);
             Destroy(gameObject);
             return;

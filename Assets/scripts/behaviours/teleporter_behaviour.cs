@@ -43,6 +43,8 @@ public class teleporter_behaviour : MonoBehaviour
             player_control pc = player.GetComponent<player_control>();
             pc.current_world.player_pos_x = 0f;
             pc.current_world.player_pos_y = 0f;
+            pc.unbuffed_player_stat.exp_pos_x = float.PositiveInfinity;
+            pc.unbuffed_player_stat.exp_pos_y = float.PositiveInfinity;
             StartCoroutine(statics.load_new_world(destination, pc.current_world, pc.unbuffed_player_stat, gameObject));
         }
     }

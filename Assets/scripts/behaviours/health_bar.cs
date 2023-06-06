@@ -8,6 +8,7 @@ public class health_bar : MonoBehaviour
     public float p_health, e_health, max_p_health, max_e_health, max_p_stamina, p_stamina;
     player_control control;
     public GameObject enemy_health_bar, stamina_bar;
+    public bool boss_fight;
     void Start()
     {
         p = GameObject.Find("player");
@@ -23,6 +24,7 @@ public class health_bar : MonoBehaviour
         p_stamina = control.stamina;
         max_p_stamina = control.player_stat.stamina;
         stamina_bar.transform.localScale = new Vector3(p_stamina/max_p_stamina, 1, 1);
+        if(boss_fight) return;
         if(control.locked_enemy==null) {
             enemy_health_bar.transform.parent.localScale = Vector3.zero;
             return;

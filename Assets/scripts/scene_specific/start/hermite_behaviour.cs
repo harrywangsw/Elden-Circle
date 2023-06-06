@@ -5,16 +5,18 @@ using TMPro;
 
 public class hermite_behaviour : MonoBehaviour
 {
-    public GameObject boss_stopper, teleporter, message_screen;
+    public GameObject boss_stopper, teleporter, message_screen, enemy_health_bar;
     npc_control n;
     rope r;
     player_control player;
-    public float health;
+    public float health, max_health;
     public stats stat;
 
     void Start()
     {
+        health =  max_health;
         player = GameObject.Find("player").GetComponent<player_control>();
+        enemy_health_bar = GameObject.Find("enemy_health_bar");
         n = GetComponent<npc_control>();
         r = GetComponent<rope>();
         r.enabled = false;
@@ -27,9 +29,18 @@ public class hermite_behaviour : MonoBehaviour
             teleporter.SetActive(true);
             Destroy(gameObject);
         }
-        if(!n.enabled) return;
+        //if the boss fight has started
+        if(r.enabled) {
+            enemy_health_bar.transform.parent.localScale = Vector3.one;
+            enemy_health_bar.transform.localScale = new Vector3(health/max_health, 1, 1);
+            return;
+        }
         //if the boss has finished the monologue
-        if(n.index==1) {
+        if(player.current_world.npc_index["Hermite"]==1){
+            n.force_talk = false;
+        }
+        if(player.current_world.npc_index["Hermite"]==1&&n.entered) {
+            GameObject.Find("player_health_bar").GetComponent<health_bar>().boss_fight = true;
             GetComponent<AudioSource>().Play();
             message_screen.GetComponent<switchmessages>().messages.Remove("press enter/B to talk");
             boss_stopper.SetActive(true);
@@ -68,8 +79,8 @@ public class hermite_behaviour : MonoBehaviour
         teleporter.SetActive(true);
         teleporter.transform.position = transform.position;
         player.current_world.hermite_dead = true;
-        save_load.SavePlayer(player.player_stat);
-        save_load.Saveworld(player.current_world, player.player_stat.name);
+        save_load.SavePlayer(player.unbuffed_player_stat);
+        save_load.Saveworld(player.current_world, player.unbuffed_player_stat.name);
     }
 
     void OnCollisionEnter2D(Collision2D c){

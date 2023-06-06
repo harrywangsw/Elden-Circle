@@ -6,19 +6,25 @@ using System.Linq;
 using TMPro;
 using System;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.LowLevel;
 
 public class inventory_manager : MonoBehaviour
 {
-    public GameObject row, last_slot, up, right, left, empty_slot;
+    public GameObject row, last_slot, up, right, left, empty_slot, menu;
     public bool right_triggered, left_triggered, dpadverti_triggered, dpadhori_triggered;
     player_control p;
+    public float cursor_speed = 888f, scroll_speed = 8f;
     public int i, current_itemr, current_iteml, current_itemu;
     public List<GameObject> u_gameobjects = new List<GameObject>(), l_gameobjects = new List<GameObject>(), r_gameobjects = new List<GameObject>();
     public GameObject tut_tab, inv_tab, settings_tab;
     public TMPro.TextMeshProUGUI current_tab_text, left_tab_text, right_tab_text;
     public Button quit_to_menu, quit_to_desktop;
+    public ScrollRect inventory_scroll;
     void Start()
     {
+        menu = GameObject.Find("item_menu");
         quit_to_menu.onClick.AddListener(delegate{StartCoroutine(quit_menu());});
         quit_to_desktop.onClick.AddListener(delegate{Application.Quit();});
         p = GameObject.Find("player").GetComponent<player_control>();
@@ -31,6 +37,15 @@ public class inventory_manager : MonoBehaviour
         u_gameobjects.Add(empty_slot);
         l_gameobjects.Add(empty_slot);
         r_gameobjects.Add(empty_slot);
+    }
+
+    void move_cursor_with_controller(){
+        if(Input.GetAxis("Vertical")!=0f){
+            float contentHeight = inventory_scroll.content.sizeDelta.y;
+            float contentShift = scroll_speed * Input.GetAxis("Vertical") * Time.deltaTime;
+            inventory_scroll.verticalNormalizedPosition += contentShift / contentHeight;
+        }
+        if(Input.GetAxis("xboxHorizontal")!=0||Input.GetAxis("xboxVertical")!=0) Mouse.current.WarpCursorPosition((Vector2)Input.mousePosition+new Vector2(Input.GetAxis("xboxHorizontal"), -Input.GetAxis("xboxVertical"))*cursor_speed*Time.deltaTime);
     }
 
     public IEnumerator quit_menu(){
@@ -176,6 +191,9 @@ public class inventory_manager : MonoBehaviour
 
     void Update()
     {
+        if(menu.GetComponent<RectTransform>().localScale == Vector3.one){
+            move_cursor_with_controller();
+        }
         if(transform.parent.parent.parent.parent.localScale.x == 0f) switch_quickslot_item();
         else if((Input.GetAxis("xboxrtrigger")==1f||Input.GetKeyDown("2"))&&!right_triggered){
             right_triggered = true;

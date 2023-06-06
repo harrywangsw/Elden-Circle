@@ -10,12 +10,14 @@ public class stats
     //note that all of these def and dmg stats are multiplyers
     public float slash_def, strike_def, pierce_def, mag_def, health, dash_dura, item_speed, health_up_amount;
     public float slash_dmg, strike_dmg, peirce_dmg, mag_dmg, stamina;
-    public float spd;
+    public float spd, exp_pos_x, exp_pos_y;
     public int exp, level, exp_lost;
     public string name;
     public inventory inv;
     public stats()
     {
+        exp_pos_x = float.PositiveInfinity;
+        exp_pos_y = float.PositiveInfinity;
         slash_def = 1f;
         strike_def = 1f;
         pierce_def = 1f;
