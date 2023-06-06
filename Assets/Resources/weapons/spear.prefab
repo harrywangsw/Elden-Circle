@@ -102,7 +102,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slash: 12
   strike: 2
-  pierce: 88
+  pierce: 8
   magic: 0
 --- !u!114 &4370679048650191015
 MonoBehaviour:

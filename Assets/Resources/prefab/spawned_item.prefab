@@ -97,6 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a921fa436b6529c4388c2d9f0538fb35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ding: {fileID: 6035467070879620963, guid: 2011037aec6f47e448ae7b8f322306f0, type: 3}
   trigger_dist: 4
   flash_period: 0.8
   type: 

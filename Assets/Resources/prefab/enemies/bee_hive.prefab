@@ -148,7 +148,7 @@ MonoBehaviour:
     strike_def: 1
     pierce_def: 1
     mag_def: 1
-    health: 800
+    health: 400
     dash_dura: 0.2
     item_speed: 1
     health_up_amount: 100

@@ -77,7 +77,7 @@ public unsafe class glint_stone : MonoBehaviour
     IEnumerator check_for_new_attack(Rigidbody2D body){
         StartCoroutine(end(body));
         float time = 0f;
-        while(time<0.5f*range/speed){
+        while(time<0.3f*range/speed){
             if(body==null){
                 break;
             }

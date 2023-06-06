@@ -40,7 +40,10 @@ public class teleporter_behaviour : MonoBehaviour
         if(c.collider.gameObject.name=="player"){
             GameObject player = GameObject.Find("player");
             player.name = "old_player";
-            StartCoroutine(statics.load_new_world(destination, c.gameObject.GetComponent<player_control>().current_world, c.gameObject.GetComponent<player_control>().unbuffed_player_stat, gameObject));
+            player_control pc = player.GetComponent<player_control>();
+            pc.current_world.player_pos_x = 0f;
+            pc.current_world.player_pos_y = 0f;
+            StartCoroutine(statics.load_new_world(destination, pc.current_world, pc.unbuffed_player_stat, gameObject));
         }
     }
 }

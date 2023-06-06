@@ -16,8 +16,8 @@ public class button_hover_behavior : MonoBehaviour
     }
 
     public void show_instructions(){
-        if(increase) message.text = "press left mouse button/A to level-up";
-        else message.text = "press left mouse button/A to level-down";
+        if(increase) message.text = "press left mouse button/B to level-up";
+        else message.text = "press left mouse button/B to level-down";
         wait_for_input = true;
     }
 

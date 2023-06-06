@@ -47,28 +47,21 @@ public class inventory_manager : MonoBehaviour
         {
             if(p.unbuffed_player_stat.inv.inv[i].num_left==0) continue;
             GameObject it = Resources.Load<GameObject>("prefab/UI_items/"+p.unbuffed_player_stat.inv.inv[i].item_name);
-            add_item(it, p.unbuffed_player_stat.inv.inv[i].num_left);
+            it = add_item(it, p.unbuffed_player_stat.inv.inv[i].num_left);
 
             //quickslot_up/down/left/right_indexes are the indexes of inv that represent the items in each respective quickslot
             //u/d/l/r_gameobjects are the gameobject for each item
             if(p.unbuffed_player_stat.inv.quickslot_up_indexes.FindIndex(x=>x==i)>=0){
                 u_gameobjects.Add(it);
+                switchu();
             }
             if(p.unbuffed_player_stat.inv.quickslot_right_indexes.FindIndex(x=>x==i)>=0){
                 r_gameobjects.Add(it);
+                switchr();
             }
             if(p.unbuffed_player_stat.inv.quickslot_left_indexes.FindIndex(x=>x==i)>=0){
                 l_gameobjects.Add(it);
-            }
-
-            if(r_gameobjects.Count>0){
-                switchr();
-            }
-            if(l_gameobjects.Count>0){
                 switchl();
-            }
-            if(u_gameobjects.Count>0){
-                switchu();
             }
         }
     }
@@ -119,8 +112,7 @@ public class inventory_manager : MonoBehaviour
             dpadhori_triggered =true;
             if(Input.mouseScrollDelta.y>0f) current_itemr = (current_itemr+1)%r_gameobjects.Count;
             else if(current_itemr==0){
-                current_itemr = r_gameobjects.Count;
-                current_itemr = (current_itemr-1)%r_gameobjects.Count;
+                current_itemr = r_gameobjects.Count-1;
             }
             else{
                 current_itemr = (current_itemr-1)%r_gameobjects.Count;
@@ -132,21 +124,20 @@ public class inventory_manager : MonoBehaviour
             dpadhori_triggered =true;
             if(Input.mouseScrollDelta.y>0f) current_iteml = (current_iteml+1)%l_gameobjects.Count;
             else if(current_iteml==0){
-                current_iteml = l_gameobjects.Count;
-                current_iteml = (current_iteml-1)%l_gameobjects.Count;
+                current_iteml = l_gameobjects.Count-1;
             }
             else{
-                current_iteml = (current_itemr-1)%l_gameobjects.Count;
+                current_iteml = (current_iteml-1)%l_gameobjects.Count;
             }
             switchl();
         }
 
         else if((Input.mouseScrollDelta.y!=0f||Input.GetAxis("xboxdpadverti")>0.75f)&&u_gameobjects.Count>0&&!dpadverti_triggered){
             dpadverti_triggered = true;
+            Debug.Log("what");
             if(Input.mouseScrollDelta.y>0f) current_itemu = (current_itemu+1)%u_gameobjects.Count;
             else if(current_itemu==0){
-                current_itemu = u_gameobjects.Count;
-                current_itemu = (current_itemu-1)%u_gameobjects.Count;
+                current_itemu = u_gameobjects.Count-1;
             }
             else{
                 current_itemu = (current_itemu-1)%u_gameobjects.Count;
@@ -185,7 +176,7 @@ public class inventory_manager : MonoBehaviour
 
     void Update()
     {
-        if(transform.parent.parent.parent.parent.localScale == Vector3.zero) switch_quickslot_item();
+        if(transform.parent.parent.parent.parent.localScale.x == 0f) switch_quickslot_item();
         else if((Input.GetAxis("xboxrtrigger")==1f||Input.GetKeyDown("2"))&&!right_triggered){
             right_triggered = true;
             swich_tabs(true);
@@ -199,7 +190,7 @@ public class inventory_manager : MonoBehaviour
     }
 
     //add an item into the inventory menu and hope that it has already been added to unbuffed_player_stat.inv
-    public void add_item(GameObject item, int num){
+    public GameObject add_item(GameObject item, int num){
         Transform tran = last_slot.transform;
         tran.GetChild(1).gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = num.ToString();
         GameObject item_inserted = GameObject.Instantiate(item, tran);
@@ -218,6 +209,7 @@ public class inventory_manager : MonoBehaviour
             Transform next_row = tran.parent.parent.GetChild(tran.parent.GetSiblingIndex()+1);
             last_slot = next_row.GetChild(0).gameObject;
         }
+        return tran.gameObject;
     }
 
     public void remove_item_from_quickslot(GameObject item){

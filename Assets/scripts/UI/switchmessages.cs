@@ -36,8 +36,8 @@ public class switchmessages : MonoBehaviour
         else{
             m_background.color = new Color(1f, 1f, 1f, 0f);
         }
-        if(messages.Count>1) switch_guide.SetActive(true);
-        else switch_guide.SetActive(false);
+        if(messages.Count>1) switch_guide.transform.parent.localScale = Vector3.one;
+        else switch_guide.transform.parent.localScale = Vector3.zero;
         if(messages.Count>0) {
             message_screen.GetComponent<TMPro.TextMeshProUGUI>().text = messages[(current)%messages.Count];
         }

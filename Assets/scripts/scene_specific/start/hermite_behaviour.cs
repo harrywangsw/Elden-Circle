@@ -24,11 +24,13 @@ public class hermite_behaviour : MonoBehaviour
     void Update()
     {
         if(player.current_world.hermite_dead){
+            teleporter.SetActive(true);
             Destroy(gameObject);
         }
         if(!n.enabled) return;
         //if the boss has finished the monologue
         if(n.index==1) {
+            GetComponent<AudioSource>().Play();
             message_screen.GetComponent<switchmessages>().messages.Remove("press enter/B to talk");
             boss_stopper.SetActive(true);
             r.enabled = true;
@@ -39,6 +41,7 @@ public class hermite_behaviour : MonoBehaviour
 
     IEnumerator diag(){
         boss_stopper.SetActive(false);
+        StartCoroutine(lower_volume());
         GameObject dialogue_screen = GameObject.Find("dialogue_screen");
         TMPro.TextMeshProUGUI dialogue_text_bar = dialogue_screen.GetComponent<TMPro.TextMeshProUGUI>();
         dialogue_screen.transform.parent.localScale = Vector3.one;
@@ -77,6 +80,15 @@ public class hermite_behaviour : MonoBehaviour
         if(health<=0f){
             StartCoroutine(diag());
             GetComponent<rope>().dead = true;
+        }
+    }
+
+    IEnumerator lower_volume(){
+        float time = 0f;
+        while(time<4f){
+            GetComponent<AudioSource>().volume-=Time.deltaTime/4f;
+            time+=Time.deltaTime;
+            yield return new WaitForSeconds(Time.deltaTime);
         }
     }
 }

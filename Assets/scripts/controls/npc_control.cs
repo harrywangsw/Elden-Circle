@@ -111,6 +111,7 @@ public class npc_control : MonoBehaviour
             in_conversation = false;
             force_talk = false;
             //switch to the buffer dialogue if we're not on the buffer dialogue right now
+            Debug.Log(p.current_world.npc_index[gameObject.name].ToString()+" "+index.ToString());
             if(index%2==0) p.current_world.npc_index[gameObject.name]+=1;
             start_new_lines();
             return;

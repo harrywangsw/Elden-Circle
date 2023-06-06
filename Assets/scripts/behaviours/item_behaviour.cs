@@ -6,6 +6,7 @@ using UnityEngine;
 public class item_behaviour : MonoBehaviour
 {
     GameObject player, message_screen;
+    public GameObject ding;
     public float trigger_dist, flash_period;
     public string type;
     public bool entered = false;
@@ -52,6 +53,7 @@ public class item_behaviour : MonoBehaviour
         if(Input.GetButtonDown("confirm")&&message_screen.GetComponent<TMPro.TextMeshProUGUI>().text=="press enter to pick up item"&&entered){
                 int i;
                 StartCoroutine(temp_message.show_message("picked up a "+gameObject.name.Replace('_', ' ')));
+                GameObject.Instantiate(ding, transform.position, Quaternion.identity);
                 //if the player already has the item in inventory, add one to the item's count
                 for(i=0; i<plac.unbuffed_player_stat.inv.inv.Count; i++){
                     //Debug.Log(plac.unbuffed_player_stat.inv.inv[i].item_name);

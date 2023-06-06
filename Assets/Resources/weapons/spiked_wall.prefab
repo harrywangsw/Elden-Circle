@@ -46,8 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   slash: 0
-  strike: 2
-  pierce: 8
+  strike: 8
+  pierce: 10
   magic: 0
 --- !u!114 &419691569167481888
 MonoBehaviour:
@@ -64,11 +64,11 @@ MonoBehaviour:
   new_input: 0
   attacking: 0
   attack_interrupted: 0
-  range: 10
+  range: 18
   stamina_cost: 30
   init_loc: {x: 0, y: 0, z: 0}
   user: {fileID: 0}
   wall: {fileID: 6585350171406650642, guid: 4f1a7fd95b232064da2a97e760a232db, type: 3}
-  period: 1
+  period: 0.2
   vel: 23
   init_new_attacking: 1

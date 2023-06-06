@@ -20,10 +20,10 @@ public class stats
         strike_def = 1f;
         pierce_def = 1f;
         mag_def = 1f;
-        health = 888f;
+        health = 100f;
         dash_dura = 0.2f;
         item_speed = 1f;
-        health_up_amount = 100f;
+        health_up_amount = 30f;
         slash_dmg = 1f;
         strike_dmg = 1f;
         peirce_dmg = 1f;

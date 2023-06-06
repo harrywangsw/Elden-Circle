@@ -69,7 +69,6 @@ public static class statics
             doors[i].GetComponent<doors>().num = i;
             bool closed = doors[i].GetComponent<Collider2D>().enabled;
             if(i>=pc.current_world.opened_doors[world_num].Count) {
-                Debug.Log("world num: "+world_num.ToString()+" num: "+doors[i].GetComponent<doors>().num.ToString());
                 pc.current_world.opened_doors[world_num].Add(!closed);
             }
             //if door is closed but saved world detail say it's open, then open it
@@ -99,6 +98,9 @@ public static class statics
         //         break;
         //     }
         // }
+        if(world_name=="start"){
+            Camera.main.gameObject.GetComponent<start_level_management>().late_start(world);
+        }
         UnityEngine.Object.Destroy(GameObject.Find("old_player"));
         if(loader_object!=null) UnityEngine.Object.Destroy(loader_object);
         player_control p = GameObject.Find("player").GetComponent<player_control>();

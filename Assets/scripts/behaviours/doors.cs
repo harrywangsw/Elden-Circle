@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.AI;
 
 public class doors : MonoBehaviour
 {
@@ -16,9 +17,12 @@ public class doors : MonoBehaviour
     GameObject message_screen;
     reactive_messages temporary_messages;
     switchmessages swi;
+    //NavMeshSurface nm_big, nm_small;
 
     void Start()
     {
+        // nm_big = GameObject.Find("Nav Mesh 2D").GetComponent<NavMeshSurface>();
+        // nm_small = GameObject.Find("Nav Mesh 2D (big)").GetComponent<NavMeshSurface>();
         player = GameObject.Find("player");
         message_screen = GameObject.Find("message_screen");
         swi = message_screen.GetComponent<switchmessages>();
@@ -64,6 +68,8 @@ public class doors : MonoBehaviour
     }
 
     IEnumerator open(){
+        // nm_big.UpdateNavMesh(nm_big.navMeshData);
+        // nm_small.UpdateNavMesh(nm_small.navMeshData);
         float time = 0f;
         SpriteRenderer sp = gameObject.GetComponent<SpriteRenderer>();
         swi.messages.Remove("press enter to open the door");

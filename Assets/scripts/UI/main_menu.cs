@@ -86,6 +86,14 @@ public class main_menu : MonoBehaviour
     }
 
     public void start_new(string name){
+        // string path = save_load.save_path;
+        // DirectoryInfo info = new DirectoryInfo(path);
+        // foreach (FileInfo file in info.GetFiles().OrderBy(f=>f.CreationTime).ToArray()){
+        //     //Debug.Log(file);
+        //     if(file.FullName.Split(".")[0]==name){
+        //         your_name.GetComponent<TMP_InputField>().placeholder.GetComponent<TMPro.TextMeshProUGUI>().text = "This name has been used already. Please come up with another.";
+        //     }
+        // }
         stat[worlds.Count-1].name = name;
         save_load.SavePlayer(stat[stat.Count-1]);
         save_load.Saveworld(worlds[worlds.Count-1], name);

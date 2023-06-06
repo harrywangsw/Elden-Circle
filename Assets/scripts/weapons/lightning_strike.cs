@@ -11,14 +11,12 @@ public unsafe class lightning_strike : MonoBehaviour
     public bool attacking, new_input, init_new_attack=true;
     public Vector3 offset, new_loc, init_loc;
     public GameObject lightning_piece;
-    damage_manager selfd;
     Collider2D userc;
     stats enemy_stat, player_stat;
 
     void Start()
     {
         userc = transform.parent.gameObject.GetComponent<Collider2D>();
-        selfd = GetComponent<damage_manager>();
         if(transform.parent.GetComponent<enemy_control>()!=null){
             enemy_stat = transform.parent.GetComponent<enemy_control>().enemy_stat;
         }
@@ -60,7 +58,8 @@ public unsafe class lightning_strike : MonoBehaviour
     GameObject spawn_new_piece(float angle, Vector3 new_location){
         GameObject p = GameObject.Instantiate(lightning_piece, new_location, Quaternion.AngleAxis(angle, Vector3.forward));    
         p.transform.localScale*=transform.parent.localScale.x;
-        statics.apply_stats(GetComponent<damage_manager>(), p.GetComponent<damage_manager>(), new stats());
+        if(player_stat!=null) statics.apply_stats(p.GetComponent<damage_manager>(), p.GetComponent<damage_manager>(), player_stat);
+        else statics.apply_stats(p.GetComponent<damage_manager>(), p.GetComponent<damage_manager>(), enemy_stat);
         Physics2D.IgnoreCollision(p.GetComponent<Collider2D>(), userc, true);
         return p;
     }

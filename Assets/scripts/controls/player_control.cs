@@ -19,6 +19,7 @@ public unsafe class player_control : MonoBehaviour
     public world_details current_world;
     public bool* pattacking, pattacking_l;
     damage_manager damages;
+    public AudioSource walking_sound, dashing_sound;
     public Vector2 velocity = new Vector2();
     public Vector3 previous_angle = new Vector3();
     Vector3 init_loc = new Vector3();
@@ -34,6 +35,9 @@ public unsafe class player_control : MonoBehaviour
 
     void Start()
     {
+        AudioSource[] auds = GameObject.Find("walking_sound").GetComponents<AudioSource>();
+        walking_sound = auds[0];
+        dashing_sound = auds[1];
         orig_cam_size = Camera.main.orthographicSize; 
         update_weapon(rweapon, lweapon);
         if(rweapon!=null){
@@ -272,6 +276,7 @@ public unsafe class player_control : MonoBehaviour
     {
         //current_world = new world_details();
         // Debug.Log(player_stat.inv.inv[0].num_left.ToString()+" "+player_stat.inv.inv[1].num_left.ToString());
+        if(health<=0f) return;
         if(stop){
             body.velocity = Vector2.zero;
             return;
@@ -336,6 +341,7 @@ public unsafe class player_control : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D c)
     {
+        if(health<=0f) return;
         damage_manager d = c.collider.gameObject.GetComponent<damage_manager>();
         if(!d) return;   
         attack_interrupted = true;
@@ -343,7 +349,7 @@ public unsafe class player_control : MonoBehaviour
         health -= statics.calc_damage(player_stat, d);
         StartCoroutine(statics.animate_hurt(player_sprite));
         StartCoroutine(hurt());
-        if (health < 0f) StartCoroutine(death());
+        if (health <= 0f) StartCoroutine(death());
     }
 
     IEnumerator hurt(){
@@ -355,6 +361,8 @@ public unsafe class player_control : MonoBehaviour
 
     public IEnumerator death(){
         GetComponent<Collider2D>().enabled = false;
+        body.velocity = Vector2.zero;
+        walking_sound.mute = true;
         unbuffed_player_stat.exp_lost = unbuffed_player_stat.exp;
         unbuffed_player_stat.exp = 0;
         overlay.SetActive(false);
@@ -377,6 +385,8 @@ public unsafe class player_control : MonoBehaviour
 
     void FixedUpdate()
     {
+        if(health<=0f) return;
+        if(walking_sound!=null) walking_sound.mute = true;
         if(!dashing&&!stop&&!attacking) move();
         Camera.main.gameObject.GetComponent<Transform>().position = new Vector3(transform.position.x, transform.position.y, -10f);
     }
@@ -392,6 +402,7 @@ public unsafe class player_control : MonoBehaviour
         velocity.y = Mathf.MoveTowards(velocity.y, speed * moveInput.y, walkAcceleration * Time.fixedDeltaTime);
         //velocity = Quaternion.AngleAxis(-transform.eulerAngles.z, Vector3.forward) * velocity;
         body.velocity = velocity;
+        if(velocity.magnitude>speed*0.08f)walking_sound.mute = false;
         //transform.Translate(velocity * Time.fixedDeltaTime);
 
         Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -433,6 +444,7 @@ public unsafe class player_control : MonoBehaviour
     IEnumerator dash()
     {
         dashing = true;
+        dashing_sound.Play();
         player_sprite.color = Color.grey;
         float time = 0f;
         while(time<player_stat.dash_dura){
@@ -555,7 +567,7 @@ public unsafe class player_control : MonoBehaviour
             return;
         }
         foreach(enemy_control enemy_c in enemies){
-            if(enemy_c.gameObject==null) {
+            if(enemy_c==null) {
                 enemies.Remove(enemy_c);
                 continue;
             }
