@@ -3,5 +3,7 @@
 
 External contirbutors:
 Lewis Stone (Student at Merivale High School): a soundtrack in the game
+
 h8man: navmesh 2d (https://github.com/h8man/NavMeshPlus)
+
 coding monkey: FOV script (https://unitycodemonkey.com/video_comments.php?v=CSeUMTaNFYk)
